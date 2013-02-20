@@ -1,4 +1,4 @@
-OBJS=../datareader.o ../readfiles.o
+OBJS=../datareader.o ../readfiles.o ../tipsy_io.o
 
 all:
 	g++ -c dataconverter.cpp

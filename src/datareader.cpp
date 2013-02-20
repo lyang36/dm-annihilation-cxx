@@ -1,3 +1,10 @@
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <cstring>
+#include <rpc/xdr.h>
+#include <rpc/types.h>
+#include "tipsydefs.h"
 #include "readfiles.h"
 #include "datareader.h"
 
@@ -20,7 +27,7 @@ DataReader::~DataReader(){
 bool DataReader::readParticle(){
     int loopi;
    
-    Tipsyheader tips;
+    tipsy_header tips;
     XDRFileReader::read_tipsyheader(particle_file_name, &tips);
     numParts_ = tips.ndark;
     Pdm * dmpart;
@@ -29,15 +36,15 @@ bool DataReader::readParticle(){
     //copy the data to the DMparticles array
     particles = new DMParticle[numParts_];
     for(loopi = 0; loopi < numParts_; loopi++){
-        particles[i].mass = dmpart[i].mass;
-        particles[i].posx = dmpart[i].pos[0];
-        particles[i].posy = dmpart[i].pos[1];
-        particles[i].posz = dmpart[i].pos[2];
-        particles[i].velx = dmpart[i].vel[0];
-        particles[i].vely = dmpart[i].vel[1];
-        particles[i].velz = dmpart[i].vel[2];
-        particles[i].eps = dmpart[i].eps;
-        particles[i].phi = dmpart[i].phi;
+        particles[loopi].mass = dmpart[loopi].mass;
+        particles[loopi].posx = dmpart[loopi].pos[0];
+        particles[loopi].posy = dmpart[loopi].pos[1];
+        particles[loopi].posz = dmpart[loopi].pos[2];
+        particles[loopi].velx = dmpart[loopi].vel[0];
+        particles[loopi].vely = dmpart[loopi].vel[1];
+        particles[loopi].velz = dmpart[loopi].vel[2];
+        particles[loopi].eps = dmpart[loopi].eps;
+        particles[loopi].phi = dmpart[loopi].phi;
     }
     delete dmpart;
     
@@ -50,20 +57,20 @@ bool DataReader::readParticle(){
         exit(1);
     }
     for(loopi = 0; loopi < numParts_; loopi++){
-        particles[i].dens = density[i];
+        particles[loopi].dens = density[loopi];
     }
     delete density;
     
     //reader scalars
     float * hsmooth;
-    int testn = 0;
+    //int testn = 0;
     XDRFileReader::read_scalar(density_file_name, hsmooth, testn);
     if(testn != numParts_){
         printf("Number of particles not consistent!\n");
         exit(1);
     }
     for(loopi = 0; loopi < numParts_; loopi++){
-        particles[i].hsmooth = hsmooth[i];
+        particles[loopi].hsmooth = hsmooth[loopi];
     }
     delete hsmooth;
     
@@ -71,17 +78,17 @@ bool DataReader::readParticle(){
     for(loopi = 0; loopi < numParts_; loopi++){
         printf("Particle %d:{%e, %e, %e, %e, %e, %e, %e, %e, %e, %e, %e}\n",
                loopi,
-               particles[i].mass,
-               particles[i].dens,
-               particles[i].hsmooth,
-               particles[i].posx,
-               particles[i].posy,
-               particles[i].posz,
-               particles[i].velx,
-               particles[i].vely,
-               particles[i].velz,
-               particles[i].eps,
-               particles[i].phi)
+               particles[loopi].mass,
+               particles[loopi].dens,
+               particles[loopi].hsmooth,
+               particles[loopi].posx,
+               particles[loopi].posy,
+               particles[loopi].posz,
+               particles[loopi].velx,
+               particles[loopi].vely,
+               particles[loopi].velz,
+               particles[loopi].eps,
+               particles[loopi].phi);
     }
 #endif
     return true;
@@ -91,6 +98,6 @@ DMParticle * DataReader::getParticles(){
     return particles;
 }
 
-int DMParticle::getNumParts(){
+int DataReader::getNumParts(){
     return numParts_;
 }
