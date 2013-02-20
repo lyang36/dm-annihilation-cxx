@@ -17,10 +17,10 @@
 using namespace std;
 
 
-void XDRFileReader::read_tipsyheader(string filename, Tipsyheader * tipsyheader){
+void XDRFileReader::read_tipsyheader(string filename, tipsy_header * tipsyheader){
 	char fi[255];
 	strcpy(fi, filename.c_str());
-	read_tipsy_header(fi, &tipsyheader);
+	read_tipsy_header(fi, tipsyheader);
 }
 
 
@@ -30,15 +30,15 @@ void XDRFileReader::read_particles(string filename, Pdm * particles){
 	XDR xdrs;
 	char fi[255];
     
-    Tipsyheader tips;
+    tipsy_header tips;
     
 	//keywords
 	//positions keyword overrides the {xyz}pos keywords
     
-	strcpy(fi, filename->c_str());
+	strcpy(fi, filename.c_str());
 	fp=fopen(fi,"r");
 	if(!fp) {
-		fprintf(stderr,"Problem opening file: %s\n",filename);
+		fprintf(stderr,"Problem opening file: %s\n",filename.c_str());
 		exit(1);
 		return ;
 	}
@@ -46,7 +46,7 @@ void XDRFileReader::read_particles(string filename, Pdm * particles){
 	xdrstdio_create(&xdrs,fp,XDR_DECODE);
     
 	//read header
-	status = xdr_header(&xdrs, &tips);
+	int status = xdr_header(&xdrs, &tips);
     int Nparticles = tips.ndark;
     
     //create the vector
@@ -66,8 +66,8 @@ void XDRFileReader::read_particles(string filename, Pdm * particles){
 }
 
 
-void XDRFileReader::read_scalar(float * scalar){
-    ifstream myFile ( filename->	c_str(), ios::in | ios::binary);
+void XDRFileReader::read_scalar(string filename, float * scalar, int &np){
+    ifstream myFile ( filename.c_str(), ios::in | ios::binary);
 	myFile.read( reinterpret_cast<char*>( &np ), sizeof np );
     
     scalar = new float[np];

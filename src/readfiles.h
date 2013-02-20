@@ -14,7 +14,7 @@ class XDRFileReader{
 	
 public:
     //function reader the tipsheader
-    static void read_tipsyheader(string filename, Tipsyheader * tipsyheader);
+    static void read_tipsyheader(string filename, tipsy_header * tipsyheader);
     
     //Create the vector and read darkmatter particles from XDR files
     static void read_particles(string filename, Pdm * particles);
