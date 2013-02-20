@@ -3,6 +3,7 @@
 class DataReader{
 public:
     DataReader(std::string basedir);
+    
 };
 
 #endif
