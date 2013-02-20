@@ -1,5 +1,6 @@
 #ifndef __DATAREADER__LY__
 #define __DATAREADER__LY__
+#include "datatypes.h"
 using namespace std;
 class DataReader{
 public:

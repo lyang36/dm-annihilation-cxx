@@ -3,6 +3,9 @@
 #include <fstream>
 #include <string>
 
+#include <rpc/types.h>
+#include <rpc/xdr.h>
+
 #include "parameters.h"
 #include "datareader.h"
 #include "mapgenerator.h"
@@ -43,7 +46,7 @@ int main(int argc, const char **argv){
     cout << "CONFIGUR FILE: " << par_file << endl;
     
     Parameters par(info_file, par_file);
-    DataReader reader(basedir);
+    DataReader reader(basedir, basename);
     MapGenerator generator(&par, &reader);
     printf("Start generating dark matter map:...\n");
     generator.start();

@@ -2,8 +2,8 @@
 #include <iostream>
 #include <string>
 #include <cstring>
-#include <rpc/xdr.h>
 #include <rpc/types.h>
+#include <rpc/xdr.h>
 #include "tipsydefs.h"
 #include "readfiles.h"
 #include "datareader.h"
