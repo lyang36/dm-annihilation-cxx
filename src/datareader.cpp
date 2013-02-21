@@ -13,7 +13,7 @@ using namespace std;
 //read native data
 DataReader::DataReader(string path){
     filePath_ = path;
-    memBuffer_ = 1000000;
+    memBuffer_ = 10000000;
     memCursor_ = 0;
     readCursor_ = 0;
     partNumbers_ = 0;
@@ -30,7 +30,7 @@ DataReader::DataReader(string basedir, string basename){
     basedir_ = basedir;
     basename_ = basename;
     
-    memBuffer_ = 1000000;
+    memBuffer_ = 10000000;
     memCursor_ = 0;
     readCursor_ = 0;
     partNumbers_ = 0;

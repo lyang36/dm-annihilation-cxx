@@ -41,10 +41,19 @@ int main(int argc, const char **argv){
     
     if(myFile.good()){
         cout << "starting ... "<< endl;
+        int nn = 0;
         while(reader.hasNext()){
+            nn += reader.getMemparts();
+            printf("Particles: %d\n", nn);
+            DMParticle *dp = reader.getBuf();
+            //printf("%e %e %e %e %e %e %e %e %e %e %e\n", dp[0].mass, dp[0].dens,
+            //                dp[0].hsmooth, dp[0].posx, dp[0].posy, dp[0].posz,
+            //                dp[0].velx, dp[0].vely, dp[0].velz, dp[0].eps, dp[0].phi);
+            cout.flush();
             myFile.write((char *) reader.getBuf(), sizeof(DMParticle) * reader.getMemparts()) ;
             reader.loadBuffer();
         }
+        printf("\n");
         cout << "ending... Output file: " << output << endl;
         myFile.close();
     }

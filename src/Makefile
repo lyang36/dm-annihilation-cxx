@@ -4,6 +4,7 @@ CC=g++
 all: comp
 	#$(CC) -o annmap main.o
 	@cd dataconverter; make
+	@cd test; make
 
 comp:
 	$(CC) -c main.cpp
@@ -15,3 +16,4 @@ clean:
 	rm -fr *.o
 	rm -fr annmap
 	@cd dataconverter; make clean
+	@cd test; make clean
