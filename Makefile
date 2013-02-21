@@ -14,7 +14,7 @@ annmap:
 
 clean:
 	@cd src; make clean
-	rm bin/annmap
+	rm -fr bin/annmap
 
 clean-all:
 	cd libs/cfitsio; make clean
