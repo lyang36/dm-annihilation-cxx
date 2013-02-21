@@ -67,7 +67,7 @@ void ang2vec(double theta, double phi, vec3 *vec) {
     
     if( theta<0. || theta>PI) {
         fprintf(stderr, "%s (%d): theta out of range: %f\n", __FILE__, __LINE__, theta);
-        exit(0);
+        exit(1);
     }
     
     sz = sin(theta);
@@ -128,8 +128,10 @@ void MapGenerator::start(){
 		}
         reader_->readParticle(& current_part);
         
+        //printf("%e %e %e %e %e %e\n", current_part.mass, current_part.dens, current_part.posx,
+        //                current_part.posy, current_part.posz);
         //ignore the low resolution mass
-        if(current_part.dens >= hires_particle_mass * 1.1){
+        if(current_part.mass >= hires_particle_mass * 1.1){
             continue;
         }
         
@@ -196,6 +198,7 @@ void MapGenerator::start(){
                              (par_->units.eV_in_cgs * 1.0e9), 2) / (par_->units.Mpc_in_cgs * 1.0e-3);
     for(int i = 0; i < Npix; i++){
         map_[i] *= unit_factor  / par_->map.dOmega;
+        printf("%e\n", map_[i]);
     }
     
     free(weight);

@@ -51,6 +51,8 @@ int main(int argc, const char **argv){
 
     printf("Start generating dark matter map:...\n");
     generator.start();
+    reader->close();
+
     generator.saveToFits(par.outputFileName);
     printf("Finished....\nMap saved as fits file in %s.\n", par.outputFileName.c_str());
 
