@@ -108,7 +108,7 @@ bool DataReader::open(){
         }
         
         //open hsmooth file
-        hsmoothStream_.open( density_file_name.c_str(), ios::in | ios::binary);
+        hsmoothStream_.open( hsmooth_file_name.c_str(), ios::in | ios::binary);
         hsmoothStream_.read( reinterpret_cast<char*>( &np ), sizeof np );
         if(np != partNumbers_){
             fprintf(stderr,"Particle numbers in hsmooth not match.\n");

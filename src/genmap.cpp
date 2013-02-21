@@ -128,7 +128,8 @@ void MapGenerator::start(){
 		}
         reader_->readParticle(& current_part);
         
-        //printf("%e %e %e %e %e %e\n", current_part.mass, current_part.dens, current_part.posx,
+        //printf("%e %e %e %e %e %e\n", current_part.mass, current_part.dens, 
+        //                current_part.hsmooth, current_part.posx,
         //                current_part.posy, current_part.posz);
         //ignore the low resolution mass
         if(current_part.mass >= hires_particle_mass * 1.1){
@@ -170,6 +171,8 @@ void MapGenerator::start(){
             continue;
         }
         
+        //printf("angular_radius: %e, disc size: %d, dist: %f\n", 2.0*angular_radius, 
+        //                npix_disc, distances);
         // get here only if the particle covers more than one pixel
         double weight_norm = 0.0;
         for(int j=0; j<npix_disc; j++) {
