@@ -208,7 +208,7 @@ void MapGenerator::start(){
         //if(good_count >= 1000000) break;
     }
     isFinished_ = true;
-    cout << "finished!." << endl;
+    cout << "\nFinished!." << endl;
     
     double unit_factor = pow(pow((par_ -> natconst.c_in_cgs), 2) /
                              (par_->units.eV_in_cgs * 1.0e9), 2) / (par_->units.Mpc_in_cgs * 1.0e-3);
