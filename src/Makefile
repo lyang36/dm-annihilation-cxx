@@ -11,6 +11,7 @@ comp:
 	$(CC) -c datareader.cpp
 	$(CC) -c readfiles.cpp
 	$(CC) -c tipsy_io.c
+	$(CC) -c parameters.cpp
 
 clean:
 	rm -fr *.o

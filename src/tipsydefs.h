@@ -10,8 +10,8 @@
 
 #define FAILURE 1
 #define SUCCESS 0
-//#include <rpc/rpc.h>
 //#include <rpc/types.h>
+//#include <rpc/rpc.h>
 
 struct gas_particle {
   float mass;
