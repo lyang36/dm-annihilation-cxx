@@ -2,6 +2,7 @@
 #include <sstream>
 #include <fstream>
 #include <string>
+#include <cstring>
 #include <cmath>
 #include <rpc/types.h>
 #include <rpc/xdr.h>
