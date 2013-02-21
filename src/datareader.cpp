@@ -31,23 +31,28 @@ bool DataReader::readParticle(){
     XDRFileReader::read_tipsyheader(particle_file_name, &tips);
     numParts_ = tips.ndark;
     Pdm * dmpart;
-    XDRFileReader::read_particles(particle_file_name, dmpart);
+    printf("Reading %d particles...\n", numParts_);
     
+    XDRFileReader::read_particles(particle_file_name, dmpart);
     //copy the data to the DMparticles array
+    printf("Particles read.\n");
     particles = new DMParticle[numParts_];
     for(loopi = 0; loopi < numParts_; loopi++){
         particles[loopi].mass = dmpart[loopi].mass;
         particles[loopi].posx = dmpart[loopi].pos[0];
         particles[loopi].posy = dmpart[loopi].pos[1];
         particles[loopi].posz = dmpart[loopi].pos[2];
+        //printf("%d\n", loopi);
         particles[loopi].velx = dmpart[loopi].vel[0];
         particles[loopi].vely = dmpart[loopi].vel[1];
         particles[loopi].velz = dmpart[loopi].vel[2];
         particles[loopi].eps = dmpart[loopi].eps;
         particles[loopi].phi = dmpart[loopi].phi;
     }
+    //printf("fdsfjals\n");
     delete dmpart;
     
+    printf("Reading density...\n");
     //reader scalars
     float * density;
     int testn = 0;
@@ -62,6 +67,7 @@ bool DataReader::readParticle(){
     delete density;
     
     //reader scalars
+    printf("Reading hsmooth...");
     float * hsmooth;
     //int testn = 0;
     XDRFileReader::read_scalar(density_file_name, hsmooth, testn);

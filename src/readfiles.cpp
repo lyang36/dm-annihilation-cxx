@@ -50,19 +50,27 @@ void XDRFileReader::read_particles(string filename, Pdm * particles){
     int Nparticles = tips.ndark;
     
     //create the vector
+    //printf("%d\n", Nparticles);
     particles = new Pdm[Nparticles];
     
 	//buid all particles, this is a slow way
 	for(i=0; i < Nparticles; i++) {
 		status = xdr_dark(&xdrs,&(particles[i]));
+        //if(i % 1000000 == 0){
+        //    printf("%d, %d\n", i, Nparticles);
+        //}
 		if (status != 1) {
 			fprintf(stderr,"Error reading dark particle from input file.\n");
 			exit(1);
 		}
+        //break;
 	}
     
+    //printf("Strange ... \n");
 	xdr_destroy(&xdrs);
+    //printf("ok\n");
 	fclose(fp);
+    //printf("ok1\n");
 }
 
 
