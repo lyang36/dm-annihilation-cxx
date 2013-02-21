@@ -25,12 +25,15 @@ public:
     //output all the parameters
     void printParameters();
     
+    //for filename
+    string baseDir, baseName;
+    string nativeDatafile;
+    
+    //for output
+    string outputFileName;
+    
     //whether use native data?
     bool isNative;
-    
-    //for filename
-    string basedir, basename;
-    string nativedatafile;
     
 private:
     double align_vector[3];
@@ -45,6 +48,8 @@ private:
     void initialize();
     
     double redshift;
+    
+
 };
 
 #endif

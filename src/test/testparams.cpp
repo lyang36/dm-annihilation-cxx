@@ -8,7 +8,7 @@
 #include "../parameters.h"
 using namespace std;
 int main(){
-        string infofile = "VL2_info.txt";
+        string infofile = "VL2_info.ini";
         Parameters params(infofile);
         params.printParameters();
         return 0;

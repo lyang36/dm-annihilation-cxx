@@ -209,6 +209,11 @@ void Parameters::initialize(){
     map.setNside(512);
     memParts = 10000000;
     testNum = -1;
+    isNative = true;
+    baseDir = " ";
+    baseName = " ";
+    nativeDatafile = " ";
+    outputFileName = " ";
 }
 
 Parameters::Parameters(string ifname){
@@ -328,7 +333,17 @@ Parameters::Parameters(string ifname){
                 map.setNside(nSide);
 			}else if (temp == "test"){
                 testNum = atoi(val);
-			}
+			}else if (temp == "datafile"){
+                nativeDatafile = (val);
+			}else if (temp == "basename"){
+                baseName = val;
+                isNative = false;
+            }else if (temp == "basedir"){
+                baseDir = val;
+                isNative = false;
+            }else if (temp == "outputmap"){
+                outputFileName = val;
+            }
             
 		}
 	}else{
@@ -459,6 +474,15 @@ void print_out_master( Parameters * master){
 	cout << "rotmatrix " << getstring_double( master -> rotmatrix[0], 3) << endl;
 	cout << "rotmatrix " << getstring_double( master -> rotmatrix[1], 3) << endl;
 	cout << "rotmatrix " << getstring_double( master -> rotmatrix[2], 3) << endl;
+    if(master->isNative)
+        cout << "Data File (Native): " << master->nativeDatafile << endl;
+    else{
+        cout << "Data File Base Dir (XDR): " << master->baseDir << endl;
+        cout << "Data File Base Name (XDR): " << master->baseName << endl;
+    }
+    
+    cout << "Output Fits: " << master->outputFileName << endl;
+        
 }
 
 
