@@ -45,6 +45,7 @@ int main(int argc, const char **argv){
     else
         reader = new DataReader(par.baseDir, par.baseName);
     reader->setTest(par.testNum);
+    reader->open();
 
     MapGenerator generator(&par, reader);
 

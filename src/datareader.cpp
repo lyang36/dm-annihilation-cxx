@@ -5,7 +5,6 @@
 #include <rpc/types.h>
 #include <rpc/xdr.h>
 #include "tipsydefs.h"
-#include "readfiles.h"
 #include "datareader.h"
 
 using namespace std;
@@ -63,6 +62,11 @@ bool DataReader::open(){
     buffer_ = new DMParticle[memBuffer_];
     if(isNative_){
         dataInputFile_.open(filePath_.c_str(), ios::binary);
+       
+        if(!dataInputFile_.good()){
+            printf("Datafile error: %s !\n", filePath_.c_str());
+            exit(1);
+        }
         dataInputFile_.read((char*)&partNumbers_, sizeof(int));
         cout << "Particles: " << partNumbers_ << endl;
         if(testnum_ != -1){

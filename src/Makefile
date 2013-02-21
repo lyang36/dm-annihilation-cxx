@@ -1,19 +1,34 @@
+#must setup these 2 lib to compile
+FITSIOLIB=/Users/lyang/Tools/cfitsio
+HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
+
+HEALPIXSRC = $(HEALPIXHOME)/src/cxx/basic_gcc/include
+HEALPIXLIB = $(HEALPIXHOME)/src/cxx/basic_gcc/lib
+HEALPIXCXX = $(HEALPIXHOME)/src/cxx/cxxsupport
+HEALPIXC  = $(HEALPIXHOME)/cxx/Healpix_cxx
+
 C=gcc
 CC=g++
-OBJS=main.o datareader.o tipsy_io.o parameters.o mapgenerator.o
+OBJS=main.o datareader.o tipsy_io.o parameters.o mapgenerator.o\
+	 genmap.o
+
+LFLAGS=$(HEALPIXLIB)/libhealpix_cxx.a\
+	   $(HEALPIXLIB)/libcxxsupport.a\
+	   $(FITSIOLIB)/libcfitsio.a
+
+IFLAG=-I $(HEALPIXSRC) -I$(FITSIOLIB)
+
+
 
 all: comp
-	$(CC) -o annmap $(OBJS) 
+	$(CC) -o annmap $(OBJS) $(LFLAGS)
 	@cd dataconverter; make
 	@cd test; make
 
 comp:
-	$(CC) -c main.cpp
-	$(CC) -c datareader.cpp
-	$(CC) -c readfiles.cpp
-	$(CC) -c tipsy_io.c
-	$(CC) -c parameters.cpp
-	$(CC) -c mapgenerator.cpp
+	$(CC) -c main.cpp  datareader.cpp  tipsy_io.c \
+		   	parameters.cpp mapgenerator.cpp genmap.cpp\
+			$(IFLAG)
 
 clean:
 	rm -fr *.o

@@ -7,7 +7,6 @@
 #include <rpc/xdr.h>
 
 #include "../tipsydefs.h"
-#include "../readfiles.h"
 #include "../datareader.h"
 int main(){
         string basedir = "/home/lyang/files/r200";
