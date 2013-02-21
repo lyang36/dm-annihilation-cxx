@@ -397,7 +397,7 @@ string getstring_int( int * d, int numx){
 
 
 void print_out_natconst( Natconst * natconst){
-	cout << "Out put Natconst:-----------------------------------------------------" << endl;
+	cout << "--------------------------Natconst--------------------------" << endl;
     cout << "h100 " << natconst -> h100 << endl;
     cout << "G_in_cgs " << natconst -> G_in_cgs << endl;
     cout << "rho_crit_in_cgs " << natconst -> rho_crit_in_cgs << endl;
@@ -408,7 +408,7 @@ void print_out_natconst( Natconst * natconst){
 }
 
 void print_out_halo( Halo * halo){
-	cout << "Out put Halo:-----------------------------------------------------" << endl;
+	cout << "----------------------------Halo----------------------------" << endl;
 	cout << "Mvir_in_Msun " << halo -> Mvir_in_Msun << endl;
 	cout << "M200_in_Msun " << halo -> M200_in_Msun << endl;
 	cout << "M200crit_in_Msun " << halo -> M200crit_in_Msun << endl;
@@ -426,7 +426,7 @@ void print_out_halo( Halo * halo){
 }
 
 void print_out_dm( Dm * dm){
-	cout << "DM:-----------------------------------------------------" << endl;
+	cout << "----------------------------Dm------------------------------" << endl;
 	cout << "M_in_GeV " << dm -> M_in_GeV << endl;// = 46.0;
 	cout << "M_in_cgs " << dm -> M_in_cgs << endl;// = 0.0;
 	cout << "sigma_v_in_cgs "<< dm -> sigma_v_in_cgs << endl;// = 5.0e-26;
@@ -434,7 +434,7 @@ void print_out_dm( Dm * dm){
 }
 
 void print_out_codeunits( Codeunits * codeunits){
-	cout << "Codeunits:-----------------------------------------------------" << endl;
+	cout << "------------------------Code Units--------------------------" << endl;
 	cout << "mass_to_cgs " <<  codeunits -> mass_to_cgs << endl;
 	cout << "mass_to_Msun " <<  codeunits -> mass_to_Msun << endl;
 	cout << "length_to_Mpc " << codeunits -> length_to_Mpc << endl;
@@ -447,7 +447,7 @@ void print_out_codeunits( Codeunits * codeunits){
 
 
 void print_out_params( Params * params){
-	cout << "Params:-----------------------------------------------------" << endl;
+	cout << "--------------------------Params----------------------------" << endl;
 	cout << "z " <<  params -> z << endl;
 	cout << "cpos " << getstring_double(params -> cpos, 3) << endl;
 	cout << "cvel " << getstring_double(params -> cvel, 3) << endl;//cvel[3];
@@ -463,7 +463,7 @@ void print_out_params( Params * params){
 
 
 void print_out_master( Parameters * master){
-	cout << "Parameters:-----------------------------------------------------" << endl;
+	cout << "+========================Parameters========================+" << endl;
 	print_out_natconst( &(master -> natconst) );
 	print_out_dm( &(master -> dm) );
 	print_out_halo( &(master -> halo) );
@@ -482,13 +482,20 @@ void print_out_master( Parameters * master){
     }
     
     cout << "Output Fits: " << master->outputFileName << endl;
+    if(master->testNum == -1){
+        cout << "Use all particles to generate map!" << endl;
+    }else{
+        cout << "Use first " << master->testNum << " Particles to generate map!" << endl;
+    }
+
+    cout << "+==========================================================+" << endl;
         
 }
 
 
 
 void print_out_map( Map * map){
-	cout << "map:-----------------------------------------------------" << endl;
+	cout << "----------------------------Map-----------------------------" << endl;
 	cout << "projection " << map -> projection << endl;//;
 	cout << "Nside " << map -> Nside << endl;//;
 	cout << "Npix " << map -> Npix << endl;//;

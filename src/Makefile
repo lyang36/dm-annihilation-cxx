@@ -1,8 +1,9 @@
 C=gcc
 CC=g++
+OBJS=main.o datareader.o tipsy_io.o parameters.o mapgenerator.o
 
 all: comp
-	#$(CC) -o annmap main.o
+	$(CC) -o annmap $(OBJS) 
 	@cd dataconverter; make
 	@cd test; make
 
@@ -12,6 +13,7 @@ comp:
 	$(CC) -c readfiles.cpp
 	$(CC) -c tipsy_io.c
 	$(CC) -c parameters.cpp
+	$(CC) -c mapgenerator.cpp
 
 clean:
 	rm -fr *.o
