@@ -30,10 +30,10 @@ int main(int argc, const char **argv){
     }
     
     DataReader reader(basedir, basename);
-    reader.readParticle();
+    reader.open();
     
     cout << "writing data to files ... " << endl;
-    int nums = reader.getNumParts();
+    int nums = reader.getPartNum();
     cout << "There are " << nums << " particles" << endl;
     
     ofstream myFile (output.c_str(), ios::out | ios::binary);;
@@ -41,9 +41,13 @@ int main(int argc, const char **argv){
     
     if(myFile.good()){
         cout << "starting ... "<< endl;
-        myFile.write((char *) reader.getParticles(), sizeof(DMParticle) * nums) ;
+        while(reader.hasNext()){
+            myFile.write((char *) reader.getBuf(), sizeof(DMParticle) * reader.getMemparts()) ;
+            reader.loadBuffer();
+        }
         cout << "ending... Output file: " << output << endl;
         myFile.close();
     }
+    reader.close();
     return 0;
 }
