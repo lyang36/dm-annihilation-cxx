@@ -92,11 +92,11 @@ bool DataReader::open(){
         partNumbers_ = tips_.ndark;
         
         cout << "Particles: " << partNumbers_ << endl;
-        if(testnum_ != -1){
-            if((int)partNumbers_ > testnum_){
-                partNumbers_ = testnum_;
-            }
-        }
+        // if(testnum_ != -1){
+        //     if((int)partNumbers_ > testnum_){
+        //         partNumbers_ = testnum_;
+        //    }
+        //}
         
         //open density file
         int np;
@@ -117,6 +117,11 @@ bool DataReader::open(){
         
         cout << "Load to buffer ... " << endl;
         loadBuffer();
+        if(testnum_ != -1){
+            if((int)partNumbers_ > testnum_){
+                  partNumbers_ = testnum_;
+            }   
+        }  
         return (fp_ != 0);
     }
 }
