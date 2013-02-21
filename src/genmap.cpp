@@ -95,7 +95,10 @@ void MapGenerator::start(){
     
     Healpix_Base base(Nside, RING, SET_NSIDE);
     
+    //testing
     int count=0;
+    int good_count = 0;
+
     map_ = (double *) calloc(Npix, sizeof(double));
     weight = (double *) calloc(Npix, sizeof(double));
     int Np = reader_->getPartNum();
@@ -170,10 +173,17 @@ void MapGenerator::start(){
             map_[pix] += fluxes;
             continue;
         }
-        
-        //printf("angular_radius: %e, disc size: %d, dist: %f\n", 2.0*angular_radius, 
+        static int mm = 0;
+
+        //if(mm < 100) {printf("%e %e %e %e %e %e\n", current_part.mass, current_part.dens, 
+        //               current_part.hsmooth, current_part.posx,
+        //               current_part.posy, current_part.posz);
+        //               mm ++;} 
+
+        //if(mm < 100) printf("angular_radius: %e, disc size: %d, dist: %f\n", 2.0*angular_radius, 
         //                npix_disc, distances);
         // get here only if the particle covers more than one pixel
+        
         double weight_norm = 0.0;
         for(int j=0; j<npix_disc; j++) {
             int this_pix = pix_list[j];
@@ -186,13 +196,16 @@ void MapGenerator::start(){
         }
         
         // apply weighted flux to map
-        for(int j=0;j<weight_norm;j++) {
+        for(int j=0;j<npix_disc;j++) {
             // first normalize weight array
-            weight[j] /= weight_norm;
+            weight[j] = weight[j] / weight_norm;
             map_[pix_list[j]] += weight[j] * fluxes;
             
         }  // loop over pixels covered by this particle
-        
+        //if(mm < 100) printf("pix %d flux %e Map %e weightnorm %e\n", pix, fluxes, map_[pix], weight_norm);
+        //testing
+        //good_count ++;
+        //if(good_count >= 1000000) break;
     }
     isFinished_ = true;
     cout << "finished!." << endl;
@@ -200,9 +213,12 @@ void MapGenerator::start(){
     double unit_factor = pow(pow((par_ -> natconst.c_in_cgs), 2) /
                              (par_->units.eV_in_cgs * 1.0e9), 2) / (par_->units.Mpc_in_cgs * 1.0e-3);
     for(int i = 0; i < Npix; i++){
-        map_[i] *= unit_factor  / par_->map.dOmega;
-        printf("%e\n", map_[i]);
+        map_[i] *= unit_factor / par_->map.dOmega;
+        //printf("%e\n", map_[i]);
     }
     
+    //printf("%e\n%e\n%e", map_[0], map_[100], map_[10000]);
+
+
     free(weight);
 }
