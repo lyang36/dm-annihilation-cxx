@@ -89,6 +89,7 @@ void Parameters::setupParams(){
     for(int i = 0; i < 3; i ++){
         params.cpos[i] = info.centerpos[i];
         params.cvel[i] = info.centervel[i];
+        params.opos[i] = obs_pos[i];
     }
 	params.otheta = 0.0;
 	params.ophi = 0.0;
@@ -104,6 +105,20 @@ void Parameters::setupParams(){
 			j++;
 		}
 	}
+    
+    double radius = sqrt(pow(params.opos[0] - params.cpos[0], 2.0)
+                         + pow(params.opos[1] - params.cpos[1], 2.0)
+                         + pow(params.opos[2] - params.cpos[2], 2.0));
+    
+    double otheta = acos((params.opos[2] - params.cpos[2])/radius );
+  	double ophi = -PI + atan((params.opos[1]- params.cpos[1]) / (params.opos[0]- params.cpos[0]));
+  	if (ophi < 0.0)
+		ophi += 2.0 * PI;
+	//cout << "Params Otheta:" << otheta << endl;
+    
+  	params.otheta = otheta;
+  	params.ophi = ophi;
+
 }
 
 void Parameters::setupOthers(){
@@ -115,7 +130,78 @@ void Parameters::setupOthers(){
 }
 
 void Parameters::setupRotation(){
+    double otheta = params.otheta;
+  	double ophi = params.ophi;
     
+  	double rotaxis[3];
+	rotaxis[0] = 0.0;
+  	rotaxis[1] = cos(otheta) / sqrt(pow((sin(otheta) * sin(ophi)), 2.0) + pow(cos(otheta), 2));
+  	rotaxis[2] = -sin(otheta) * sin(ophi) / sqrt(pow((sin(otheta)*sin(ophi)), 2) + pow(cos(otheta), 2));
+    
+	double c = -sin(otheta) * cos(ophi);
+  	double s = -sqrt(pow(sin(otheta) * sin(ophi), 2)+ pow(cos(otheta), 2));
+  	double t = 1.0 - c;
+    
+    double rotm[3][3];
+    
+  	rotm[0][0] = t * pow(rotaxis[0], 2) + c;
+  	rotm[1][0] = t * rotaxis[0] * rotaxis[1] - s * rotaxis[2];
+  	rotm[2][0] = t * rotaxis[0] * rotaxis[2] + s * rotaxis[1];
+    
+  	rotm[0][1] = t * rotaxis[0] * rotaxis[1] + s * rotaxis[2];
+  	rotm[1][1] = t * pow(rotaxis[1], 2) + c;
+  	rotm[2][1] = t * rotaxis[1] * rotaxis[2] - s * rotaxis[0];
+    
+ 	rotm[0][2] = t * rotaxis[0] * rotaxis[2] - s * rotaxis[1];
+  	rotm[1][2] = t * rotaxis[1] * rotaxis[2] + s * rotaxis[0];
+  	rotm[2][2] = t * pow(rotaxis[2], 2) + c;
+    
+	//cout << "ROT[0][0] " << rotmatrix[0][0] << endl;
+    
+  	double distance = sqrt(pow(params.opos[0] - params.cpos[0], 2.0)
+                           + pow(params.opos[1] - params.cpos[1], 2.0)
+                           + pow(params.opos[2] - params.cpos[2], 2.0));
+    
+  	double tmpvec[] = {params.cpos[0] + distance * align_vector[0] - params.opos[0],
+        params.cpos[1] + distance * align_vector[1] - params.opos[1],
+        params.cpos[2] + distance * align_vector[2] - params.opos[2]};
+    
+  	double xtmp = tmpvec[0] * rotm[0][0] +
+    tmpvec[1] * rotm[1][0] +
+    tmpvec[2] * rotm[2][0];
+    
+  	double ytmp = tmpvec[0] * rotm[0][1] +
+    tmpvec[1] * rotm[1][1] +
+    tmpvec[2] * rotm[2][1];
+    
+  	double ztmp = tmpvec[0] * rotm[0][2] +
+    tmpvec[1] * rotm[1][2] +
+    tmpvec[2] * rotm[2][2];
+    
+  	tmpvec[0] = xtmp;
+	tmpvec[1] = ytmp;
+	tmpvec[2] = ztmp;
+  	double gamma_t = fabs(atan(ztmp / ytmp));
+    
+  	if (gamma_t > PI/4.0)
+		gamma_t *= -1.0;
+	//cout << "GAMMA = " << gamma_t <<endl;
+    
+  	double rotmatrix2[][3] = { 1.0, 0.0, 0.0,
+        0.0, cos(gamma_t), sin(gamma_t),
+        0.0, -sin(gamma_t), cos(gamma_t)};
+    
+	//static double rottmp[3][3];
+	for (int i = 0; i<3; i++){
+		for (int j =0; j<3; j++){
+			double val = 0;
+			for (int k=0; k<3; k++)
+				val += rotm[i][k] * rotmatrix2[k][j];
+			
+			(rotmatrix)[i][j] = val;
+		}
+	}
+ 	return;
 }
 
 void Parameters::initialize(){

@@ -46,10 +46,10 @@ params_Einasto =  1.141e4  21.76  0.1663
 
 ###############Visualization info##############
 # align vector
-align_vec = 3.612030e-01  2.106580e-01  6.877260e-03
+align_vec = 0.0265062 0.285643 0.957970
 
 # observation pos
-obs_pos = 3.612030e-01  2.106580e-01  6.877260e-03
+obs_pos = 0.36116062 0.21047031 0.0069339937 
 
 # memory buffers for reading particles (how many particles)
 mem_buffer = 10000000
