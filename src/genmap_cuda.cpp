@@ -18,6 +18,7 @@
 #include "datatypes.h"
 #include "mapgenerator.h"
 #include "anglefuncs.h"
+#include "kernel.h"
 
 //this file implements the mapgenerator's gen function
 void MapGenerator::start(){
@@ -42,8 +43,8 @@ void MapGenerator::start(){
     map_ = (MAPTYPE *) calloc(Npix, sizeof(MAPTYPE));
     int Np = reader_->getPartNum();
     
-    int rec = Np / 50;
-    int ll = 0;
+    //int rec = Np / 50;
+    //int ll = 0;
     cout << "Creating map!!!" << endl;
 	//cout << "---10---20---30---40---50---60---70---80---90--100%\n";
     
@@ -83,7 +84,7 @@ void MapGenerator::start(){
     	exit(1);
     }
     
-    int count = 0;
+    //int count = 0;
     while(reader_->hasNext()){
     	parts = reader_->getBuf();
     	
@@ -136,7 +137,7 @@ void MapGenerator::start(){
 		}
 		
 		//pass particles, map to CUDA, calculating
-		status = calulateMapWithCUDA(map_, parts_, reader_->getMemparts());
+		status = calulateMapWithCUDA(map_, parts, reader_->getMemparts());
 	    if(status != cudaSuccess){
 	    	printf("CUDA initialize error!\n");
 	    	exit(1);

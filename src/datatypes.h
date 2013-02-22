@@ -56,6 +56,7 @@ public:
         velz = rhs.velz;
         eps = rhs.eps;
         phi = rhs.phi;
+        return (*this);
     };
     
     DMParticle(const DMParticle &rhs){
@@ -70,6 +71,7 @@ public:
         velz = rhs.velz;
         eps = rhs.eps;
         phi = rhs.phi;
+        //return *this;
     };
     
     DMParticle(){};
