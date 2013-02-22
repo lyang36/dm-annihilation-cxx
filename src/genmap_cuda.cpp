@@ -12,6 +12,9 @@
 #include <fitshandle.h>
 #include <healpix_map_fitsio.h>
 
+#include "cuda_runtime.h"
+#include "device_launch_parameters.h"
+
 #include "datatypes.h"
 #include "mapgenerator.h"
 
@@ -21,10 +24,10 @@
 //input x, y, z
 //output costheta, phi
 void calc_angles( MAPTYPE xpos, MAPTYPE ypos, MAPTYPE zpos, MAPTYPE &distances,
-                  Parameters * params, MAPTYPE & costheta, MAPTYPE &phi){
+                 Parameters * params, MAPTYPE & costheta, MAPTYPE &phi){
 	MAPTYPE vec[] = { xpos, ypos, zpos};
 	MAPTYPE temp[] = {0, 0, 0};
-
+    
     for(int i = 0; i < 3; i ++){
         temp[i] = 0;
         for(int j = 0; j < 3; j ++){
@@ -90,7 +93,7 @@ void MapGenerator::start(){
     
     MAPTYPE unit_factor = pow(pow((par_ -> natconst.c_in_cgs), 2) /
                               (par_->units.eV_in_cgs * 1.0e9), 2) / (par_->units.Mpc_in_cgs * 1.0e-3)
-                            * par_->codeunits.annihilation_flux_to_cgs;
+    * par_->codeunits.annihilation_flux_to_cgs;
     
 	int Nside = par_->map.Nside;
 	int Npix = par_->map.Npix;
@@ -98,7 +101,7 @@ void MapGenerator::start(){
     MAPTYPE theta0 = acos( 1.0 - dOmega/(2.0*3.141592) );
     
     Healpix_Base base(Nside, RING, SET_NSIDE);
-
+    
     map_ = (MAPTYPE *) calloc(Npix, sizeof(MAPTYPE));
     weight = (MAPTYPE *) calloc(Npix, sizeof(MAPTYPE));
     int Np = reader_->getPartNum();
@@ -108,7 +111,7 @@ void MapGenerator::start(){
     cout << "Creating map!!!" << endl;
 	cout << "---10---20---30---40---50---60---70---80---90--100%\n";
     
-
+    
     //remove low resolution particles
     float hires_particle_mass = 1.0e9f;
     for(int i = 0; i < 10; i ++){
@@ -124,6 +127,7 @@ void MapGenerator::start(){
     MAPTYPE oposy = par_->params.opos[1];
     MAPTYPE oposz = par_->params.opos[2];
     
+    
     for( int i = 0; i< Np; i++){
         if(i % rec == 0){
             cout << "#";
@@ -137,13 +141,13 @@ void MapGenerator::start(){
         }
         
         distances = sqrt((current_part.posx-oposx) * (current_part.posx-oposx)
-                        +(current_part.posy-oposy) * (current_part.posy-oposy)
-                        +(current_part.posz-oposz) * (current_part.posz-oposz));
+                         +(current_part.posy-oposy) * (current_part.posy-oposy)
+                         +(current_part.posz-oposz) * (current_part.posz-oposz));
         
         fluxes = unit_factor * current_part.dens * current_part.mass / (4.0 * PI * distances * distances);
         
         calc_angles(current_part.posx-oposx, current_part.posy-oposy,
-                    current_part.posz-oposz, distances, (par_),
+                    current_part.posz-oposz, distances, par_,
                     costheta, phi);
         
         theta = acos(costheta);
@@ -170,15 +174,6 @@ void MapGenerator::start(){
             continue;
         }
         
-        /*static int mm = 0;
-
-        if(mm < 100) {printf("%e %e %e %e %e %e\n", current_part.mass, current_part.dens,
-                       current_part.hsmooth, current_part.posx,
-                       current_part.posy, current_part.posz);
-                       mm ++;}
-
-        if(mm < 100) printf("angular_radius: %e, disc size: %d, dist: %f\n", 2.0*angular_radius, 
-                        npix_disc, distances);*/
         // get here only if the particle covers more than one pixel
         
         MAPTYPE weight_norm = 0.0;
@@ -189,7 +184,7 @@ void MapGenerator::start(){
             MAPTYPE d2 = acos( dotprod(this_vec,vec) ) / angular_radius;
             d2 = d2*d2;
             weight[j] = exp(-0.5 * d2 / 0.333);
-            weight_norm += weight[j];		    
+            weight_norm += weight[j];
         }
         
         // apply weighted flux to map
@@ -199,7 +194,6 @@ void MapGenerator::start(){
             map_[pix_list[j]] += weight[j] * fluxes;
             
         }  // loop over pixels covered by this particle
-        /*if(mm < 100) printf("pix %d flux %e Map %e weightnorm %e\n", pix, fluxes, map_[pix], weight_norm);*/
     }
     isFinished_ = true;
     cout << "\nFinished!." << endl;
@@ -209,7 +203,7 @@ void MapGenerator::start(){
     }
     
     //printf("%e\n%e\n%e", map_[0], map_[100], map_[10000]);
-
-
+    
+    
     free(weight);
 }

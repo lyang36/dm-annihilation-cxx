@@ -51,6 +51,7 @@ public:
         eps = rhs.eps;
         phi = rhs.phi;
     };
+    
     DMParticle(const DMParticle &rhs){
         mass = rhs.mass;
         dens = rhs.dens;
