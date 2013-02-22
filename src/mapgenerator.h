@@ -3,11 +3,7 @@
 #include "parameters.h"
 #include "datareader.h"
 
-//define the map's type
-typedef double MAPTYPE;
 
-//float can lead to incorrect result
-//typedef float MAPTYPE;
 
 class MapGenerator{
 public:

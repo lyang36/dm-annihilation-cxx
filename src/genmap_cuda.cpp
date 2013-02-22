@@ -77,7 +77,7 @@ void MapGenerator::start(){
     
     cudaError_t status;
     //initialize
-    status = initializeCUDA(healx, healy, healz, Npix);
+    status = initializeCUDA(healx, healy, healz, Npix, par_->memParts);
     if(status != cudaSuccess){
     	printf("CUDA initialize error!\n");
     	exit(1);
@@ -145,6 +145,10 @@ void MapGenerator::start(){
 		reader_->loadBuffer();
     }
     isFinished_ = true;
+    
+    //cleaing up CUDA
+    cudaCleaingUp();
+    
     cout << "\nFinished!." << endl;
     
     for(int i = 0; i < Npix; i++){

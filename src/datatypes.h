@@ -11,6 +11,12 @@ using namespace std;
 
 const double PI = M_PI;
 
+//define the map's type
+typedef double MAPTYPE;
+
+//float can lead to incorrect result
+//typedef float MAPTYPE;
+
 
 class DMParticle {
 public:
