@@ -70,6 +70,11 @@ void MapGenerator::start(){
     MAPTYPE * healz = new MAPTYPE[Npix];
     
     for(int i = 0; i < Npix; i++){
+                    //vec3 this_vec = base.pix2vec(i);
+        //pointing px = base.pix2ang(i);
+        //healx[i] = px.theta;//this_vec.x;
+        //healy[i] = px.phi; //this_vec.y;
+        //healz[i] = 0;//this_vec.z;
     	vec3 this_vec = base.pix2vec(i);
     	healx[i] = this_vec.x;
     	healy[i] = this_vec.y;
@@ -84,10 +89,11 @@ void MapGenerator::start(){
     	exit(1);
     }
     
-    //int count = 0;
+    int count = 0;
     while(reader_->hasNext()){
     	parts = reader_->getBuf();
-    	
+    	count += reader_->getMemparts();
+        printf("Particles: %d\n", count);
     	//first step -- filter the particles
 		for( int i = 0; i< reader_->getMemparts(); i++){
 			/////Particle calculating
@@ -125,7 +131,8 @@ void MapGenerator::start(){
 			current_part.hsmooth = theta;
 			current_part.posx = phi;
 			current_part.posy = angular_radius;
-			current_part.velx = vec.x;
+			current_part.posz = cos(2.0 * angular_radius);
+            current_part.velx = vec.x;
 			current_part.vely = vec.y;
 			current_part.velz = vec.z;
 					

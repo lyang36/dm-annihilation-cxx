@@ -66,12 +66,23 @@ __global__ void calculateNorm(int Npix, MAPTYPE * healpixX, MAPTYPE * healpixY, 
 		if(parts[i].eps < 0){
 			continue;
 		}
+        //if(parts[i].hsmooth - healpixX[pix] > 2 * parts[i].posy)
+        //    continue;
+        //if(- parts[i].hsmooth + healpixX[pix] > 2 * parts[i].posy)
+        //   continue;
+        //if(parts[i].posx - healpixY[pix] > 2 * parts[i].posy)
+        //    continue;
+        //if(- parts[i].posx + healpixY[pix] > 2 * parts[i].posy)
+        //    continue;
+
+        //testing	
 		
-		MAPTYPE prod = dotProd(healpixX[pix], healpixY[pix], healpixZ[pix]
+        MAPTYPE prod = dotProd(healpixX[pix], healpixY[pix], healpixZ[pix]
 		                      , parts[i].velx, parts[i].vely, parts[i].velz);
 		
+        //continue;
 		//could add more constraints here
-		if(prod < 0){
+		if(prod < parts[i].posz){
 			continue;
 		}
 		
@@ -79,10 +90,12 @@ __global__ void calculateNorm(int Npix, MAPTYPE * healpixX, MAPTYPE * healpixY, 
 		if(d2 > 2){
 			continue;
 		}
-		
-		d2 = d2 * d2;
+		//continue;
+	    d2 = d2 * d2;
 		MAPTYPE weight = SPHKenerl(d2);
-		atomicAdd(&(norm[i]), weight);
+		//testing...
+        //norm[i] += weight;
+        //atomicAdd(&(norm[i]), weight);
 	}
 }
 
@@ -100,12 +113,13 @@ __global__ void calculateMap(int Npix, MAPTYPE * healpixX, MAPTYPE * healpixY, M
 		if(parts[i].eps < 0){
 			continue;
 		}
-		
+	    
+        	
 		MAPTYPE prod = dotProd(healpixX[pix], healpixY[pix], healpixZ[pix]
 		                      , parts[i].velx, parts[i].vely, parts[i].velz);
 		
 		//could add more constraints here
-		if(prod < 0){
+		if(prod < parts[i].posz){
 			continue;
 		}
 		
@@ -116,7 +130,8 @@ __global__ void calculateMap(int Npix, MAPTYPE * healpixX, MAPTYPE * healpixY, M
 		
 		d2 = d2 * d2;
 		MAPTYPE weight = SPHKenerl(d2);
-		map[pix] += weight / norm[i] * parts[i].mass;
+		//map[pix] += weight / norm[i] * parts[i].mass;
+        //if(pix == i) map[pix] += 1.0;
 	}
 }
 
@@ -237,7 +252,8 @@ cudaError_t calulateMapWithCUDA(MAPTYPE * map, DMParticle * parts, int numParts)
         fprintf(stderr, "cudaMemcpy failed -- copying HEALPIX X!\n");
         return cudaStatus;
     }
-    
+   
+    printf("Start Norm kernel...\n"); 
     calculateNorm<<<gridsize, blocksize>>>(Npix_, healpixX_GPU, healpixY_GPU, healpixZ_GPU, 
     		numParts, parts_GPU, norm_GPU);
     cudaStatus = cudaThreadSynchronize();
@@ -246,6 +262,7 @@ cudaError_t calulateMapWithCUDA(MAPTYPE * map, DMParticle * parts, int numParts)
         return cudaStatus;
     }
     
+    printf("Start Map kernel...\n");
     calculateMap<<<gridsize, blocksize>>>(Npix_, healpixX_GPU, healpixY_GPU, healpixZ_GPU, 
     		numParts, parts_GPU, norm_GPU, map_GPU);
     cudaStatus = cudaThreadSynchronize();
