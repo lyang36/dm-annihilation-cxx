@@ -10,7 +10,7 @@ HEALPIXC  = $(HEALPIXHOME)/cxx/Healpix_cxx
 C=gcc
 CC=g++
 OBJS=main.o datareader.o tipsy_io.o parameters.o mapgenerator.o\
-	 genmap.o
+	 genmap.o anglefuncs.o
 
 LFLAGS=$(HEALPIXLIB)/libhealpix_cxx.a\
 	   $(HEALPIXLIB)/libcxxsupport.a\
@@ -28,7 +28,7 @@ all: comp
 comp:
 	$(CC) -c main.cpp  datareader.cpp  tipsy_io.c \
 		   	parameters.cpp mapgenerator.cpp genmap.cpp\
-			$(IFLAG)
+			anglefuncs.cpp $(IFLAG)
 
 clean:
 	rm -fr *.o
