@@ -35,8 +35,8 @@ void MapGenerator::saveToFits(string filename){
     
     //write a fits file
     int npix = 12 * (par_->map.Nside) * (par_->map.Nside);
-    arr<double> maparr (map_, npix);
-    Healpix_Map<double> outputmap (maparr, RING);
+    arr<MAPTYPE> maparr (map_, npix);
+    Healpix_Map<MAPTYPE> outputmap (maparr, RING);
     string fits_filename = par_-> outputFileName;
     ifstream ifile(fits_filename.c_str());
     if (ifile) {
@@ -48,14 +48,14 @@ void MapGenerator::saveToFits(string filename){
             remove( fits_filename.c_str() );
             fitshandle fitswriter;
             fitswriter.create(fits_filename);
-            write_Healpix_map_to_fits<double>(fitswriter, outputmap, PLANCK_FLOAT64 );
+            write_Healpix_map_to_fits<MAPTYPE>(fitswriter, outputmap, PLANCK_FLOAT64 );
             fitswriter.close();
         }
     }else{
         cout << "Creating fits!..." << endl;
         fitshandle fitswriter;
         fitswriter.create(fits_filename);
-        write_Healpix_map_to_fits<double>(fitswriter, outputmap, PLANCK_FLOAT64 );
+        write_Healpix_map_to_fits<MAPTYPE>(fitswriter, outputmap, PLANCK_FLOAT64 );
         fitswriter.close();
     }
 
@@ -65,7 +65,7 @@ bool MapGenerator::isFinished(){
     return isFinished_;
 }
 
-double * MapGenerator::getMap(){
+MAPTYPE * MapGenerator::getMap(){
     return map_;
 }
 

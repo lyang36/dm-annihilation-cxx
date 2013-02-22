@@ -2,6 +2,13 @@
 #define __MAP_GENERATOR__LY
 #include "parameters.h"
 #include "datareader.h"
+
+//define the map's type
+typedef double MAPTYPE;
+
+//float can lead to incorrect result
+//typedef float MAPTYPE;
+
 class MapGenerator{
 public:
     MapGenerator(Parameters * par, DataReader * reader);
@@ -9,14 +16,16 @@ public:
     void start();
     void saveToFits(std::string fits_file);
     bool isFinished();
-    double * getMap();
+    MAPTYPE * getMap();
     int getNside();
+    
+    
     
 private:
     Parameters * par_;
     DataReader * reader_;
     bool isFinished_;
-    double * map_;
+    MAPTYPE * map_;
     
 };
 
