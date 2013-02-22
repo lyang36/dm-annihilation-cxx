@@ -30,6 +30,11 @@ comp:
 		   	parameters.cpp mapgenerator.cpp genmap.cpp\
 			anglefuncs.cpp $(IFLAG)
 
+cuda:
+	nvcc -c kernel.cpp genmap_cuda.cpp
+	nvcc -o annmap_cuda main.o datareader.o tipsy_io.o parameters.o mapgenerator.o\
+		genmap_cuda.o anglefuncs.o kernel.o	
+
 clean:
 	rm -fr *.o
 	rm -fr annmap
