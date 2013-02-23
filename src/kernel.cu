@@ -49,7 +49,7 @@ __device__ double SPHKenerl(MAPTYPE d2){
 }
 
 __device__ MAPTYPE dotProd(MAPTYPE ax, MAPTYPE ay, MAPTYPE az, MAPTYPE bx, MAPTYPE by, MAPTYPE bz){
-	return ax * ax + ay * ay + az * az;
+	return ax * bx + ay * by + az * bz;
 }
 
 //use atomicAdd, may affect perfermance
@@ -130,7 +130,7 @@ __global__ void calculateMap(int Npix, MAPTYPE * healpixX, MAPTYPE * healpixY, M
 		
 		d2 = d2 * d2;
 		MAPTYPE weight = SPHKenerl(d2);
-		map[pix] += weight / norm[i] * parts[i].mass;
+		map[pix] += weight * parts[i].mass / norm[i];
         //if(pix == i) map[pix] += 1.0;
 	}
 }
