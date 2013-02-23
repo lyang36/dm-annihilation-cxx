@@ -254,7 +254,7 @@ cudaError_t initializeHealpix(){
     //the coased healpix base
     Healpix_Base super_base(NsideSuper, NEST, SET_NSIDE);
     NpixCoase_ = 12 * NsideSuper * NsideSuper;
-    dOmegaSuper_ = 4 * PI / NpixCoase_;
+    dOmegaSuper_ = 2 * PI / sqrt(NpixCoase_);
     
     //healpix pix coordinates
     healx = new MAPTYPE[Npix_];
