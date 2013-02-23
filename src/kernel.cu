@@ -95,7 +95,7 @@ __global__ void calculateNorm(int Npix, MAPTYPE * healpixX, MAPTYPE * healpixY, 
 		MAPTYPE weight = SPHKenerl(d2);
 		//testing...
         //norm[i] += weight;
-        //atomicAdd(&(norm[i]), weight);
+        atomicAdd(&(norm[i]), weight);
 	}
 }
 
@@ -130,7 +130,7 @@ __global__ void calculateMap(int Npix, MAPTYPE * healpixX, MAPTYPE * healpixY, M
 		
 		d2 = d2 * d2;
 		MAPTYPE weight = SPHKenerl(d2);
-		//map[pix] += weight / norm[i] * parts[i].mass;
+		map[pix] += weight / norm[i] * parts[i].mass;
         //if(pix == i) map[pix] += 1.0;
 	}
 }

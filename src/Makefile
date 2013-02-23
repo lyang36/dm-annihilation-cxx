@@ -36,7 +36,12 @@ comp:
 cuda:
 	nvcc -c -arch=sm_13 kernel.cu genmap_cuda.cpp $(IFLAG)
 	nvcc -o annmap_cuda main.o datareader.o tipsy_io.o parameters.o mapgenerator.o\
-		genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)	
+			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
+
+cuda-debug:
+	nvcc -c -arch=sm_13 -g -G kernel.cu genmap_cuda.cpp $(IFLAG)
+	nvcc -o annmap_cuda main.o datareader.o tipsy_io.o parameters.o mapgenerator.o\
+		genmap_cuda.o anglefuncs.o -g -G kernel.o $(LFLAGS)	
 
 clean:
 	rm -fr *.o

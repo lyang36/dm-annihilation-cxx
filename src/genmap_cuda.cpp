@@ -38,7 +38,7 @@ void MapGenerator::start(){
     MAPTYPE dOmega = par_->map.dOmega;
     MAPTYPE theta0 = acos( 1.0 - dOmega/(2.0*3.141592) );
     
-    Healpix_Base base(Nside, RING, SET_NSIDE);
+    Healpix_Base base(Nside, NEST, SET_NSIDE);
 
     map_ = (MAPTYPE *) calloc(Npix, sizeof(MAPTYPE));
     int Np = reader_->getPartNum();
