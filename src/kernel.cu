@@ -448,7 +448,7 @@ cudaError_t calulatePartsNumListH(int numParts){
     int blocksize = 512;
 	int gridsize = NpixCoase_ / blocksize + 1;
     calcuatePartsNum<<<gridsize, blocksize>>>(NpixCoase_, heal_superx_GPU, heal_supery_GPU, heal_superz_GPU,
-                                              numParts, parts_GPU, dev_part_num_list, dOmegaSuper_ / 4, cos(dOmegaSuper_ / 4));
+                                              numParts, parts_GPU, dev_part_num_list, dOmegaSuper_ * 2, cos(dOmegaSuper_ * 2));
     
     cudaStatus = cudaThreadSynchronize();
     if( cudaStatus != cudaSuccess){
@@ -493,7 +493,7 @@ cudaError_t calulatePartsListH(int numParts){
 	int gridsize = NpixCoase_ / blocksize + 1;
     calcuatePartsList<<<gridsize, blocksize>>>(NpixCoase_, heal_superx_GPU, heal_supery_GPU, heal_superz_GPU,
                                               numParts, parts_GPU, dev_part_num_list, dev_part_list,
-                                               dOmegaSuper_ / 4, cos(dOmegaSuper_ / 4));
+                                               dOmegaSuper_ * 2, cos(dOmegaSuper_ * 2));
     cudaError_t cudaStatus = cudaThreadSynchronize();
     if( cudaStatus != cudaSuccess){
         fprintf(stderr,"Sync particle list calculating error: %s\n", cudaGetErrorString(cudaStatus));
