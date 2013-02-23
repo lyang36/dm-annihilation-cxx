@@ -66,17 +66,7 @@ __global__ void calculateNorm(int Npix, MAPTYPE * healpixX, MAPTYPE * healpixY, 
 		if(parts[i].eps < 0){
 			continue;
 		}
-        //if(parts[i].hsmooth - healpixX[pix] > 2 * parts[i].posy)
-        //    continue;
-        //if(- parts[i].hsmooth + healpixX[pix] > 2 * parts[i].posy)
-        //   continue;
-        //if(parts[i].posx - healpixY[pix] > 2 * parts[i].posy)
-        //    continue;
-        //if(- parts[i].posx + healpixY[pix] > 2 * parts[i].posy)
-        //    continue;
 
-        //testing	
-		
         MAPTYPE prod = dotProd(healpixX[pix], healpixY[pix], healpixZ[pix]
 		                      , parts[i].velx, parts[i].vely, parts[i].velz);
 		
@@ -95,7 +85,7 @@ __global__ void calculateNorm(int Npix, MAPTYPE * healpixX, MAPTYPE * healpixY, 
 		MAPTYPE weight = SPHKenerl(d2);
 		//testing...
         //norm[i] += weight;
-        atomicAdd(&(norm[i]), weight);
+        //atomicAdd(&(norm[i]), weight);
 	}
 }
 
@@ -110,29 +100,29 @@ __global__ void calculateMap(int Npix, MAPTYPE * healpixX, MAPTYPE * healpixY, M
 	
 	int i = 0;
 	for(i = 0; i < numParts; i ++){
-		if(parts[i].eps < 0){
-			continue;
-		}
+		if(parts[i].eps >= 0){
+			
+		
 	    
         	
-		MAPTYPE prod = dotProd(healpixX[pix], healpixY[pix], healpixZ[pix]
+		    MAPTYPE prod = dotProd(healpixX[pix], healpixY[pix], healpixZ[pix]
 		                      , parts[i].velx, parts[i].vely, parts[i].velz);
 		
-		//could add more constraints here
-		if(prod < parts[i].posz){
-			continue;
-		}
+		    //could add more constraints here
+		    if(prod >= parts[i].posz){
+			    
+		    
 		
-		MAPTYPE d2 = acos(prod) / parts[i].posy;
-		if(d2 > 2){
-			continue;
-		}
+		        MAPTYPE d2 = acos(prod) / parts[i].posy;
+		        
 		
-		d2 = d2 * d2;
-		MAPTYPE weight = SPHKenerl(d2);
-		map[pix] += weight * parts[i].mass / norm[i];
-        //if(pix == i) map[pix] += 1.0;
-	}
+		        d2 = d2 * d2;
+		        MAPTYPE weight = SPHKenerl(d2);
+		        //map[pix] += weight * parts[i].mass / norm[i];
+                //if(pix == i) map[pix] += 1.0;
+	        }
+        }
+    }
 }
 
 cudaError_t zeroLizeNorm(){
