@@ -204,7 +204,7 @@ __global__ void calcuatePartsList(int NpixCoase,  MAPTYPE * healpixSuperX, MAPTY
     if(pix == 0){
         start_pt = 0;
     }else{
-        start_pt = numlist[pix - 1]
+        start_pt = numlist[pix - 1];
     }
     //search for particles
     for(int i = 0; i < numParts; i++){
@@ -256,9 +256,9 @@ cudaError_t initializeHealpix(){
     healz = new MAPTYPE[Npix_];
     
     //healpix coordinates for super pixels
-    heal_superx = new MAPTYPE[NpixCoase];
-    heal_supery = new MAPTYPE[NpixCoase];
-    heal_superz = new MAPTYPE[NpixCoase];
+    heal_superx = new MAPTYPE[NpixCoase_];
+    heal_supery = new MAPTYPE[NpixCoase_];
+    heal_superz = new MAPTYPE[NpixCoase_];
     
     
     
@@ -280,8 +280,8 @@ cudaError_t initializeHealpix(){
     
     cudaError_t cudaStatus;
     
-    host_part_num_list = new int[NpixCoase];
-    cudaStatus = cudaMalloc((void**)&dev_part_num_list, NpixCoase * sizeof(int));
+    host_part_num_list = new int[NpixCoase_];
+    cudaStatus = cudaMalloc((void**)&dev_part_num_list, NpixCoase_ * sizeof(int));
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "cudaMalloc failed -- allocating dev_part_num_list memory!\n");
         return cudaStatus;
@@ -375,6 +375,7 @@ cudaError_t initializeHealpix(){
         fprintf(stderr, "cudaMemcpy failed -- copying HEALPIX Super Z!\n");
         return cudaStatus;
     }
+    return cudaStatus;
 }
 
 cudaError_t initializeCUDA(int Nside, int memParts){
@@ -477,6 +478,7 @@ cudaError_t calulatePartsNumListH(int numParts){
         fprintf(stderr, "cudaMemcpy failed -- copying num_list Back!\n");
         return cudaStatus;
     }
+    return cudaStatus;
 }
 
 //step 2: calculate the particle list in each
@@ -486,12 +488,12 @@ cudaError_t calulatePartsListH(int numParts){
     calcuatePartsList<<<gridsize, blocksize>>>(NpixCoase_, heal_superx_GPU, heal_supery_GPU, heal_superz_GPU,
                                               numParts, parts_GPU, dev_part_num_list, dev_part_list,
                                                dOmegaSuper_ * 2, cos(dOmegaSuper_ * 2));
-    cudaStatus = cudaThreadSynchronize();
+    cudaError_t cudaStatus = cudaThreadSynchronize();
     if( cudaStatus != cudaSuccess){
         fprintf(stderr,"Sync particle list calculating error: %s\n", cudaGetErrorString(cudaStatus));
         return cudaStatus;
     }
-    
+    return cudaStatus;   
 }
 
 cudaError_t calulateMapH(int numParts){
@@ -502,7 +504,7 @@ cudaError_t calulateMapH(int numParts){
     //printf("Start Norm kernel...\n");
     calculateNorm<<<gridsize, blocksize>>>(Npix_, healpixX_GPU, healpixY_GPU, healpixZ_GPU,
                                            numParts, parts_GPU, norm_GPU, dev_part_num_list, dev_part_list);
-    cudaStatus = cudaThreadSynchronize();
+    cudaError_t cudaStatus = cudaThreadSynchronize();
     if( cudaStatus != cudaSuccess){
         fprintf(stderr,"cudaThreadSynchronize error -- sync Norm: %s\n", cudaGetErrorString(cudaStatus));
         return cudaStatus;
@@ -517,12 +519,12 @@ cudaError_t calulateMapH(int numParts){
         fprintf(stderr,"cudaThreadSynchronize error -- sync map: %s\n", cudaGetErrorString(cudaStatus));
         return cudaStatus;
     }
-    
+    return cudaStatus;    
 }
 
 cudaError_t calulateMapWithCUDA(MAPTYPE * map, DMParticle * parts, int numParts){
     //copy the particle data to GPU
-    cudaStatus = cudaMemcpy(parts_GPU, parts, memParts_ * sizeof(DMParticle), cudaMemcpyHostToDevice);
+    cudaError_t cudaStatus = cudaMemcpy(parts_GPU, parts, memParts_ * sizeof(DMParticle), cudaMemcpyHostToDevice);
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "cudaMemcpy failed -- copying HEALPIX X!\n");
         return cudaStatus;
@@ -530,18 +532,23 @@ cudaError_t calulateMapWithCUDA(MAPTYPE * map, DMParticle * parts, int numParts)
     
     zeroLizeNorm();
     //copy the Map data to GPU
-    cudaError_t cudaStatus = cudaMemcpy(map_GPU, map, Npix_ * sizeof(MAPTYPE), cudaMemcpyHostToDevice);
+    cudaStatus = cudaMemcpy(map_GPU, map, Npix_ * sizeof(MAPTYPE), cudaMemcpyHostToDevice);
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "cudaMemcpy failed -- copying MAP!\n");
         return cudaStatus;
     }
     //step1:
-    calulatePartsNumListH(numParts);
-    //step2:
-    calulatePartsListH(numParts);
-    //step3:
-    calulateMapH(numParts);
+    cudaStatus = calulatePartsNumListH(numParts);
+    if(cudaStatus != cudaSuccess) return cudaSuccess;
     
+    //step2:
+    cudaStatus = calulatePartsListH(numParts);
+    if(cudaStatus != cudaSuccess) return cudaSuccess;
+
+    //step3:
+    cudaStatus = calulateMapH(numParts);
+    if(cudaStatus != cudaSuccess) return cudaSuccess;
+
     //copy map back
      cudaStatus = cudaMemcpy(map, map_GPU, Npix_ * sizeof(MAPTYPE), cudaMemcpyDeviceToHost);
      if (cudaStatus != cudaSuccess) {
