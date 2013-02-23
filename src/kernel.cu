@@ -63,29 +63,26 @@ __global__ void calculateNorm(int Npix, MAPTYPE * healpixX, MAPTYPE * healpixY, 
 	
 	int i = 0;
 	for(i = 0; i < numParts; i ++){
-		if(parts[i].eps < 0){
-			continue;
-		}
+		if(parts[i].eps >= 0){
+		
+		
 
-        MAPTYPE prod = dotProd(healpixX[pix], healpixY[pix], healpixZ[pix]
+            MAPTYPE prod = dotProd(healpixX[pix], healpixY[pix], healpixZ[pix]
 		                      , parts[i].velx, parts[i].vely, parts[i].velz);
 		
         //continue;
 		//could add more constraints here
-		if(prod < parts[i].posz){
-			continue;
-		}
+		    if(prod >= parts[i].posz){
 		
-		MAPTYPE d2 = acos(prod) / parts[i].posy;
-		if(d2 > 2){
-			continue;
-		}
-		//continue;
-	    d2 = d2 * d2;
-		MAPTYPE weight = SPHKenerl(d2);
-		//testing...
-        //norm[i] += weight;
-        //atomicAdd(&(norm[i]), weight);
+		        MAPTYPE d2 = acos(prod) / parts[i].posy;
+		        //continue;
+	            d2 = d2 * d2;
+		        MAPTYPE weight = SPHKenerl(d2);
+		        //testing...
+                //norm[i] += weight;
+                atomicAdd(&(norm[i]), weight);
+            }
+        }
 	}
 }
 
@@ -118,7 +115,7 @@ __global__ void calculateMap(int Npix, MAPTYPE * healpixX, MAPTYPE * healpixY, M
 		
 		        d2 = d2 * d2;
 		        MAPTYPE weight = SPHKenerl(d2);
-		        //map[pix] += weight * parts[i].mass / norm[i];
+                map[pix] += weight * parts[i].mass / norm[i];
                 //if(pix == i) map[pix] += 1.0;
 	        }
         }
@@ -225,9 +222,10 @@ void cudaCleaingUp(){
 }
 
 cudaError_t calulateMapWithCUDA(MAPTYPE * map, DMParticle * parts, int numParts){
-	int blocksize = 512;
-	int gridsize = Npix_ / blocksize + 1;
-	
+	int blocksize = 256;
+	//int gridsize = Npix_ / blocksize + 1;
+	int gridsize = 12*512 / 16 * 512 / 16;
+
 	zeroLizeNorm();
     //copy the Map data to GPU
     cudaError_t cudaStatus = cudaMemcpy(map_GPU, map, Npix_ * sizeof(MAPTYPE), cudaMemcpyHostToDevice);
