@@ -21,6 +21,10 @@
 #include "kernel.h"
 
 //this file implements the mapgenerator's gen function
+//Step 1: Divide the high resolution Healpix grid to lower resolution one, calculate how many particles are in each pixel
+//Step 2: Calculate the tetra list for each pixel
+//Step 3: Calculate the normalization for each particle
+//Step 4: Calculate the final value for each high resolution pixel
 void MapGenerator::start(){
     MAPTYPE distances;
     MAPTYPE fluxes;
@@ -38,7 +42,6 @@ void MapGenerator::start(){
     MAPTYPE dOmega = par_->map.dOmega;
     MAPTYPE theta0 = acos( 1.0 - dOmega/(2.0*3.141592) );
     
-    Healpix_Base base(Nside, NEST, SET_NSIDE);
 
     map_ = (MAPTYPE *) calloc(Npix, sizeof(MAPTYPE));
     int Np = reader_->getPartNum();
@@ -64,26 +67,11 @@ void MapGenerator::start(){
     MAPTYPE oposy = par_->params.opos[1];
     MAPTYPE oposz = par_->params.opos[2];
     
-    //healpix pix coordinates
-    MAPTYPE * healx = new MAPTYPE[Npix];
-    MAPTYPE * healy = new MAPTYPE[Npix];
-    MAPTYPE * healz = new MAPTYPE[Npix];
-    
-    for(int i = 0; i < Npix; i++){
-                    //vec3 this_vec = base.pix2vec(i);
-        //pointing px = base.pix2ang(i);
-        //healx[i] = px.theta;//this_vec.x;
-        //healy[i] = px.phi; //this_vec.y;
-        //healz[i] = 0;//this_vec.z;
-    	vec3 this_vec = base.pix2vec(i);
-    	healx[i] = this_vec.x;
-    	healy[i] = this_vec.y;
-    	healz[i] = this_vec.z;
-    }
-    
+
     cudaError_t status;
     //initialize
-    status = initializeCUDA(healx, healy, healz, Npix, par_->memParts);
+    status = initializeCUDA(Nside, par_->memParts);
+    
     if(status != cudaSuccess){
     	printf("CUDA initialize error!\n");
     	exit(1);
@@ -135,9 +123,9 @@ void MapGenerator::start(){
             current_part.velx = vec.x;
 			current_part.vely = vec.y;
 			current_part.velz = vec.z;
-					
-			int pix = base.ang2pix(p);
+			
 			if( 2.0*angular_radius < theta0 ) {
+				int pix = base.ang2pix(p);
 				map_[pix] += fluxes;
 				current_part.eps = -1;
 			}
@@ -164,7 +152,4 @@ void MapGenerator::start(){
     }
     
     printf("%e\n%e\n%e", map_[0], map_[100], map_[10000]);
-    delete healx;
-    delete healy;
-    delete healz;
 }
