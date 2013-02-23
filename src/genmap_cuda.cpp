@@ -149,9 +149,16 @@ void MapGenerator::start(){
     
     cout << "\nFinished!." << endl;
     
+    MAPTYPE * ringmap = new MAPTYPE[Npix];
+
     for(int i = 0; i < Npix; i++){
         map_[i] /= par_->map.dOmega;
+        ringmap[base.nest2ring(i)] = map_[i];
     }
-    
+    for(int i = 0; i < Npix; i++){
+        map_[i] = ringmap[i];
+    }
+
+    delete ringmap;
     printf("%e\n%e\n%e", map_[0], map_[100], map_[10000]);
 }

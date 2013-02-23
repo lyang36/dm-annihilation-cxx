@@ -168,6 +168,9 @@ __global__ void calcuatePartsNum(int NpixCoase,  MAPTYPE * healpixSuperX, MAPTYP
         int numParts, DMParticle * parts, int * numlist,
         MAPTYPE dOmega2, MAPTYPE cos2DOmega){
     int pix = blockIdx.x * blockDim.x + threadIdx.x;
+    if(pix >= NpixCoase){
+        return;
+    }
     
     //clear them to be zero
     numlist[pix] = 0;
@@ -198,7 +201,10 @@ __global__ void calcuatePartsList(int NpixCoase,  MAPTYPE * healpixSuperX, MAPTY
                                  int numParts, DMParticle * parts, int * numlist, int * partList,
                                  MAPTYPE dOmega2, MAPTYPE cos2DOmega){
     int pix = blockIdx.x * blockDim.x + threadIdx.x;
-    
+    if(pix >= NpixCoase){
+        return;
+    }    
+
     int plist_ct = 0;
     int start_pt;
     if(pix == 0){
@@ -442,7 +448,7 @@ cudaError_t calulatePartsNumListH(int numParts){
     int blocksize = 512;
 	int gridsize = NpixCoase_ / blocksize + 1;
     calcuatePartsNum<<<gridsize, blocksize>>>(NpixCoase_, heal_superx_GPU, heal_supery_GPU, heal_superz_GPU,
-                                              numParts, parts_GPU, dev_part_num_list, dOmegaSuper_ * 2, cos(dOmegaSuper_ * 2));
+                                              numParts, parts_GPU, dev_part_num_list, dOmegaSuper_ / 4, cos(dOmegaSuper_ / 4));
     
     cudaStatus = cudaThreadSynchronize();
     if( cudaStatus != cudaSuccess){
@@ -487,7 +493,7 @@ cudaError_t calulatePartsListH(int numParts){
 	int gridsize = NpixCoase_ / blocksize + 1;
     calcuatePartsList<<<gridsize, blocksize>>>(NpixCoase_, heal_superx_GPU, heal_supery_GPU, heal_superz_GPU,
                                               numParts, parts_GPU, dev_part_num_list, dev_part_list,
-                                               dOmegaSuper_ * 2, cos(dOmegaSuper_ * 2));
+                                               dOmegaSuper_ / 4, cos(dOmegaSuper_ / 4));
     cudaError_t cudaStatus = cudaThreadSynchronize();
     if( cudaStatus != cudaSuccess){
         fprintf(stderr,"Sync particle list calculating error: %s\n", cudaGetErrorString(cudaStatus));
