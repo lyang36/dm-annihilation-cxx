@@ -42,9 +42,13 @@ void MapGenerator::start(){
     MAPTYPE dOmega = par_->map.dOmega;
     MAPTYPE theta0 = acos( 1.0 - dOmega/(2.0*3.141592) );
    
+    
+    int NpixCoase_;
+    NpixCoase_ = Npix / BLOCK_N_DIVIDER / BLOCK_N_DIVIDER;
     //the actuall base
     Healpix_Base base(Nside, NEST, SET_NSIDE);
-
+    Healpix_Base superBase(Nside / BLOCK_N_DIVIDER, RING, SET_NSIDE);
+    
     map_ = (MAPTYPE *) calloc(Npix, sizeof(MAPTYPE));
     int Np = reader_->getPartNum();
     
@@ -65,6 +69,7 @@ void MapGenerator::start(){
     //= min(master.params.particle_masses)
     
     DMParticle * parts;//current_part;
+    
     MAPTYPE oposx = par_->params.opos[0];
     MAPTYPE oposy = par_->params.opos[1];
     MAPTYPE oposz = par_->params.opos[2];
@@ -73,6 +78,9 @@ void MapGenerator::start(){
     cudaError_t status;
     //initialize
     status = initializeCUDA(Nside, par_->memParts);
+    vector<int> * pixellist = new vector<int>[par_->memParts];
+    setCudaPixelList(pixellist);
+    
     
     if(status != cudaSuccess){
     	printf("CUDA initialize error!\n");
@@ -80,6 +88,8 @@ void MapGenerator::start(){
     }
     
     int count = 0;
+
+    
     while(reader_->hasNext()){
     	parts = reader_->getBuf();
     	count += reader_->getMemparts();
@@ -131,6 +141,10 @@ void MapGenerator::start(){
 				map_[pix] += fluxes;
 				current_part.eps = -1;
 			}
+			
+			//query the pixles in the superBase
+			pixellist[i].clear();
+			superBase.query_disc_inclusive(p, 2.0 * angular_radius, pixellist[i]);
 		}
 		
 		//pass particles, map to CUDA, calculating

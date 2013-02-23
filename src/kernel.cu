@@ -36,6 +36,7 @@ namespace kernel_space{
 	int memParts_;
     int NpixCoase_;
     MAPTYPE dOmegaSuper_;        //the dOmega of the super pixels
+    int NsideSuper_;
     
     
     //healpix pix coordinates
@@ -50,12 +51,23 @@ namespace kernel_space{
     
     //int * host_part_list;       //particle list for each super pixel
     int * dev_part_list;        //particle list for device for each super pixel
+    int * host_part_list = NULL;
     int * host_part_num_list;   //particle number list for super pixels
     int * dev_part_num_list;    //particle number list for super pixels
+    int * host_part_num_start_list;
+    int totolPartListLength_;   //the length of host_part_list
 	
+    vector<int> * parPixList_;  //the CPU particle_pixel list
+    
+    
 }
 
 using namespace kernel_space;
+
+
+void setCudaPixelList(vector<int> * parPixList){
+    parPixList_ = parPixList;
+}
 
 //atomicAdd for double
 __device__ double atomicAdd(double* address, double val)
@@ -247,6 +259,7 @@ cudaError_t initializeHealpix(){
     
     Npix_ = 12 * Nside_ * Nside_;
     int NsideSuper = Nside_ / BLOCK_N_DIVIDER;
+    NsideSuper_ = NsideSuper;
     
     //the actuall base
     Healpix_Base base(Nside_, NEST, SET_NSIDE);
@@ -287,6 +300,8 @@ cudaError_t initializeHealpix(){
     cudaError_t cudaStatus;
     
     host_part_num_list = new int[NpixCoase_];
+    host_part_num_start_list = new int[NpixCoase_];
+    
     cudaStatus = cudaMalloc((void**)&dev_part_num_list, NpixCoase_ * sizeof(int));
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "cudaMalloc failed -- allocating dev_part_num_list memory!\n");
@@ -438,6 +453,9 @@ void cudaCleaingUp(){
     cudaFree(dev_part_list);
     cudaFree(dev_part_num_list);
 	
+    delete host_part_num_list;
+    delete host_part_list;
+    delete host_part_num_start_list;
 	free(norm_CPU);
 }
 
@@ -528,6 +546,69 @@ cudaError_t calulateMapH(int numParts){
     return cudaStatus;    
 }
 
+cudaError_t calculatePartsListByCPU(DMParticle * parts, int numParts){
+    Healpix_Base super_base(NsideSuper_, NEST, SET_NSIDE);
+    delete host_part_list;
+    cudaFree(dev_part_list);
+    
+    for(int i = 0; i < NpixCoase_; i++){
+        host_part_num_list[i] = 0;
+    }
+    
+    totolPartListLength_ = 0;
+    for(int i = 0; i < numParts; i++){
+        for(int j = 0; j < parPixList_[i].size(); j++){
+            int superPix = super_base.ring2nest((parPixList_[i])[j]);
+            (parPixList_[i])[j] = superPix;
+            host_part_num_list[superPix] += 1;
+        }
+    }
+    
+    host_part_num_start_list[0] = 0;
+    for(int i = 1; i < NpixCoase_; i++){
+        host_part_num_list[i] += host_part_num_list[i-1];
+        host_part_num_start_list[i] = host_part_num_list[i-1];
+    }
+    
+    totolPartListLength_ = host_part_num_start_list[NpixCoase_ - 1];
+    
+    if(host_part_list != NULL){
+        delete host_part_list;
+    }
+    host_part_list = new int[totolPartListLength_];
+    
+    for(int i = 0; i < numParts; i++){
+        for(int j = 0; j < parPixList_[i].size(); j++){
+            int superPix = (parPixList_[i])[j];
+            host_part_list[host_part_num_start_list[superPix]] = i;
+            host_part_num_start_list[superPix] += 1;
+        }
+    }
+    
+    //allocating memory for particle list
+    cudaStatus = cudaMalloc((void**)&dev_part_list, totolPartListLength_ * sizeof(int));
+    if (cudaStatus != cudaSuccess) {
+        fprintf(stderr, "cudaMalloc failed -- allocating dev_part_list memory!\n");
+        return cudaStatus;
+    }
+    
+    //copy particle num list to GPU
+    cudaStatus = cudaMemcpy(dev_part_num_list, host_part_num_list, NpixCoase_ * sizeof(int), cudaMemcpyHostToDevice);
+    if (cudaStatus != cudaSuccess) {
+        fprintf(stderr, "cudaMemcpy failed -- copying num_list Back!\n");
+        return cudaStatus;
+    }
+    
+    //copy particle list to GPU
+    cudaStatus = cudaMemcpy(dev_part_list, host_part_list, totolPartListLength_ * sizeof(int), cudaMemcpyHostToDevice);
+    if (cudaStatus != cudaSuccess) {
+        fprintf(stderr, "cudaMemcpy failed -- copying part_list Back!\n");
+        return cudaStatus;
+    }
+    
+    
+}
+
 cudaError_t calulateMapWithCUDA(MAPTYPE * map, DMParticle * parts, int numParts){
     //copy the particle data to GPU
     cudaError_t cudaStatus = cudaMemcpy(parts_GPU, parts, memParts_ * sizeof(DMParticle), cudaMemcpyHostToDevice);
@@ -543,14 +624,18 @@ cudaError_t calulateMapWithCUDA(MAPTYPE * map, DMParticle * parts, int numParts)
         fprintf(stderr, "cudaMemcpy failed -- copying MAP!\n");
         return cudaStatus;
     }
+    
+    //These GPU functions are slower than the corresponding CPU func
+    //Use CPU func
     //step1:
-    cudaStatus = calulatePartsNumListH(numParts);
-    if(cudaStatus != cudaSuccess) return cudaSuccess;
+    //cudaStatus = calulatePartsNumListH(numParts);
+    //if(cudaStatus != cudaSuccess) return cudaSuccess;
     
     //step2:
-    cudaStatus = calulatePartsListH(numParts);
-    if(cudaStatus != cudaSuccess) return cudaSuccess;
-
+    //cudaStatus = calulatePartsListH(numParts);
+    //if(cudaStatus != cudaSuccess) return cudaSuccess;
+    calculatePartsListByCPU(parts, numParts);
+    
     //step3:
     cudaStatus = calulateMapH(numParts);
     if(cudaStatus != cudaSuccess) return cudaSuccess;
