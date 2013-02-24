@@ -10,7 +10,7 @@ public:
     MapGenerator(Parameters * par, DataReader * reader);
     ~MapGenerator();
     void start();
-    void saveToFits(std::string fits_file);
+    void saveToFits(std::string fits_file, bool isVerbose = false);
     bool isFinished();
     MAPTYPE * getMap();
     int getNside();

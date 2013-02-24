@@ -15,6 +15,7 @@
 #include "datatypes.h"
 #include "mapgenerator.h"
 #include "anglefuncs.h"
+#include "flux.h"
 
 //this file implements the mapgenerator's gen function
 void MapGenerator::start(){
@@ -26,9 +27,9 @@ void MapGenerator::start(){
 	MAPTYPE phi;
     MAPTYPE * weight;
     
-    MAPTYPE unit_factor = pow(pow((par_ -> natconst.c_in_cgs), 2) /
-                              (par_->units.eV_in_cgs * 1.0e9), 2) / (par_->units.Mpc_in_cgs * 1.0e-3)
-                            * par_->codeunits.annihilation_flux_to_cgs;
+    //MAPTYPE unit_factor = pow(pow((par_ -> natconst.c_in_cgs), 2) /
+    //                          (par_->units.eV_in_cgs * 1.0e9), 2) / (par_->units.Mpc_in_cgs * 1.0e-3)
+    //                        * par_->codeunits.annihilation_flux_to_cgs;
     
 	int Nside = par_->map.Nside;
 	int Npix = par_->map.Npix;
@@ -84,7 +85,8 @@ void MapGenerator::start(){
 							+(current_part.posy-oposy) * (current_part.posy-oposy)
 							+(current_part.posz-oposz) * (current_part.posz-oposz));
 			
-			fluxes = unit_factor * current_part.dens * current_part.mass / (4.0 * PI * distances * distances);
+			//fluxes = unit_factor * current_part.dens * current_part.mass / (4.0 * PI * distances * distances);
+			fluxes = getflux(par_, current_part, distances);
 			
 			calc_angles(current_part.posx-oposx, current_part.posy-oposy,
 						current_part.posz-oposz, distances, par_,
@@ -114,15 +116,6 @@ void MapGenerator::start(){
 				continue;
 			}
 			
-			/*static int mm = 0;
-	
-			if(mm < 100) {printf("%e %e %e %e %e %e\n", current_part.mass, current_part.dens,
-						   current_part.hsmooth, current_part.posx,
-						   current_part.posy, current_part.posz);
-						   mm ++;}
-	
-			if(mm < 100) printf("angular_radius: %e, disc size: %d, dist: %f\n", 2.0*angular_radius, 
-							npix_disc, distances);*/
 			// get here only if the particle covers more than one pixel
 			
 			MAPTYPE weight_norm = 0.0;
@@ -143,7 +136,6 @@ void MapGenerator::start(){
 				map_[pix_list[j]] += weight[j] * fluxes;
 				
 			}  // loop over pixels covered by this particle
-			/*if(mm < 100) printf("pix %d flux %e Map %e weightnorm %e\n", pix, fluxes, map_[pix], weight_norm);*/
 		}
 		reader_->loadBuffer();
     }

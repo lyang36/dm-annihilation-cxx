@@ -23,15 +23,18 @@ IFLAG=-I $(HEALPIXSRC) -I$(FITSIOLIB)
 
 
 
-all: comp
-	$(CC) -o annmap $(OBJS) $(LFLAGS)
-	@cd dataconverter; make
-	@cd test; make
+all: ann-nosop
 
 comp:
 	$(CC) -c main.cpp  datareader.cpp  tipsy_io.c \
 		   	parameters.cpp mapgenerator.cpp genmap.cpp\
 			anglefuncs.cpp $(IFLAG)
+ann-nosop: comp
+	$(CC) -c flux_ann_nosop.cpp
+	$(CC) -o annmap_ann_nosop flux_ann_nosop.o $(OBJS) $(LFLAGS)
+	@cd dataconverter; make
+	@cd test; make
+
 
 cuda:
 	nvcc -c -arch=sm_13 kernel.cu genmap_cuda.cpp $(IFLAG)
@@ -45,7 +48,7 @@ cuda-debug:
 
 clean:
 	rm -fr *.o
-	rm -fr annmap
+	rm -fr annmap_ann_nosop
 	rm -fr annmap_cuda
 	@cd dataconverter; make clean
 	@cd test; make clean

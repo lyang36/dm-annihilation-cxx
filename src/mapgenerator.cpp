@@ -27,7 +27,7 @@ MapGenerator::~MapGenerator(){
     }
 }
 
-void MapGenerator::saveToFits(string filename){
+void MapGenerator::saveToFits(string filename, bool isVerbose){
     if(!isFinished()){
         printf("Map not generated yet");
         return;
@@ -41,10 +41,10 @@ void MapGenerator::saveToFits(string filename){
     ifstream ifile(fits_filename.c_str());
     if (ifile) {
         // The file exists, and is open for input
-        cout << "File exists! Owerite?" << endl;
-        char t;
-        cin >> t;
-        if( t == 'y'){
+        cout << "File exists! Owerite..." << endl;
+        char t = 0;
+        if(isVerbose) cin >> t;
+        if( t == 'y' || !isVerbose){
             remove( fits_filename.c_str() );
             fitshandle fitswriter;
             fitswriter.create(fits_filename);

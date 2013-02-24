@@ -54,7 +54,7 @@ int main(int argc, const char **argv){
     generator.start();
     reader->close();
 
-    generator.saveToFits(par.outputFileName);
+    generator.saveToFits(par.outputFileName, verbose);
     printf("Finished....\nMap saved as fits file in %s.\n", par.outputFileName.c_str());
 
     delete reader;
