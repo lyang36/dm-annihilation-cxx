@@ -1,8 +1,8 @@
 #must setup these 2 lib to compile
-#FITSIOLIB=/Users/lyang/Tools/cfitsio
-#HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
-FITSIOLIB=/home/lyang/Tools/cfitsio
-HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
+FITSIOLIB=/Users/lyang/Tools/cfitsio
+HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
+#FITSIOLIB=/home/lyang/Tools/cfitsio
+#HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
 
 
 HEALPIXSRC = $(HEALPIXHOME)/src/cxx/basic_gcc/include
@@ -23,7 +23,7 @@ IFLAG=-I $(HEALPIXSRC) -I$(FITSIOLIB)
 
 
 
-all: ann-nosop ann-sopv ann-sopv2 others
+all: ann-nosop ann-sopv ann-sopv2 decay others
 
 others:
 	@cd dataconverter; make
@@ -45,10 +45,15 @@ ann-sopv: comp
 ann-sopv2: comp
 	$(CC) -c flux_ann_sopv2.cpp
 	$(CC) -o annmap_ann_sopv2 flux_ann_sopv2.o $(OBJS) $(LFLAGS)
+	
+decay: comp
+	$(CC) -c flux_decay.cpp
+	$(CC) -o decaymap flux_decay.o $(OBJS) $(LFLAGS)
 
 
 
-cuda-all: cuda-ann-nosop cuda-ann-sopv cuda-ann-sopv2
+
+cuda-all: cuda-ann-nosop cuda-ann-sopv cuda-ann-sopv2 cuda-decay
 
 cuda-ann-nosop:
 	nvcc -c -arch=sm_13 kernel.cu genmap_cuda.cpp $(IFLAG)
@@ -68,6 +73,13 @@ cuda-ann-sopv2:
 		   	tipsy_io.o parameters.o mapgenerator.o\
 			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
 
+cuda-decay:
+	nvcc -c -arch=sm_13 kernel.cu genmap_cuda.cpp $(IFLAG)
+	nvcc -o decaymap_cuda main.o flux_decay.o datareader.o\
+		   	tipsy_io.o parameters.o mapgenerator.o\
+			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
+
+
 cuda-debug:
 	nvcc -c -arch=sm_13 -g -G kernel.cu genmap_cuda.cpp $(IFLAG)
 	nvcc -o annmap_cuda main.o datareader.o tipsy_io.o parameters.o mapgenerator.o\
@@ -81,5 +93,7 @@ clean:
 	rm -fr annmap_cuda_ann_nosop
 	rm -fr annmap_cuda_ann_sopv
 	rm -fr annmap_cuda_ann_sopv2
+	rm -fr decaymap
+	rm -fr decaymap_cuda
 	@cd dataconverter; make clean
 	@cd test; make clean
