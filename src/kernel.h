@@ -7,6 +7,6 @@
 cudaError_t initializeCUDA(int Nside, int memParts);
 cudaError_t calulateMapWithCUDA(MAPTYPE * map, DMParticle * parts, int numParts);
 void cudaCleaingUp();
-setCudaPixelList(vector<int> * parPixList);
+void setCudaPixelList(vector<int> * parPixList);
 
 #endif

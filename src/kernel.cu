@@ -570,7 +570,7 @@ cudaError_t calculatePartsListByCPU(DMParticle * parts, int numParts){
         host_part_num_start_list[i] = host_part_num_list[i-1];
     }
     
-    totolPartListLength_ = host_part_num_start_list[NpixCoase_ - 1];
+    totolPartListLength_ = host_part_num_list[NpixCoase_ - 1];
     
     if(host_part_list != NULL){
         delete host_part_list;
@@ -586,7 +586,7 @@ cudaError_t calculatePartsListByCPU(DMParticle * parts, int numParts){
     }
     
     //allocating memory for particle list
-    cudaStatus = cudaMalloc((void**)&dev_part_list, totolPartListLength_ * sizeof(int));
+    cudaError_t cudaStatus = cudaMalloc((void**)&dev_part_list, totolPartListLength_ * sizeof(int));
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "cudaMalloc failed -- allocating dev_part_list memory!\n");
         return cudaStatus;
@@ -606,7 +606,7 @@ cudaError_t calculatePartsListByCPU(DMParticle * parts, int numParts){
         return cudaStatus;
     }
     
-    
+    return cudaStatus;    
 }
 
 cudaError_t calulateMapWithCUDA(MAPTYPE * map, DMParticle * parts, int numParts){
@@ -634,9 +634,11 @@ cudaError_t calulateMapWithCUDA(MAPTYPE * map, DMParticle * parts, int numParts)
     //step2:
     //cudaStatus = calulatePartsListH(numParts);
     //if(cudaStatus != cudaSuccess) return cudaSuccess;
+    printf("Step 1: calcuate how many particles in each super pixel...\n");
     calculatePartsListByCPU(parts, numParts);
     
     //step3:
+    printf("Step 3: calcuate map...\n");
     cudaStatus = calulateMapH(numParts);
     if(cudaStatus != cudaSuccess) return cudaSuccess;
 

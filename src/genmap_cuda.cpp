@@ -43,8 +43,8 @@ void MapGenerator::start(){
     MAPTYPE theta0 = acos( 1.0 - dOmega/(2.0*3.141592) );
    
     
-    int NpixCoase_;
-    NpixCoase_ = Npix / BLOCK_N_DIVIDER / BLOCK_N_DIVIDER;
+    //int NpixCoase_;
+    //NpixCoase_ = Npix / BLOCK_N_DIVIDER / BLOCK_N_DIVIDER;
     //the actuall base
     Healpix_Base base(Nside, NEST, SET_NSIDE);
     Healpix_Base superBase(Nside / BLOCK_N_DIVIDER, RING, SET_NSIDE);
