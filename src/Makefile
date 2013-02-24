@@ -23,7 +23,7 @@ IFLAG=-I $(HEALPIXSRC) -I$(FITSIOLIB)
 
 
 
-all: ann-nosop ann-sopv others
+all: ann-nosop ann-sopv ann-sopv2 others
 
 others:
 	@cd dataconverter; make
@@ -42,6 +42,10 @@ ann-sopv: comp
 	$(CC) -c flux_ann_sopv.cpp
 	$(CC) -o annmap_ann_sopv flux_ann_sopv.o $(OBJS) $(LFLAGS)
 	
+ann-sopv2: comp
+	$(CC) -c flux_ann_sopv2.cpp
+	$(CC) -o annmap_ann_sopv2 flux_ann_sopv2.o $(OBJS) $(LFLAGS)
+
 
 
 cuda-all: cuda-ann-nosop
@@ -54,7 +58,13 @@ cuda-ann-nosop:
 
 cuda-ann-sopv:
 	nvcc -c -arch=sm_13 kernel.cu genmap_cuda.cpp $(IFLAG)
-	nvcc -o annmap_cuda_ann_nosop main.o flux_ann_sopv.o datareader.o\
+	nvcc -o annmap_cuda_ann_sopv main.o flux_ann_sopv.o datareader.o\
+		   	tipsy_io.o parameters.o mapgenerator.o\
+			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
+
+cuda-ann-sopv2:
+	nvcc -c -arch=sm_13 kernel.cu genmap_cuda.cpp $(IFLAG)
+	nvcc -o annmap_cuda_ann_sopv2 main.o flux_ann_sopv2.o datareader.o\
 		   	tipsy_io.o parameters.o mapgenerator.o\
 			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
 
@@ -66,6 +76,10 @@ cuda-debug:
 clean:
 	rm -fr *.o
 	rm -fr annmap_ann_nosop
+	rm -fr annmap_ann_sopv
+	rm -fr annmap_ann_sopv2
 	rm -fr annmap_cuda_ann_nosop
+	rm -fr annmap_cuda_ann_sopv
+	rm -fr annmap_cuda_ann_sopv2
 	@cd dataconverter; make clean
 	@cd test; make clean
