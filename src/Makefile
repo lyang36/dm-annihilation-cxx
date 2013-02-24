@@ -36,9 +36,12 @@ ann-nosop: comp
 	@cd test; make
 
 
-cuda:
+cuda-all: cuda-ann-nosop
+
+cuda-ann-nosop:
 	nvcc -c -arch=sm_13 kernel.cu genmap_cuda.cpp $(IFLAG)
-	nvcc -o annmap_cuda main.o datareader.o tipsy_io.o parameters.o mapgenerator.o\
+	nvcc -o annmap_cuda_ann_nosop main.o flux_ann_nosop.o datareader.o\
+		   	tipsy_io.o parameters.o mapgenerator.o\
 			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
 
 cuda-debug:
@@ -49,6 +52,6 @@ cuda-debug:
 clean:
 	rm -fr *.o
 	rm -fr annmap_ann_nosop
-	rm -fr annmap_cuda
+	rm -fr annmap_cuda_ann_nosop
 	@cd dataconverter; make clean
 	@cd test; make clean

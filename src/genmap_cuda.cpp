@@ -19,6 +19,7 @@
 #include "mapgenerator.h"
 #include "anglefuncs.h"
 #include "kernel.h"
+#include "flux.h"
 
 //this file implements the mapgenerator's gen function
 //Step 1: Divide the high resolution Healpix grid to lower resolution one, calculate how many particles are in each pixel
@@ -111,8 +112,9 @@ void MapGenerator::start(){
 							+(current_part.posy-oposy) * (current_part.posy-oposy)
 							+(current_part.posz-oposz) * (current_part.posz-oposz));
 			
-			fluxes = unit_factor * current_part.dens * current_part.mass / (4.0 * PI * distances * distances);
-			
+			//fluxes = unit_factor * current_part.dens * current_part.mass / (4.0 * PI * distances * distances);
+			fluxes = getflux(par_, current_part, distances);
+
 			calc_angles(current_part.posx-oposx, current_part.posy-oposy,
 						current_part.posz-oposz, distances, par_,
 						costheta, phi);
