@@ -20,13 +20,13 @@ void calc_angles( MAPTYPE xpos, MAPTYPE ypos, MAPTYPE zpos, MAPTYPE &distances,
     for(int i = 0; i < 3; i ++){
         temp[i] = 0;
         for(int j = 0; j < 3; j ++){
-            temp[i] += params->rotmatrix[j][i] * vec[j];
+            temp[i] += params->rotmatrix[i][j] * vec[j];
         }
     }
 	
-	MAPTYPE xcoord = vec[0];
-	MAPTYPE ycoord = vec[1];
-	MAPTYPE zcoord = vec[2];
+	MAPTYPE xcoord = temp[0];//vec[0];
+	MAPTYPE ycoord = temp[1];//vec[1];
+	MAPTYPE zcoord = temp[2];//vec[2];
     
 	costheta = zcoord / distances;
     
