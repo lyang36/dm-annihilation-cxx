@@ -56,6 +56,9 @@ int main(int argc, const char **argv){
 
     generator.saveToFits(par.outputFileName, verbose);
     printf("Finished....\nMap saved as fits file in %s.\n", par.outputFileName.c_str());
+   
+    string command = "map2tga " + par.outputFileName + " " + par.outputFileName + ".tga -log -bar";
+    system(command.c_str());
 
     delete reader;
 }
