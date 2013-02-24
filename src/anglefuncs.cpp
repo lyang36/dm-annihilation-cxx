@@ -20,7 +20,7 @@ void calc_angles( MAPTYPE xpos, MAPTYPE ypos, MAPTYPE zpos, MAPTYPE &distances,
     for(int i = 0; i < 3; i ++){
         temp[i] = 0;
         for(int j = 0; j < 3; j ++){
-            temp[i] += params->rotmatrix[i][j] * vec[j];
+            temp[i] += params->rotmatrix[j][i] * vec[j];
         }
     }
 	
