@@ -1,8 +1,8 @@
 #must setup these 2 lib to compile
-FITSIOLIB=/Users/lyang/Tools/cfitsio
-HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
-#FITSIOLIB=/home/lyang/Tools/cfitsio
-#HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
+#FITSIOLIB=/Users/lyang/Tools/cfitsio
+#HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
+FITSIOLIB=/home/lyang/Tools/cfitsio
+HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
 
 
 HEALPIXSRC = $(HEALPIXHOME)/src/cxx/basic_gcc/include
@@ -48,7 +48,7 @@ ann-sopv2: comp
 
 
 
-cuda-all: cuda-ann-nosop
+cuda-all: cuda-ann-nosop cuda-ann-sopv cuda-ann-sopv2
 
 cuda-ann-nosop:
 	nvcc -c -arch=sm_13 kernel.cu genmap_cuda.cpp $(IFLAG)
