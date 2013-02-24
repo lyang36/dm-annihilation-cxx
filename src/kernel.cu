@@ -454,8 +454,11 @@ void cudaCleaingUp(){
     cudaFree(dev_part_num_list);
 	
     delete host_part_num_list;
+    host_part_num_list = NULL;
     delete host_part_list;
+    host_part_list = NULL;
     delete host_part_num_start_list;
+    host_part_num_start_list = NULL;
 	free(norm_CPU);
 }
 
@@ -548,7 +551,7 @@ cudaError_t calulateMapH(int numParts){
 
 cudaError_t calculatePartsListByCPU(DMParticle * parts, int numParts){
     Healpix_Base super_base(NsideSuper_, NEST, SET_NSIDE);
-    delete host_part_list;
+    //delete host_part_list;
     cudaFree(dev_part_list);
     
     for(int i = 0; i < NpixCoase_; i++){

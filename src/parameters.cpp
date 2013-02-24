@@ -344,6 +344,8 @@ Parameters::Parameters(string ifname){
                 isNative = false;
             }else if (temp == "outputmap"){
                 outputFileName = val;
+            }else if (temp == "mem_buffer"){
+                memParts = atoi(val);
             }
             
 		}
@@ -475,6 +477,9 @@ void print_out_master( Parameters * master){
 	cout << "rotmatrix " << getstring_double( master -> rotmatrix[0], 3) << endl;
 	cout << "rotmatrix " << getstring_double( master -> rotmatrix[1], 3) << endl;
 	cout << "rotmatrix " << getstring_double( master -> rotmatrix[2], 3) << endl;
+    
+    printf("Particle buffer size: %d\n", master -> memParts );
+
     if(master->isNative)
         cout << "Data File (Native): " << master->nativeDatafile << endl;
     else{
