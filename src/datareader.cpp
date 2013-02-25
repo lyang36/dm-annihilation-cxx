@@ -193,7 +193,7 @@ void DataReader::loadBuffer(){
     //apply the mask file
     if(isMask_){
         char * mask = new char[memParts_];
-        maskStream.read(mask, sizeof(char) * memParts_);
+        maskStream_.read(mask, sizeof(char) * memParts_);
         for(int i = 0; i < memParts_; i++){
             if(mask[i] == 0){
                 buffer_[i].dens = -1;    
