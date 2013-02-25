@@ -162,7 +162,8 @@ void Parameters::setupRotation(){
   	double distance = sqrt(pow(params.opos[0] - params.cpos[0], 2.0)
                            + pow(params.opos[1] - params.cpos[1], 2.0)
                            + pow(params.opos[2] - params.cpos[2], 2.0));
-    
+    //printf("%f %f %f\n", align_vector[0], align_vector[1], align_vector[2]);
+
   	double tmpvec[] = {params.cpos[0] + distance * align_vector[0] - params.opos[0],
         params.cpos[1] + distance * align_vector[1] - params.opos[1],
         params.cpos[2] + distance * align_vector[2] - params.opos[2]};
