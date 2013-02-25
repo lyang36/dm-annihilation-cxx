@@ -42,7 +42,7 @@ DataReader::DataReader(string basedir, string basename){
     particle_file_name = basedir_ + "/" + basename_;
     density_file_name = particle_file_name + ".den32";
     hsmooth_file_name = particle_file_name + ".hsm32";
-    
+    sigmav_file_name = particle_file_name + ".sigma32";    
 }
 
 void DataReader::setTest(int tn){
@@ -114,14 +114,22 @@ bool DataReader::open(){
             fprintf(stderr,"Particle numbers in hsmooth not match.\n");
             exit(1);
         }
-        
+       
+        sigmavStream_.open( sigmav_file_name.c_str(), ios::in | ios::binary);
+        sigmavStream_.read( reinterpret_cast<char*>( &np ), sizeof np);
+        if(np != partNumbers_){
+            fprintf(stderr,"Particle numbers in sigmav not match.\n");
+            exit(1);
+        }
+
         cout << "Load to buffer ... " << endl;
-        loadBuffer();
+        //loadBuffer();
         if(testnum_ != -1){
             if((int)partNumbers_ > testnum_){
                   partNumbers_ = testnum_;
             }   
-        }  
+        }
+        loadBuffer();  
         return (fp_ != 0);
     }
 }
@@ -149,6 +157,7 @@ void DataReader::loadBuffer(){
         Pdm dp;
         float dens;
         float hsmooth;
+        float sigmav;
         int status;
         for(i = 0; i < memParts_; i++){
             status = xdr_dark(&xdrs_, &(dp));
@@ -158,9 +167,11 @@ void DataReader::loadBuffer(){
             }
             densStream_.read((char *) &dens, sizeof(float));
             hsmoothStream_.read((char *) &hsmooth, sizeof(float));
+            sigmavStream_.read((char *) &sigmav, sizeof(float));
             buffer_[i].setPdm(dp);
             buffer_[i].dens = dens;
             buffer_[i].hsmooth = hsmooth;
+            buffer_[i].sigmav = sigmav;
         }
     }
 }
@@ -222,6 +233,7 @@ void DataReader::close(){
         fclose(fp_);
         densStream_.close();
         hsmoothStream_.close();
+        sigmavStream_.close();
     }
 }
 

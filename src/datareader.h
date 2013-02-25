@@ -58,13 +58,15 @@ private:
     string particle_file_name;
     string density_file_name;
     string hsmooth_file_name;
-    
+    string sigmav_file_name;   
+
     tipsy_header tips_;
     FILE * fp_;
 	XDR xdrs_;
     ifstream densStream_;
     ifstream hsmoothStream_;
-    
+    ifstream sigmavStream_;
+
     //for native file
     string filePath_;//file path
     

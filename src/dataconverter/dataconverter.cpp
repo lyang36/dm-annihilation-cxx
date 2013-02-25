@@ -15,10 +15,10 @@ int main(int argc, const char **argv){
     while (m<argc)
     {
         string arg = argv[m];
-        if (arg == "-base") { basedir = argv[m+1]; m+=2;}
-        if (arg == "-bname") { basename = argv[m+1]; m+=2;}
-        if (arg == "-output") {output = argv[m+1]; m+=2; }
-        if (arg == "-help") {
+        if (arg == "-base") { basedir = argv[m+1]; m++;}
+        else if (arg == "-bname") { basename = argv[m+1]; m++;}
+        else if (arg == "-output") {output = argv[m+1]; m++; }
+        else {
             cout << "Usage:" << endl;
             cout << "-base name: setup basedir of the data. Default: /home/lyang/files/r200" << endl;
             cout << "-bname name: setup basename of the data. Default: vl2b.00400.r200" << endl;
@@ -26,6 +26,7 @@ int main(int argc, const char **argv){
             cout << "-help: watching help" << endl;
             exit(0);
         }
+        m ++;
     }
     
     DataReader reader(basedir, basename);

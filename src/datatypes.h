@@ -29,6 +29,7 @@ public:
     float velx;
     float vely;
     float velz;
+    float sigmav;       //the sigma of the velocity dispersion
     float eps;
     float phi;
     
@@ -54,6 +55,7 @@ public:
         velx = rhs.velx;
         vely = rhs.vely;
         velz = rhs.velz;
+        sigmav = rhs.sigmav;
         eps = rhs.eps;
         phi = rhs.phi;
         return (*this);
@@ -69,6 +71,7 @@ public:
         velx = rhs.velx;
         vely = rhs.vely;
         velz = rhs.velz;
+        sigmav = rhs.sigmav;
         eps = rhs.eps;
         phi = rhs.phi;
         //return *this;
