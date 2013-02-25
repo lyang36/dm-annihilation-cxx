@@ -10,7 +10,7 @@
 using namespace std;
 
 //read native data
-DataReader::DataReader(string path){
+DataReader::DataReader(string path, bool isMask, string maskfile){
     filePath_ = path;
     memBuffer_ = 10000000;
     memCursor_ = 0;
@@ -21,11 +21,14 @@ DataReader::DataReader(string path){
     buffer_ = NULL;
     
     isNative_ = true;
+    isMask_ = isMask;
+    mask_file_name = maskfile;
+
     
 }
 
 //read XDR data
-DataReader::DataReader(string basedir, string basename){
+DataReader::DataReader(string basedir, string basename, bool isMask, string maskfile){
     basedir_ = basedir;
     basename_ = basename;
     
@@ -38,6 +41,8 @@ DataReader::DataReader(string basedir, string basename){
     buffer_ = NULL;
     
     isNative_ = false;
+    isMask_ = isMask;
+    mask_file_name = maskfile;
     
     particle_file_name = basedir_ + "/" + basename_;
     density_file_name = particle_file_name + ".den32";
@@ -60,6 +65,8 @@ bool DataReader::open(){
     memCursor_ = 0;
     memParts_ = 0;
     buffer_ = new DMParticle[memBuffer_];
+
+
     if(isNative_){
         dataInputFile_.open(filePath_.c_str(), ios::binary);
        
@@ -69,15 +76,7 @@ bool DataReader::open(){
         }
         dataInputFile_.read((char*)&partNumbers_, sizeof(int));
         cout << "Particles: " << partNumbers_ << endl;
-        if(testnum_ != -1){
-            if((int)partNumbers_ > testnum_){
-                    partNumbers_ = testnum_;
-            }
-        }
-        cout << "Load to buffer ... " << endl;
-        loadBuffer();
-        return dataInputFile_.is_open();
-    }else{
+     }else{
         //open particle file
         char fi[255];
         strcpy(fi, particle_file_name.c_str());
@@ -122,14 +121,31 @@ bool DataReader::open(){
             exit(1);
         }
 
-        cout << "Load to buffer ... " << endl;
-        //loadBuffer();
-        if(testnum_ != -1){
-            if((int)partNumbers_ > testnum_){
-                  partNumbers_ = testnum_;
-            }   
+    }
+
+    if(isMask_){
+        int np;
+        maskStream_.open( mask_file_name.c_str(), ios::in | ios::binary);
+        maskStream_.read( reinterpret_cast<char*>( &np ), sizeof np );
+        if(np != partNumbers_){
+            fprintf(stderr,"Particle numbers in mask file not match.\n");
+            exit(1);
         }
-        loadBuffer();  
+    }
+
+    cout << "Load to buffer ... " << endl;
+    //loadBuffer();
+    if(testnum_ != -1){
+        if((int)partNumbers_ > testnum_){
+            partNumbers_ = testnum_;
+        }   
+    }
+    loadBuffer();  
+
+
+    if(isNative_){
+        return dataInputFile_.is_open();
+    }else{
         return (fp_ != 0);
     }
 }
@@ -172,6 +188,16 @@ void DataReader::loadBuffer(){
             buffer_[i].dens = dens;
             buffer_[i].hsmooth = hsmooth;
             buffer_[i].sigmav = sigmav;
+        }
+    }
+    //apply the mask file
+    if(isMask_){
+        char * mask = new char[memParts_];
+        maskStream.read(mask, sizeof(char) * memParts_);
+        for(int i = 0; i < memParts_; i++){
+            if(mask[i] == 0){
+                buffer_[i].dens = -1;    
+            }
         }
     }
 }
@@ -234,6 +260,9 @@ void DataReader::close(){
         densStream_.close();
         hsmoothStream_.close();
         sigmavStream_.close();
+    }
+    if(isMask_){
+        maskStream_.close();
     }
 }
 

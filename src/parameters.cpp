@@ -216,6 +216,7 @@ void Parameters::initialize(){
     baseName = " ";
     nativeDatafile = " ";
     outputFileName = " ";
+    isMask = false;
 }
 
 Parameters::Parameters(string ifname){
@@ -347,8 +348,10 @@ Parameters::Parameters(string ifname){
                 outputFileName = val;
             }else if (temp == "mem_buffer"){
                 memParts = atoi(val);
+            }else if (temp == "mask"){
+                maskFileName = val;
+                isMask = true;
             }
-            
 		}
 	}else{
         printf("Info file incorrect!!!\n");
@@ -487,7 +490,9 @@ void print_out_master( Parameters * master){
         cout << "Data File Base Dir (XDR): " << master->baseDir << endl;
         cout << "Data File Base Name (XDR): " << master->baseName << endl;
     }
-    
+    if(master->isMask){
+        cout << "MaskFile: " << master->maskFileName << endl;
+    }
     cout << "Output Fits: " << master->outputFileName << endl;
     if(master->testNum == -1){
         cout << "Use all particles to generate map!" << endl;

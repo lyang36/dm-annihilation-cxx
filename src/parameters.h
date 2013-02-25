@@ -28,12 +28,14 @@ public:
     //for filename
     string baseDir, baseName;
     string nativeDatafile;
+    string maskFileName;
     
     //for output
     string outputFileName;
     
     //whether use native data?
     bool isNative;
+    bool isMask;    //whether a mask file is set up
     
 private:
     double align_vector[3];

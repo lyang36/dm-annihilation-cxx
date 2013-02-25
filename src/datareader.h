@@ -24,11 +24,11 @@ public:
     };
     
     //to use this reader to read the native file
-    DataReader(string path); //set path
+    DataReader(string path, bool isMask = false, string maskfile = ""); //set path
     
     //to use this reader to read the XDR file
     //it should hase a basedir, and a basename
-    DataReader(string basedir, string basename);
+    DataReader(string basedir, string basename, bool isMask = false, string maskfile = "");
     
     void setTest(int tn);                           //set test: not read all the particles
     
@@ -51,6 +51,7 @@ public:
     
 private:
     bool isNative_;
+    bool isMask_;
     
     //for XDR file
     string basedir_, basename_;
@@ -58,7 +59,8 @@ private:
     string particle_file_name;
     string density_file_name;
     string hsmooth_file_name;
-    string sigmav_file_name;   
+    string sigmav_file_name;
+    string mask_file_name;   
 
     tipsy_header tips_;
     FILE * fp_;
@@ -66,6 +68,7 @@ private:
     ifstream densStream_;
     ifstream hsmoothStream_;
     ifstream sigmavStream_;
+    ifstream maskStream_;
 
     //for native file
     string filePath_;//file path

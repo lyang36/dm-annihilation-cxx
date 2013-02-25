@@ -77,7 +77,9 @@ void MapGenerator::start(){
 			DMParticle &current_part = parts[i];
 			
 			//ignore the low resolution mass
-			if(current_part.mass >= hires_particle_mass * 1.1){
+            //use density < 0 to set the mask
+			if(current_part.mass >= hires_particle_mass * 1.1 
+             ||current_part.dens < 0;){
 				continue;
 			}
 			

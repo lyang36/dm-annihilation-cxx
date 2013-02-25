@@ -103,7 +103,8 @@ void MapGenerator::start(){
 			current_part.eps = 0;
 			
 			//ignore the low resolution mass
-			if(current_part.mass >= hires_particle_mass * 1.1){
+			if(current_part.mass >= hires_particle_mass * 1.1 ||
+               current_part.dens < 0){
 				current_part.eps = -1;
 				continue;
 			}
