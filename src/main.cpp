@@ -41,9 +41,9 @@ int main(int argc, const char **argv){
     DataReader * reader;
 
     if(par.isNative)
-        reader = new DataReader(par.nativeDatafile);
+        reader = new DataReader(par.nativeDatafile, par.isMask, par.maskFileName);
     else
-        reader = new DataReader(par.baseDir, par.baseName);
+        reader = new DataReader(par.baseDir, par.baseName, par.isMask, par.maskFileName);
     reader->setTest(par.testNum);
     reader->setBuf(par.memParts);
     reader->open();
