@@ -4,7 +4,7 @@
 #include <rpc/xdr.h>
 #include <cmath>
 
-#include "flux.h"
+#include "../flux.h"
 //decay
 //With units: GeV.kpc/cm^6
 MAPTYPE getflux(Parameters * par_, DMParticle & current_part, MAPTYPE distances){

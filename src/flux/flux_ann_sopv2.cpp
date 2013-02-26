@@ -4,7 +4,7 @@
 #include <rpc/xdr.h>
 #include <cmath>
 
-#include "flux.h"
+#include "../flux.h"
 
 #define SAT_V 0.00495617 // 5 km/s
 

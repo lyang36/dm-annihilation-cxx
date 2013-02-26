@@ -4,7 +4,7 @@
 #include <rpc/xdr.h>
 #include <cmath>
 
-#include "flux.h"
+#include "../flux.h"
 
 MAPTYPE getflux(Parameters * par_, DMParticle & current_part, MAPTYPE distances){
        MAPTYPE unit_factor = pow(pow((par_ -> natconst.c_in_cgs), 2) /

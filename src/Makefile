@@ -1,14 +1,16 @@
 #must setup these 2 lib to compile
-#FITSIOLIB=/Users/lyang/Tools/cfitsio
-#HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
-FITSIOLIB=/home/lyang/Tools/cfitsio
-HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
+FITSIOLIB=/Users/lyang/Tools/cfitsio
+HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
+#FITSIOLIB=/home/lyang/Tools/cfitsio
+#HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
 
 
 HEALPIXSRC = $(HEALPIXHOME)/src/cxx/basic_gcc/include
 HEALPIXLIB = $(HEALPIXHOME)/src/cxx/basic_gcc/lib
 HEALPIXCXX = $(HEALPIXHOME)/src/cxx/cxxsupport
 HEALPIXC  = $(HEALPIXHOME)/cxx/Healpix_cxx
+
+FLUXDIR = ./flux
 
 C=gcc
 CC=g++
@@ -35,19 +37,19 @@ comp:
 			anglefuncs.cpp $(IFLAG)
 
 ann-nosop: comp
-	$(CC) -c flux_ann_nosop.cpp
+	$(CC) -c $(FLUXDIR)/flux_ann_nosop.cpp
 	$(CC) -o annmap_ann_nosop flux_ann_nosop.o $(OBJS) $(LFLAGS)
 
 ann-sopv: comp
-	$(CC) -c flux_ann_sopv.cpp
+	$(CC) -c $(FLUXDIR)/flux_ann_sopv.cpp
 	$(CC) -o annmap_ann_sopv flux_ann_sopv.o $(OBJS) $(LFLAGS)
 	
 ann-sopv2: comp
-	$(CC) -c flux_ann_sopv2.cpp
+	$(CC) -c $(FLUXDIR)/flux_ann_sopv2.cpp
 	$(CC) -o annmap_ann_sopv2 flux_ann_sopv2.o $(OBJS) $(LFLAGS)
 	
 decay: comp
-	$(CC) -c flux_decay.cpp
+	$(CC) -c $(FLUXDIR)/flux_decay.cpp
 	$(CC) -o decaymap flux_decay.o $(OBJS) $(LFLAGS)
 
 
