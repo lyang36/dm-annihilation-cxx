@@ -11,6 +11,7 @@ HEALPIXCXX = $(HEALPIXHOME)/src/cxx/cxxsupport
 HEALPIXC  = $(HEALPIXHOME)/cxx/Healpix_cxx
 
 FLUXDIR = ./flux
+COREDIR = ./halocore
 
 C=gcc
 CC=g++
@@ -25,7 +26,7 @@ IFLAG=-I $(HEALPIXSRC) -I$(FITSIOLIB)
 
 
 
-all: ann-nosop ann-sopv ann-sopv2 decay others
+all: ann-nosop ann-sopv ann-sopv2 ann-core-nosop decay others
 
 others:
 	@cd dataconverter; make
@@ -39,6 +40,10 @@ comp:
 ann-nosop: comp
 	$(CC) -c $(FLUXDIR)/flux_ann_nosop.cpp
 	$(CC) -o annmap_ann_nosop flux_ann_nosop.o $(OBJS) $(LFLAGS)
+
+ann-core-nosop: comp
+	$(CC) -c $(FLUXDIR)/flux_ann_core_nosop.cpp $(COREDIR)/halocore.cpp
+	$(CC) -o annmap_ann_core_nosop flux_ann_core_nosop.o halocore.o $(OBJS) $(LFLAGS)
 
 ann-sopv: comp
 	$(CC) -c $(FLUXDIR)/flux_ann_sopv.cpp
@@ -55,13 +60,19 @@ decay: comp
 
 
 
-cuda-all: cuda-ann-nosop cuda-ann-sopv cuda-ann-sopv2 cuda-decay
+cuda-all: cuda-ann-nosop cuda-ann-sopv cuda-ann-sopv2 cuda-decay cuda-ann-core-nosop
 
 cuda-ann-nosop:
 	nvcc -c -arch=sm_13 kernel.cu genmap_cuda.cpp $(IFLAG)
 	nvcc -o annmap_cuda_ann_nosop main.o flux_ann_nosop.o datareader.o\
 		   	tipsy_io.o parameters.o mapgenerator.o\
 			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
+
+cuda-ann-core-nosop:
+	nvcc -c -arch=sm_13 kernel.cu genmap_cuda.cpp $(IFLAG)
+	nvcc -o annmap_cuda_ann_nosop main.o flux_ann_core_nosop.o datareader.o\
+		   	tipsy_io.o parameters.o mapgenerator.o\
+			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)	
 
 cuda-ann-sopv:
 	nvcc -c -arch=sm_13 kernel.cu genmap_cuda.cpp $(IFLAG)
