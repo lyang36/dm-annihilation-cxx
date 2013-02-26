@@ -61,7 +61,6 @@ namespace kernel_space{
     
     
 }
-
 using namespace kernel_space;
 
 
@@ -614,9 +613,9 @@ cudaError_t calculatePartsListByCPU(DMParticle * parts, int numParts){
 
 cudaError_t calulateMapWithCUDA(MAPTYPE * map, DMParticle * parts, int numParts){
     //copy the particle data to GPU
-    cudaError_t cudaStatus = cudaMemcpy(parts_GPU, parts, memParts_ * sizeof(DMParticle), cudaMemcpyHostToDevice);
+    cudaError_t cudaStatus = cudaMemcpy(parts_GPU, parts, numParts * sizeof(DMParticle), cudaMemcpyHostToDevice);
     if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMemcpy failed -- copying HEALPIX X!\n");
+        fprintf(stderr, "cudaMemcpy failed -- copying Particles!\n");
         return cudaStatus;
     }
     
@@ -653,4 +652,8 @@ cudaError_t calulateMapWithCUDA(MAPTYPE * map, DMParticle * parts, int numParts)
      }
 
      return cudaStatus;
+}
+
+DMParticle * getDevParticle(){
+	return parts_GPU;
 }

@@ -1,8 +1,8 @@
 #must setup these 2 lib to compile
-FITSIOLIB=/Users/lyang/Tools/cfitsio
-HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
-#FITSIOLIB=/home/lyang/Tools/cfitsio
-#HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
+#FITSIOLIB=/Users/lyang/Tools/cfitsio
+#HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
+FITSIOLIB=/home/lyang/Tools/cfitsio
+HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
 
 
 HEALPIXSRC = $(HEALPIXHOME)/src/cxx/basic_gcc/include
@@ -69,11 +69,11 @@ cuda-ann-nosop:
 			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
 
 cuda-ann-core-nosop:
-	nvcc -c -arch=sm_13 kernel.cu genmap_cuda.cpp $(IFLAG)
+	nvcc -c -arch=sm_13 kernel.cu genmap_cuda_core.cpp $(COREDIR)/cudahalocore.cu $(IFLAG)
 	nvcc -o annmap_cuda_ann_core_nosop main.o \
-			halocore.o flux_ann_core_nosop.o \
+			halocore.o flux_ann_nosop.o cudahalocore.o\
 			datareader.o tipsy_io.o parameters.o \
-			mapgenerator.o genmap_cuda.o \
+			mapgenerator.o genmap_cuda_core.o \
 			anglefuncs.o kernel.o $(LFLAGS)	
 
 cuda-ann-sopv:

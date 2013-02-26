@@ -26,7 +26,8 @@ HaloCore::HaloCore(){
     }
     numHalos_ = number_of_lines;
     halos_ = new HaloData[number_of_lines];
-    
+    printf("There are %d halos in consideration!\n", numHalos_);
+
     std::ifstream haloFile(halo_core_file_name_.c_str());
     int i = 0;
     while(haloFile.good()){
@@ -44,18 +45,23 @@ HaloCore::~HaloCore(){
 }
 
 MAPTYPE HaloCore::getCorrection(float x, float y, float z){
-    MAPTYPE xp = x * 40000.0;
-    MAPTYPE yp = y * 40000.0;
-    MAPTYPE zp = z * 40000.0;
+    MAPTYPE xp = x;
+    MAPTYPE yp = y;
+    MAPTYPE zp = z;
 
     MAPTYPE r = 1.0;
     for(int i = 0; i < numHalos_; i++){
         r *= coreFunc(xp, yp, zp, halos_[i].xc, 
                         halos_[i].xc,
                         halos_[i].zc, 
-                        halos_[i].radius * RADIUS_RATIO);
+                        halos_[i].radius * RADIUS_RATIO / 40000.0);
+        //printf("%f %f %f %f %f %f %f\n", xp, yp, zp, 
+        //                halos_[i].xc,
+        //                halos_[i].xc,
+        //                halos_[i].zc,
+        //                halos_[i].radius * RADIUS_RATIO);
     }
-    
+    //printf("%f\n", r);   
     return r;
 }
 
@@ -67,6 +73,7 @@ MAPTYPE HaloCore::coreFunc(float x, float y, float z,
     MAPTYPE zz = (z - hzc);
     MAPTYPE r = sqrt(xx*xx + yy*yy + zz*zz);
     MAPTYPE ratio = 1.0;
+    //printf("%f %f\n", r, radius);
     if( r < radius){
         if( r > SAT_RADIUS * radius)
             ratio = pow(r / radius, 0.6);
