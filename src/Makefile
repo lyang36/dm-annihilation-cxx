@@ -98,7 +98,14 @@ cuda-decay:
 cuda-debug:
 	nvcc -c -arch=sm_13 -g -G kernel.cu genmap_cuda.cpp $(IFLAG)
 	nvcc -o annmap_cuda main.o datareader.o tipsy_io.o parameters.o mapgenerator.o\
-		genmap_cuda.o anglefuncs.o -g -G kernel.o $(LFLAGS)	
+		genmap_cuda.o anglefuncs.o -g -G kernel.o flux_ann_nosop.o $(LFLAGS)	
+	nvcc -c -arch=sm_13 -g -G kernel.cu -g -G genmap_cuda_core.cpp \
+			-g -G $(COREDIR)/cudahalocore.cu $(IFLAG)
+	nvcc -o annmap_cuda_ann_core_nosop main.o \
+			halocore.o flux_ann_nosop.o cudahalocore.o\
+			datareader.o tipsy_io.o parameters.o \
+			mapgenerator.o genmap_cuda_core.o \
+			anglefuncs.o -g -G kernel.o $(LFLAGS)
 
 clean:
 	rm -fr *.o

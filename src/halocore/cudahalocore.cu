@@ -41,7 +41,8 @@ __device__ MAPTYPE coreFunc(float x, float y, float z,
     MAPTYPE ratio = 1.0;
     if( r < radius){
         if( r > SAT_RADIUS * radius)
-            ratio = pow(r / radius, 0.6);
+            //ratio = pow(r / radius, 0.6);
+            ratio = 0.0;    //remove the center
         else
             ratio = pow(r / SAT_RADIUS / radius, 0.6);
     }
@@ -62,7 +63,7 @@ __global__ void calculateCoreCorrectionGPU(int numParts, int numHalos,
 	MAPTYPE zp = parts[id].posz;
 	for(int i = 0; i < numHalos; i++){
 		correction *= coreFunc(xp, yp, zp, halos[i].xc, 
-                        halos[i].xc,
+                        halos[i].yc,
                         halos[i].zc, 
                         halos[i].radius * RADIUS_RATIO / 40000.0);	
 	}
@@ -82,6 +83,12 @@ cudaError_t applyingCore(DMParticle * parts, int numParts, MAPTYPE * result){
 
 	calculateCoreCorrectionGPU<<<gridsize, blocksize>>>(numParts, numHalos_,
 		dev_halos, dev_dmparts, dev_result);
+
+	cudaStatus = cudaThreadSynchronize();
+    if( cudaStatus != cudaSuccess){
+        fprintf(stderr,"Sync core correction calculating error: %s\n", cudaGetErrorString(cudaStatus));
+        return cudaStatus;
+    }
 
 	 //copy result back
     cudaStatus = cudaMemcpy(result, dev_result, numParts * sizeof(MAPTYPE), cudaMemcpyDeviceToHost);
