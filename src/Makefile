@@ -70,7 +70,7 @@ cuda-ann-nosop:
 
 cuda-ann-core-nosop:
 	nvcc -c -arch=sm_13 kernel.cu genmap_cuda.cpp $(IFLAG)
-	nvcc -o annmap_cuda_ann_nosop main.o \
+	nvcc -o annmap_cuda_ann_core_nosop main.o \
 			halocore.o flux_ann_core_nosop.o \
 			datareader.o tipsy_io.o parameters.o \
 			mapgenerator.o genmap_cuda.o \
@@ -108,6 +108,8 @@ clean:
 	rm -fr annmap_cuda_ann_nosop
 	rm -fr annmap_cuda_ann_sopv
 	rm -fr annmap_cuda_ann_sopv2
+	rm -fr annmap_cuda_ann_core_nosop
+	rm -fr annmap_ann_core_nosop
 	rm -fr decaymap
 	rm -fr decaymap_cuda
 	@cd dataconverter; make clean
