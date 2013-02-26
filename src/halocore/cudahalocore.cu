@@ -41,8 +41,8 @@ __device__ MAPTYPE coreFunc(float x, float y, float z,
     MAPTYPE ratio = 1.0;
     if( r < radius){
         if( r > SAT_RADIUS * radius)
-            //ratio = pow(r / radius, 0.6);
-            ratio = 0.0;    //remove the center
+            ratio = pow(r / radius, 0.6);
+            //ratio = 0.0;    //remove the center
         else
             ratio = pow(r / SAT_RADIUS / radius, 0.6);
     }
