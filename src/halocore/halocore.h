@@ -15,6 +15,7 @@ public:
 class HaloCore{
 public:
     HaloCore(); //initialize
+    ~HaloCore();
     MAPTYPE getCorrection(float x, float y, float z);
 private:
     std::string haloDataFiles_; 
