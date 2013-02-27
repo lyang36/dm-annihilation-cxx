@@ -41,7 +41,7 @@ void getSearchRes(int requiredSearchPartNum, int numPartsRead_){
     thrust::binary_search(dev_val.begin(), dev_val.begin() + numPartsRead_,
                           dev_searchParts_.begin(),
                           dev_searchParts_.begin() + requiredSearchPartNum,
-                          dev_searchResult_);
+                          dev_searchResult_.begin());
     thrust::copy(dev_searchResult_.begin(), dev_searchResult_.begin() + requiredSearchPartNum, searchResult_);
     for(int l = 0; l < requiredSearchPartNum; l++){
         if(searchResult_[l]){
