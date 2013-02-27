@@ -82,8 +82,9 @@ void getFlag(int * particles_, char * flags_, int numParts_){
                     if(requiredSearchPartNum >= GPU_MEM){
                         //do the search
                         thrust::binary_search(dev_val.begin(), dev_val.begin() + numPartsRead_,
-                                              searchParts_.begin(), searchParts_.begin() + requiredSearchPartNum,
-                                              searchResult_.begin());
+                                                searchParts_, 
+                                                searchParts_ + requiredSearchPartNum,
+                                                searchResult_);
                         for(int l = 0; l < requiredSearchPartNum; l++){
                             if(searchResult_[l]){
                                 flags_[searchIndex_[l]] = 1;
@@ -95,8 +96,8 @@ void getFlag(int * particles_, char * flags_, int numParts_){
                 if(requiredSearchPartNum > 0){
                     //do the search
                     thrust::binary_search(dev_val.begin(), dev_val.begin() + numPartsRead_,
-                                          searchParts_.begin(), searchParts_.begin() + requiredSearchPartNum,
-                                          searchResult_.begin());
+                                          searchParts_, searchParts_ + requiredSearchPartNum,
+                                          searchResult_);
                     for(int l = 0; l < requiredSearchPartNum; l++){
                         if(searchResult_[l]){
                             flags_[searchIndex_[l]] = 1;
@@ -135,8 +136,8 @@ void getFlag(int * particles_, char * flags_, int numParts_){
             if(requiredSearchPartNum >= GPU_MEM){
                 //do the search
                 thrust::binary_search(dev_val.begin(), dev_val.begin() + numPartsRead_,
-                                      searchParts_.begin(), searchParts_.begin() + requiredSearchPartNum,
-                                      searchResult_.begin());
+                                      searchParts_, searchParts_ + requiredSearchPartNum,
+                                      searchResult_);
                 for(int l = 0; l < requiredSearchPartNum; l++){
                     if(searchResult_[l]){
                         flags_[searchIndex_[l]] = 1;
@@ -148,8 +149,8 @@ void getFlag(int * particles_, char * flags_, int numParts_){
         if(requiredSearchPartNum > 0){
             //do the search
             thrust::binary_search(dev_val.begin(), dev_val.begin() + numPartsRead_,
-                                  searchParts_.begin(), searchParts_.begin() + requiredSearchPartNum,
-                                  searchResult_.begin());
+                                  searchParts_, searchParts_ + requiredSearchPartNum,
+                                  searchResult_);
             for(int l = 0; l < requiredSearchPartNum; l++){
                 if(searchResult_[l]){
                     flags_[searchIndex_[l]] = 1;
