@@ -36,9 +36,12 @@ void getFlag(int * particles_, char * flags_, int numParts_){
     }
 
     //thrust::device_vector<int> dev_key(particles_,  particles_+ numParts_);
+    printf("ok2.5\n");
     thrust::device_vector<int> dev_val(sorted_key_, sorted_key_ + numParts_);
+    printf("ok3\n");    
 
     thrust::sort_by_key(dev_key.begin(), dev_key.end(), dev_val.begin());
+    printf("ok4\n");
     thrust::copy(dev_val.begin(), dev_val.end(), sorted_key_);
 
     ifstream haloInputFile_(ahf_part_file.c_str());
@@ -99,8 +102,10 @@ int main(int argc, const char **argv){
     cout << "Particles: " << numParts_ << endl;
 
     particles_ = new int[numParts_];
+    printf("ok\n");
     flags_ = new char[numParts_];
-    
+    printf("ok1\n");    
+
     dataInputFile_.read((char *) particles_, sizeof(int) * numParts_);
     dataInputFile_.close();
     

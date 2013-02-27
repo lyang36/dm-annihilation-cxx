@@ -13,7 +13,7 @@
 #include <thrust/pair.h>
 
 #define IGNORE_FIRST_N 1        //ignore the first n halo? host?
-#define CPU_MEM = 100000000;
+#define CPU_MEM 100000000
 
 using namespace std;
 
@@ -101,17 +101,17 @@ int main(int argc, const char **argv){
 
 	thrust::device_vector<int> dev_key(numParts_);
     
-	particles_ = new int[CPU_MEM_];
+	particles_ = new int[CPU_MEM];
 	int pt = 0;
 	while(dataInputFile_.good()){
-    	dataInputFile_.read((char *) particles_, sizeof(int) * numParts_);
+    	dataInputFile_.read((char *) particles_, sizeof(int) * CPU_MEM);
 		int num = dataInputFile_.gcount() / sizeof(int);
 		thrust::copy(dev_key.begin() + pt, dev_key.begin() + pt + num, particles_);
 		pt += num;
 	}
     dataInputFile_.close();
     
-    getFlag(particles_, flags_, numParts_);
+    getFlag(particles_, flags_, numParts_, dev_key);
 
     //output
     printf("Output the result...\n");
