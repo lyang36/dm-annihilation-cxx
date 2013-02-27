@@ -35,7 +35,7 @@ void getFlag(int * particles_, char * flags_, int numParts_){
     int * haloParticles_ = new int[GPU_MEM];
     int * searchParts_ = new int[GPU_MEM];
     int * searchIndex_ = new int[GPU_MEM];
-    bool * searchResult = new bool[GPU_MEM];
+    bool * searchResult_ = new bool[GPU_MEM];
     haloParticles_[GPU_MEM - 1] = 0;
        
 
@@ -63,7 +63,7 @@ void getFlag(int * particles_, char * flags_, int numParts_){
                 //step 1: sorting
                 printf("Sorting ...\n");
                 thrust::copy(haloParticles_, haloParticles_ + numPartsRead_, dev_val.begin());
-                thrust::sort(dev_val.begin(), dev_val.end());
+                thrust::sort(dev_val.begin(), dev_val.begin() + numPartsRead_);
                 
                 //step 2: testing
                 printf("Searching ...\n");
@@ -81,30 +81,83 @@ void getFlag(int * particles_, char * flags_, int numParts_){
                     }
                     if(requiredSearchPartNum >= GPU_MEM){
                         //do the search
-                        thrust::binary_search(dev_val.begin(), dev_val.end(), searchParts_.begin
-                        thrust::binary_search()
+                        thrust::binary_search(dev_val.begin(), dev_val.begin() + numPartsRead_,
+                                              searchParts_.begin(), searchParts_.begin() + requiredSearchPartNum,
+                                              searchResult_.begin());
+                        for(int l = 0; l < requiredSearchPartNum; l++){
+                            if(searchResult_[l]){
+                                flags_[searchIndex_[l]] = 1;
+                            }
+                        }
+                        requiredSearchPartNum = 0;
+                    }
                 }
+                if(requiredSearchPartNum > 0){
+                    //do the search
+                    thrust::binary_search(dev_val.begin(), dev_val.begin() + numPartsRead_,
+                                          searchParts_.begin(), searchParts_.begin() + requiredSearchPartNum,
+                                          searchResult_.begin());
+                    for(int l = 0; l < requiredSearchPartNum; l++){
+                        if(searchResult_[l]){
+                            flags_[searchIndex_[l]] = 1;
+                        }
+                    }
+                    requiredSearchPartNum = 0;
+                }
+               
                 numPartsRead_ = 0;
             }
         }
     }
     
-    if(numPartsRead_ > 0){
+    if(numPartsRead_ >= GPU_MEM){
         printf("Start testing %d halo particles...\n", numPartsRead_);
         //start filling the tags
         //step 1: sorting
+        printf("Sorting ...\n");
         thrust::copy(haloParticles_, haloParticles_ + numPartsRead_, dev_val.begin());
-        thrust::sort(dev_val.begin(), dev_val.end());
+        thrust::sort(dev_val.begin(), dev_val.begin() + numPartsRead_);
         
         //step 2: testing
+        printf("Searching ...\n");
         //test every particle whether it's in the array
+        int requiredSearchPartNum = 0;
         for(int k = 0; k < numParts_; k ++){
             if(flags_[k] == 0){
-                if(thrust::binary_search(dev_val.begin(), dev_val.end(), particles_[k])){
-                    flags_[k] = 1;
+                //if(thrust::binary_search(dev_val.begin(), dev_val.end(), particles_[k])){
+                //    flags_[k] = 1;
+                //}
+                // }
+                searchParts_[requiredSearchPartNum] = particles_[k];
+                searchIndex_[requiredSearchPartNum] = k;
+                requiredSearchPartNum ++;
+            }
+            if(requiredSearchPartNum >= GPU_MEM){
+                //do the search
+                thrust::binary_search(dev_val.begin(), dev_val.begin() + numPartsRead_,
+                                      searchParts_.begin(), searchParts_.begin() + requiredSearchPartNum,
+                                      searchResult_.begin());
+                for(int l = 0; l < requiredSearchPartNum; l++){
+                    if(searchResult_[l]){
+                        flags_[searchIndex_[l]] = 1;
+                    }
                 }
+                requiredSearchPartNum = 0;
             }
         }
+        if(requiredSearchPartNum > 0){
+            //do the search
+            thrust::binary_search(dev_val.begin(), dev_val.begin() + numPartsRead_,
+                                  searchParts_.begin(), searchParts_.begin() + requiredSearchPartNum,
+                                  searchResult_.begin());
+            for(int l = 0; l < requiredSearchPartNum; l++){
+                if(searchResult_[l]){
+                    flags_[searchIndex_[l]] = 1;
+                }
+            }
+            requiredSearchPartNum = 0;
+        }
+        
         numPartsRead_ = 0;
     }
     printf("\n");
