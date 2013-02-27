@@ -13,6 +13,7 @@
 #include <thrust/pair.h>
 
 #define IGNORE_FIRST_N 1        //ignore the first n halo? host?
+#define CPU_MEM = 100000000;
 
 using namespace std;
 
@@ -23,10 +24,8 @@ string output_file = "vl2b.00400.r200.ahf.haloflags";
 int * sorted_key_;
 
 //get flags
-void getFlag(int * particles_, char * flags_, int numParts_){
-    int numHalos = 0;    
-    thrust::device_vector<int> dev_key(particles_, particles_ + numParts_);    
-
+void getFlag(int * particles_, char * flags_, int numParts_, thrust::device_vector<int> & dev_key){    
+	int numHalos = 0;    
     //sorted_key_ = new int[numParts_];
     sorted_key_ = particles_;
 
@@ -98,10 +97,18 @@ int main(int argc, const char **argv){
     dataInputFile_.read((char*)&numParts_, sizeof(int));
     cout << "Particles: " << numParts_ << endl;
 
-    particles_ = new int[numParts_];
     flags_ = new char[numParts_];
+
+	thrust::device_vector<int> dev_key(numParts_);
     
-    dataInputFile_.read((char *) particles_, sizeof(int) * numParts_);
+	particles_ = new int[CPU_MEM_];
+	int pt = 0;
+	while(dataInputFile_.good()){
+    	dataInputFile_.read((char *) particles_, sizeof(int) * numParts_);
+		int num = dataInputFile_.gcount() / sizeof(int);
+		thrust::copy(dev_key.begin() + pt, dev_key.begin() + pt + num, particles_);
+		pt += num;
+	}
     dataInputFile_.close();
     
     getFlag(particles_, flags_, numParts_);
