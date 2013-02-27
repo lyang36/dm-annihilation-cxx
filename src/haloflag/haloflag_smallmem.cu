@@ -32,6 +32,9 @@ bool * searchResult_;
 char * flags_;
 int * particles_;
 
+//bool verbose = false;
+int numParts_ = 0;
+
 void getSearchRes(int requiredSearchPartNum, int numPartsRead_){
     //do the search
     thrust::copy(searchParts_, searchParts_ + requiredSearchPartNum, dev_searchParts_.begin());
@@ -79,7 +82,7 @@ void doSearch(int numPartsRead_){
 
 
 //get flags
-void getFlag(int numParts_){
+void getFlag(){
     int numHalos = 0;
     for(int i = 0; i < numParts_; i++){
         flags_[i] = 0;
@@ -129,8 +132,7 @@ void getFlag(int numParts_){
 
 int main(int argc, const char **argv){
     int m=1;
-    //bool verbose = false;
-    int numParts_ = 0;
+
     
     while (m<argc)
     {
@@ -163,7 +165,7 @@ int main(int argc, const char **argv){
     dataInputFile_.read((char *) particles_, sizeof(int) * numParts_);
     dataInputFile_.close();
     
-    getFlag(particles_, flags_, numParts_);
+    getFlag();
     
     //output
     printf("Output the result...\n");
