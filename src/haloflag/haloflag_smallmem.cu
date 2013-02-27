@@ -29,7 +29,8 @@ int * haloParticles_;
 int * searchParts_;
 int * searchIndex_;
 bool * searchResult_;
-
+char * flags_;
+int * particles_;
 
 void getSearchRes(int requiredSearchPartNum, int numPartsRead_){
     //do the search
@@ -78,7 +79,7 @@ void doSearch(int numPartsRead_){
 
 
 //get flags
-void getFlag(int * particles_, char * flags_, int numParts_){
+void getFlag(int numParts_){
     int numHalos = 0;
     for(int i = 0; i < numParts_; i++){
         flags_[i] = 0;
@@ -120,14 +121,15 @@ void getFlag(int * particles_, char * flags_, int numParts_){
     haloInputFile_.close();
     
     delete haloParticles_;
+    delete searchParts_;
+    delete searchIndex_;
+    delete searchResult_;
 }
 
 
 int main(int argc, const char **argv){
     int m=1;
     //bool verbose = false;
-    int * particles_;
-    char * flags_;
     int numParts_ = 0;
     
     while (m<argc)
