@@ -22,9 +22,6 @@ string index_file =  "/home/lyang/data/vl2b.00400.r200.index";
 string ahf_part_file = "/home/lyang/halodata/vl_400_rhovesc.z0.000.AHF_particles";
 string output_file = "vl2b.00400.r200.ahf.haloflags";
 
-thrust::device_vector<int> dev_searchParts_(GPU_MEM);
-thrust::device_vector<int> dev_searchResult_(GPU_MEM);
-thrust::device_vector<int> dev_val(GPU_MEM);
 int * haloParticles_;
 int * searchParts_;
 int * searchIndex_;
@@ -35,7 +32,10 @@ int * particles_;
 //bool verbose = false;
 int numParts_ = 0;
 
-void getSearchRes(int requiredSearchPartNum, int numPartsRead_){
+void getSearchRes(int requiredSearchPartNum, int numPartsRead_,
+                  thrust::device_vector<int> &dev_searchParts_,
+                  thrust::device_vector<int> &dev_searchResult_,
+                  thrust::device_vector<int> &dev_val){
     //do the search
     thrust::copy(searchParts_, searchParts_ + requiredSearchPartNum, dev_searchParts_.begin());
     thrust::binary_search(dev_val.begin(), dev_val.begin() + numPartsRead_,
@@ -50,7 +50,9 @@ void getSearchRes(int requiredSearchPartNum, int numPartsRead_){
     }
 }
 
-void doSearch(int numPartsRead_){
+void doSearch(int numPartsRead_, thrust::device_vector<int> &dev_searchParts_,
+              thrust::device_vector<int> &dev_searchResult_,
+              thrust::device_vector<int> &dev_val){
     printf("Start testing %d halo particles...\n", numPartsRead_);
     //start filling the tags
     //step 1: sorting
@@ -69,12 +71,14 @@ void doSearch(int numPartsRead_){
             requiredSearchPartNum ++;
         }
         if(requiredSearchPartNum >= GPU_MEM){
-            getSearchRes(requiredSearchPartNum, numPartsRead_);
+            getSearchRes(requiredSearchPartNum, numPartsRead_,
+                         dev_searchParts_, dev_searchResult_, dev_val);
             requiredSearchPartNum = 0;
         }
     }
     if(requiredSearchPartNum > 0){
-        getSearchRes(requiredSearchPartNum, numPartsRead_);
+        getSearchRes(requiredSearchPartNum, numPartsRead_,
+                     dev_searchParts_, dev_searchResult_, dev_val);
         requiredSearchPartNum = 0;
     }
 
@@ -83,6 +87,11 @@ void doSearch(int numPartsRead_){
 
 //get flags
 void getFlag(){
+    
+    thrust::device_vector<int> dev_searchParts_(GPU_MEM);
+    thrust::device_vector<int> dev_searchResult_(GPU_MEM);
+    thrust::device_vector<int> dev_val(GPU_MEM);
+    
     int numHalos = 0;
     for(int i = 0; i < numParts_; i++){
         flags_[i] = 0;
@@ -110,14 +119,14 @@ void getFlag(){
             }
             
             if(numPartsRead_ >= GPU_MEM){
-                doSearch(numPartsRead_);
+                doSearch(numPartsRead_, dev_searchParts_, dev_searchResult_, dev_val);
                 numPartsRead_ = 0;
             }
         }
     }
     
     if(numPartsRead_ > 0){
-        doSearch(numPartsRead_);
+        doSearch(numPartsRead_, dev_searchParts_, dev_searchResult_, dev_val);
         numPartsRead_ = 0;
     }
     printf("\n");
