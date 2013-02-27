@@ -33,10 +33,12 @@ void getFlag(int * particles_, char * flags_, int numParts_){
     
     thrust::device_vector<int> dev_val(GPU_MEM);
     int * haloParticles_ = new int[GPU_MEM];
-    
+    haloParticles_[GPU_MEM - 1] = 0;    
+
     ifstream haloInputFile_(ahf_part_file.c_str());
     haloInputFile_ >> numHalos;
     int numPartsRead_ = 0;
+    printf("Number halos: %d.\n Start reading halo particles...\n", numHalos);
     for(int i = 0; (i < numHalos) && (i <= IGNORE_LAST_N); i ++){
         int numHaloParts;
         haloInputFile_ >> numHaloParts;
@@ -44,6 +46,7 @@ void getFlag(int * particles_, char * flags_, int numParts_){
             int partindex;
             haloInputFile_ >> partindex;
             if(i >= IGNORE_FIRST_N){
+                //if(numPartsRead_ == GPU_MEM) printf("%d\n", numPartsRead_);
                 haloParticles_[numPartsRead_] = partindex;
                 numPartsRead_ ++;
             }
