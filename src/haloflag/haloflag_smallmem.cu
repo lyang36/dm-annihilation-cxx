@@ -14,7 +14,7 @@
 
 #define IGNORE_FIRST_N 1        //ignore the first n halo? host?
 #define IGNORE_LAST_N 100000000        //ignore the halo after this number?
-#define GPU_MEM 10000000
+#define GPU_MEM 100000000
 
 using namespace std;
 
@@ -106,13 +106,16 @@ void getFlag(){
     ifstream haloInputFile_(ahf_part_file.c_str());
     haloInputFile_ >> numHalos;
     int numPartsRead_ = 0;
-    printf("Number halos: %d.\n Start reading halo particles...\n", numHalos);
+    printf("Number halos: %d.\nStart reading halo particles...\n", numHalos);
     for(int i = 0; (i < numHalos) && (i <= IGNORE_LAST_N); i ++){
         int numHaloParts;
         haloInputFile_ >> numHaloParts;
+        printf("Halo: %d, Particles: %d.\n", i, numHaloParts);
         for(int j = 0; j < numHaloParts; j++){
             int partindex;
+            int ch;
             haloInputFile_ >> partindex;
+            haloInputFile_ >> ch;
             if(i >= IGNORE_FIRST_N){
                 haloParticles_[numPartsRead_] = partindex;
                 numPartsRead_ ++;
