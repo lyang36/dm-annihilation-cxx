@@ -6,7 +6,7 @@
 
 #include "../flux.h"
 
-#define SAT_V 0.000991235   // 1km/hr
+#define SAT_V 0.000991235   // 1km/s
 
 MAPTYPE getflux(Parameters * par_, DMParticle & current_part, MAPTYPE distances){
        MAPTYPE unit_factor = pow(pow((par_ -> natconst.c_in_cgs), 2) /
