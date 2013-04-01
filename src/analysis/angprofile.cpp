@@ -47,11 +47,11 @@ int main(int argc, const char **argv){
     //angbins = new double[numbins + 1];
     countbins = new double[numbins];
     
-    printf("Filename: %s\n", filename.c_str());
-    printf("Bins: %d\n", numbins);
-    printf("Angular Radius: %f\n", anglerad);
-    printf("Theta: %f\n", theta);
-    printf("Phi: %f\n", phi);
+    fprintf(stderr, "Filename: %s\n", filename.c_str());
+    fprintf(stderr, "Bins: %d\n", numbins);
+    fprintf(stderr, "Angular Radius: %f\n", anglerad);
+    fprintf(stderr, "Theta: %f\n", theta);
+    fprintf(stderr, "Phi: %f\n", phi);
     
     anglerad = PI / 180.0 * anglerad;
     theta = PI / 180.0 * theta;
