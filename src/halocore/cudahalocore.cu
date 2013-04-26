@@ -16,7 +16,7 @@
 #include "halocore.h"
 #include "cudahalocore.h"
 #define RADIUS_RATIO (18.2 / 402.0)
-#define SAT_RADIUS (1.0 / 400000.0 / RADIUS_RATIO)
+#define SAT_RADIUS (1.0 / 40000.0 / RADIUS_RATIO)
 
 namespace cuda_halo_core{
     static const string halo_core_file_name_ = "./halocore/VL2_Halos.data";

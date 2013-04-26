@@ -7,8 +7,8 @@
 
 using namespace std;
 
-#define RADIUS_RATIO (18.2 / 402.0)
-#define SAT_RADIUS (1.0 / 400000.0 / RADIUS_RATIO)
+#define RADIUS_RATIO (4.0 / 402.0)
+#define SAT_RADIUS (1.0 / 40000.0 / RADIUS_RATIO)
 
 static const string halo_core_file_name_ = "./halocore/VL2_Halos.data";
 
@@ -52,14 +52,14 @@ MAPTYPE HaloCore::getCorrection(float x, float y, float z){
     MAPTYPE r = 1.0;
     for(int i = 0; i < numHalos_; i++){
         r *= coreFunc(xp, yp, zp, halos_[i].xc, 
-                        halos_[i].xc,
+                        halos_[i].yc,
                         halos_[i].zc, 
                         halos_[i].radius * RADIUS_RATIO / 40000.0);
-        //printf("%f %f %f %f %f %f %f\n", xp, yp, zp, 
-        //                halos_[i].xc,
-        //                halos_[i].xc,
-        //                halos_[i].zc,
-        //                halos_[i].radius * RADIUS_RATIO);
+        /*printf("%f %f %f %f %f %f %f\n", xp, yp, zp,
+                        halos_[i].xc,
+                        halos_[i].yc,
+                        halos_[i].zc,
+                        halos_[i].radius * RADIUS_RATIO);*/
     }
     //printf("%f\n", r);   
     return r;
@@ -73,7 +73,8 @@ MAPTYPE HaloCore::coreFunc(float x, float y, float z,
     MAPTYPE zz = (z - hzc);
     MAPTYPE r = sqrt(xx*xx + yy*yy + zz*zz);
     MAPTYPE ratio = 1.0;
-    //printf("%f %f\n", r, radius);
+    //if(r < 0.002)
+        //printf("%f %f\n", r, radius);
     if( r < radius){
         if( r > SAT_RADIUS * radius)
             ratio = pow(r / radius, 0.6);

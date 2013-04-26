@@ -23,12 +23,13 @@ LFLAGS=$(HEALPIXLIB)/libhealpix_cxx.a\
 IFLAG=-I $(HEALPIXSRC) -I$(FITSIOLIB) -I ../ -I ../halocore/
 
 all: comp
-	$(CC) -o angprofile angprofile.o ${LFLAGS}
-	$(CC) -o mapselect mapselect.o ${LFLAGS}
-	$(CC) -o rprofile radialprofile.o ../datareader.o ../tipsy_io.o ../halocore.o ${LFLAGS}
+	$(CC) -o slidemake slidemake.o point.o \
+		  ../datareader.o ../tipsy_io.o ../halocore.o ${LFLAGS}
 
 comp:
-	$(CC) -c angprofile.cpp radialprofile.cpp mapselect.cpp $(IFLAG)
+	$(CC) -c slidemake.cpp ../point.cpp $(IFLAG)
 
-
+clean:
+	rm -f *.o
+	rm -f slidemake
 

@@ -233,8 +233,10 @@ bool DataReader::readParticle(DMParticle * part){
         //cout << "load buffer\n";
         loadBuffer();
     }
+    //printf("%d\n", readCursor_);
     if(hasNext()){
-        (*part) = buffer_[memCursor_];
+        //(*part) = buffer_[memCursor_];
+        memcpy((char *)part, buffer_ + memCursor_, sizeof(DMParticle));
         readCursor_ ++; //move the cursor
         memCursor_ ++;  //move the cursor
     }else{
