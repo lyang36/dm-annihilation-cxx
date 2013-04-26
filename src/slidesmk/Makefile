@@ -25,9 +25,13 @@ IFLAG=-I $(HEALPIXSRC) -I$(FITSIOLIB) -I ../ -I ../halocore/
 all: comp
 	$(CC) -o slidemake slidemake.o point.o \
 		  ../datareader.o ../tipsy_io.o ../halocore.o ${LFLAGS}
+	$(CC) -o imagemake imagemake.o point.o \
+		  ../datareader.o ../tipsy_io.o ../halocore.o ${LFLAGS}
 
-comp:
+comp: 
 	$(CC) -c slidemake.cpp ../point.cpp $(IFLAG)
+	$(CC) -c imagemake.cpp $(IFLAG)
+
 
 clean:
 	rm -f *.o

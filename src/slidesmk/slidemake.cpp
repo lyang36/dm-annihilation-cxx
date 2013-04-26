@@ -252,6 +252,22 @@ int main(int argc, const char **argv){
     outfile1.write((char *) vdisp, sizeof(double) * numbins);
     outfile1.close();
     
+    /* //produce the image
+    float *values = new float[imagesize * imagesize];
+    float *imag = new float[imagesize * imagesize * 3];
+    float imgmin = 1.0e-8;
+    float imgmax = 1.0;
+    
+    //produce rho-square image
+    for(int i = 0; i < numbins; i++){
+        if(countbins[i] != 0){
+            databins[i] /= countbins[i];
+            vdisp[i] /= countbins[i];
+        }else{
+            databins[i] = 0.0;
+            vdisp[i] = 0.0;
+        }
+    }*/
     delete databins;
     delete countbins;
     delete vdisp;
