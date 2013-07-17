@@ -62,9 +62,9 @@ typedef struct dump tipsy_header;
 int xdr_header(XDR *xdrs, tipsy_header *header);
 int xdr_dark(XDR *xdrs,struct dark_particle *p);
 
-int read_tipsy_header(char *filename, tipsy_header *header);
-int read_tipsy_dm_particles(char *filename, tipsy_header header, Pdm *all_dm_particles);
-int write_tipsy_file(char *filename, tipsy_header header, Pdm *all_dm_particles, int Nhires, float hires_mass);
+int read_tipsy_header(const char *filename, tipsy_header *header);
+int read_tipsy_dm_particles(const char *filename, tipsy_header header, Pdm *all_dm_particles);
+int write_tipsy_file(const char *filename, tipsy_header header, Pdm *all_dm_particles, int Nhires, float hires_mass);
 
 #endif
 

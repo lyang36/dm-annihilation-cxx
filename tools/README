@@ -1,0 +1,9 @@
+Program: selectdm
+Usage: selectdm partilce_file selected_partilce_id_file
+Explanation: used for the select DM particles from the tipsy file.
+    particle_file: tipsyfile from the simulation
+    selected_particle_id_file: 
+        .binary file for the selection, 
+        .the first 32 bit in this file is a integer equals the total number of partilce id in this file. 
+        .after that followed by the list of particle number
+

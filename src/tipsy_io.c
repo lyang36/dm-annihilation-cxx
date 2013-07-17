@@ -6,7 +6,7 @@
 
 #include "tipsydefs.h"
 
-int read_tipsy_header(char *filename, tipsy_header *header) {
+int read_tipsy_header(const char *filename, tipsy_header *header) {
   int status;
   FILE *fp;
   XDR xdr;
@@ -38,7 +38,7 @@ int read_tipsy_header(char *filename, tipsy_header *header) {
 }
 
 
-int read_tipsy_dm_particles(char *filename, tipsy_header header, Pdm *all_dm_particles) {
+int read_tipsy_dm_particles(const char *filename, tipsy_header header, Pdm *all_dm_particles) {
   FILE *fp;
   int i,j,status;
   Pdm dp;
@@ -83,7 +83,7 @@ int read_tipsy_dm_particles(char *filename, tipsy_header header, Pdm *all_dm_par
 
 
 
-int write_tipsy_file(char *filename, tipsy_header header, Pdm *all_dm_particles, int Nhires, float hires_mass) {
+int write_tipsy_file(const char *filename, tipsy_header header, Pdm *all_dm_particles, int Nhires, float hires_mass) {
   FILE *fp;
   int i,status;
   int Ntot;
