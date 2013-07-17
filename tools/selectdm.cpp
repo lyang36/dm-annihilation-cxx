@@ -46,6 +46,7 @@ int main(int argn, char ** argv){
     lstr.close();
     
     //sort the particle list
+    printf("Sorting IDs ...\n");
     std::sort (partlist, partlist + partnum);
     
     read_tipsy_header(partfile.c_str(), &header);
