@@ -67,7 +67,8 @@ int main(int argn, char ** argv){
         myfile0.close();
         
         //test
-        printf("Particle numbers: %d\n", partnum);
+        //printf("Particle numbers: %d\n", partnum);
+        printf("Will select %d partilces from simulation results.\n", partnum);
         
         ifstream myfile1(seletfile.c_str());
         partlist = new int[partnum];
