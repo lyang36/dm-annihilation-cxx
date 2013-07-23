@@ -1,7 +1,7 @@
-FITSIOLIB=/Users/lyang/Tools/cfitsio
-HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
-#FITSIOLIB=/home/lyang/Tools/cfitsio
-#HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
+#FITSIOLIB=/Users/lyang/Tools/cfitsio
+#HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
+FITSIOLIB=/home/lyang/Tools/cfitsio
+HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
 
 
 HEALPIXSRC = $(HEALPIXHOME)/src/cxx/basic_gcc/include
@@ -23,8 +23,8 @@ LFLAGS=$(HEALPIXLIB)/libhealpix_cxx.a\
 IFLAG=-I $(HEALPIXSRC) -I$(FITSIOLIB) -I ../ -I ../halocore/
 
 all: comp
-	$(CC) -o angprofile angprofile.o ${LFLAGS}
-	$(CC) -o mapselect mapselect.o ${LFLAGS}
+	$(CC) -o angprofile angprofile.o ../datareader.o ../tipsy_io.o ../halocore.o  ${LFLAGS}
+	$(CC) -o mapselect mapselect.o ../datareader.o ../tipsy_io.o ../halocore.o  ${LFLAGS}
 	$(CC) -o rprofile radialprofile.o ../datareader.o ../tipsy_io.o ../halocore.o ${LFLAGS}
 
 comp:

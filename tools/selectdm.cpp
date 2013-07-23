@@ -51,7 +51,7 @@ int main(int argn, char ** argv){
             lstr.read((char *) &partnum, sizeof(int));
             printf("Will select %d partilces from simulation results.\n", partnum);
             partlist = new int[partnum];
-            all_dm_particles = new Pdm[partnum];
+            //all_dm_particles = new Pdm[partnum];
             lstr.read((char * ) partlist, sizeof(int) * partnum);
         }else{
             printf("Input list file not good!\n");
@@ -79,6 +79,8 @@ int main(int argn, char ** argv){
 
     }
     
+    all_dm_particles = new Pdm[partnum];
+
     //sort the particle list
     printf("Sorting IDs ...\n");
     std::sort (partlist, partlist + partnum);
