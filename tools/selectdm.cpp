@@ -1,4 +1,5 @@
 #include <string>
+#include <cstring>
 #include <cstdio>
 #include <fstream>
 #include <algorithm>    // std::sort
@@ -11,9 +12,21 @@
 using namespace std;
 
 int main(int argn, char ** argv){
-    if(argn != 4){
-        printf("Usage: selectpart partilce_file selected_partilce_id_file outfile\n");
+    bool istext = false;
+    if(argn != 4 && argn !=5){
+        printf("Usage: selectpart partilce_file selected_partilce_id_file outfile [-txt]\n");
+        printf("To use a text selected particle file, use \"-txt\"");
         exit(1);
+    }
+    
+    if(argn == 5){
+        if(strcmp(argv[4], "-txt") != 0){
+            printf("Usage: selectpart partilce_file selected_partilce_id_file outfile [-txt]\n");
+            printf("To use a text selected particle file, use \"-txt\"");
+            exit(1);
+        }else{
+            istext = true;
+        }
     }
     
     string partfile = argv[1];
@@ -32,18 +45,38 @@ int main(int argn, char ** argv){
     int partnum = 0;
     int partind = 0;
     
-    fstream lstr(seletfile.c_str(), ios::binary | ios::in);
-    if(lstr.good()){
-        lstr.read((char *) &partnum, sizeof(int));
-        printf("Will select %d partilces from simulation results.\n", partnum);
-        partlist = new int[partnum];
-        all_dm_particles = new Pdm[partnum];
-        lstr.read((char * ) partlist, sizeof(int) * partnum);
+    if(!istext){
+        fstream lstr(seletfile.c_str(), ios::binary | ios::in);
+        if(lstr.good()){
+            lstr.read((char *) &partnum, sizeof(int));
+            printf("Will select %d partilces from simulation results.\n", partnum);
+            partlist = new int[partnum];
+            all_dm_particles = new Pdm[partnum];
+            lstr.read((char * ) partlist, sizeof(int) * partnum);
+        }else{
+            printf("Input list file not good!\n");
+            exit(1);
+        }
+        lstr.close();
     }else{
-        printf("Input list file not good!\n");
-        exit(1);
+        string line;
+        ifstream myfile0(seletfile.c_str());
+        while (std::getline(myfile0, line)){
+            ++partnum;
+        }
+        myfile0.close();
+        
+        //test
+        printf("Particle numbers: %d\n", partnum);
+        
+        ifstream myfile1(seletfile.c_str());
+        partlist = new int[partnum];
+        for(int i = 0; i < partnum; i++){
+            myfile1 >> partlist[i];
+        }
+        myfile1.close();
+
     }
-    lstr.close();
     
     //sort the particle list
     printf("Sorting IDs ...\n");
