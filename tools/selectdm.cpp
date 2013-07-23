@@ -116,8 +116,9 @@ int main(int argn, char ** argv){
     header.ndark = partnum;
     header.nsph = 0;
     header.nstar = 0;
+    
     printf("Write to output...\n");
-    write_tipsy_file(outfile.c_str(), header, all_dm_particles, partnum, 0.0);
+    write_tipsy_dm_file(outfile.c_str(), header, all_dm_particles);
     printf("Finished.\n");
     delete partlist;
     delete all_dm_particles;

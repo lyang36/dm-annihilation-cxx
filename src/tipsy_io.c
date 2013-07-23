@@ -123,6 +123,38 @@ int write_tipsy_file(const char *filename, tipsy_header header, Pdm *all_dm_part
 }
 
 
+int write_tipsy_dm_file(const char *filename, tipsy_header header, Pdm *all_dm_particles) {
+    FILE *fp;
+    int i,status;
+    int Ntot;
+    XDR xdr;
+    
+    Ntot = header.ndark;
+    
+    fp=fopen(filename,"w");
+    if(!fp) {
+        fprintf(stderr,"Problem creating file: %s\n",filename);
+        return FAILURE;
+    }
+    
+    xdrstdio_create(&xdr,fp,XDR_ENCODE);
+    status = xdr_header(&xdr,&header);
+    
+    for(i=0;i<Ntot;i++) {
+        
+        status = xdr_dark(&xdr,&(all_dm_particles[i]));
+        if (status != 1) {
+            fprintf(stderr,"Error writing dark particle to output file.\n");
+            exit(1);
+        }
+    }
+    xdr_destroy(&xdr);
+    
+    fclose(fp);
+    
+    return SUCCESS;
+}
+
 
 int xdr_header(XDR *xdrs, tipsy_header *header) {
   int pad=0;
