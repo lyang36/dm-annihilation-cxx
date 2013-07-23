@@ -15,14 +15,14 @@ int main(int argn, char ** argv){
     bool istext = false;
     if(argn != 4 && argn !=5){
         printf("Usage: selectpart partilce_file selected_partilce_id_file outfile [-txt]\n");
-        printf("To use a text selected particle file, use \"-txt\"");
+        printf("To use a text selected particle file, use \"-txt\"\n");
         exit(1);
     }
     
     if(argn == 5){
         if(strcmp(argv[4], "-txt") != 0){
             printf("Usage: selectpart partilce_file selected_partilce_id_file outfile [-txt]\n");
-            printf("To use a text selected particle file, use \"-txt\"");
+            printf("To use a text selected particle file, use \"-txt\"\n");
             exit(1);
         }else{
             istext = true;
