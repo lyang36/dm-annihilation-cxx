@@ -117,6 +117,10 @@ int main(int argn, char ** argv){
     header.nsph = 0;
     header.nstar = 0;
     
+    printf("Header:\ntime = %f\nnbodies = %d\n", header.time, header.nbodies);
+    printf("ndim = %d\nnsph = %d\n", header.ndim, header.nsph);
+    printf("ndark = %d\nnstar = %d\n", header.ndark, header.nstar);
+    
     printf("Write to output...\n");
     write_tipsy_dm_file(outfile.c_str(), header, all_dm_particles);
     printf("Finished.\n");
