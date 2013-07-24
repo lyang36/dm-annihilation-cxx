@@ -51,9 +51,15 @@ int main(int argn, char ** args){
     printf("Sorting IDs ...\n");
     std::sort (partlist, partlist + partnum);
     
+    printf("Outputing...\n");
     ofstream markstream(markfile.c_str());
     markstream << totaln;
+    
+    int pcent = totaln / 100;
     for(int i = 0; i < totaln; i++){
+        if(i % pcent == 0){
+            printf(">");
+        }
         if((partind < partnum) && (i == partlist[partind])){
             markstream << "\n1";
             partind ++;
@@ -61,6 +67,7 @@ int main(int argn, char ** args){
             markstream << "\n0";
         }
     }
+    printf("\n");
     markstream.close();
     delete partlist;
     return 0;
