@@ -10,6 +10,7 @@ int main(int argn, char ** args){
         printf("totaln: the total number of particles in the file\n");
         printf("idfile: the particle ids of the halo\n");
         printf("markfile: the output ascii tipsy array\n");
+        exit(1);
     }
     
     int totaln;
