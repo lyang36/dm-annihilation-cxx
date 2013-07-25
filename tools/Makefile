@@ -25,9 +25,11 @@ IFLAG=-I $(HEALPIXSRC) -I$(FITSIOLIB)
 all: comp
 	$(CC) -o selectdm $(OBJS)
 	$(CC) -o id2mark id2mark.o
+	$(CC) -o showdark tipsy_io.o showdark.o
 
 comp:
-	$(CC) -c selectdm.cpp id2mark.cpp ../src/tipsy_io.c $(IFLAG)
+	$(CC) -c selectdm.cpp showdark.cpp \
+			id2mark.cpp ../src/tipsy_io.c $(IFLAG)
 
 clean:
 	rm -fr *.o

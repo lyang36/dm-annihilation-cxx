@@ -117,6 +117,9 @@ int main(int argn, char ** argv){
     header.nsph = 0;
     header.nstar = 0;
     
+    fclose(fp);
+    fclose(ofp);
+    
     printf("Header:\ntime = %f\nnbodies = %d\n", header.time, header.nbodies);
     printf("ndim = %d\nnsph = %d\n", header.ndim, header.nsph);
     printf("ndark = %d\nnstar = %d\n", header.ndark, header.nstar);
