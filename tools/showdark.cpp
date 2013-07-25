@@ -48,7 +48,7 @@ int main(int argn, char ** argv){
             exit(1);
         }
         printf("%d > \n", i);
-        printf("mass = %f\n", dp.mass);
+        printf("mass = %e\n", dp.mass);
         printf("pos = [%f %f %f]\n", dp.pos[0], dp.pos[1], dp.pos[2]);
         printf("vel = [%f %f %f]\n", dp.vel[0], dp.vel[1], dp.vel[2]);
         printf("eps = %f\n", dp.eps);
