@@ -113,7 +113,10 @@ void Parameters::setupParams(){
                          + pow(params.opos[2] - params.cpos[2], 2.0));
     
     double otheta = acos((params.opos[2] - params.cpos[2])/radius );
-  	double ophi = -PI + atan((params.opos[1]- params.cpos[1]) / (params.opos[0]- params.cpos[0]));
+  	//double ophi = -PI + atan((params.opos[1]- params.cpos[1]) / (params.opos[0]- params.cpos[0]));
+    double ophi = -PI + atan2((params.opos[1]- params.cpos[1]), (params.opos[0]- params.cpos[0]));
+    
+    
   	if (ophi < 0.0)
 		ophi += 2.0 * PI;
 	//cout << "Params Otheta:" << otheta << endl;
@@ -187,7 +190,8 @@ void Parameters::setupRotation(){
   	tmpvec[0] = xtmp;
 	tmpvec[1] = ytmp;
 	tmpvec[2] = ztmp;
-  	double gamma_t = fabs(atan(ztmp / ytmp));
+  	//double gamma_t = fabs(atan(ztmp / ytmp));
+    double gamma_t = fabs(atan2(ztmp, ytmp));
     
   	if (gamma_t > PI/4.0)
 		gamma_t *= -1.0;
