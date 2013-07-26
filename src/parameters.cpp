@@ -141,28 +141,67 @@ void Parameters::setupRotation(){
     double otheta = params.otheta;
   	double ophi = params.ophi;
     
-  	double rotaxis[3];
-	rotaxis[0] = 0.0;
-  	rotaxis[1] = cos(otheta) / sqrt(pow((sin(otheta) * sin(ophi)), 2.0) + pow(cos(otheta), 2));
-  	rotaxis[2] = -sin(otheta) * sin(ophi) / sqrt(pow((sin(otheta)*sin(ophi)), 2) + pow(cos(otheta), 2));
-    
-	double c = -sin(otheta) * cos(ophi);
+    double c = -sin(otheta) * cos(ophi);
   	double s = -sqrt(pow(sin(otheta) * sin(ophi), 2)+ pow(cos(otheta), 2));
   	double t = 1.0 - c;
     
+  	double rotaxis[3];
+        
+    if(s < 0.0){
+        rotaxis[0] = 0.0;
+        rotaxis[1] = - cos(otheta) / s;
+        rotaxis[2] = sin(otheta) * sin(ophi) / s;
+    }
+    
+    
     double rotm[3][3];
     
-  	rotm[0][0] = t * pow(rotaxis[0], 2) + c;
-  	rotm[1][0] = t * rotaxis[0] * rotaxis[1] - s * rotaxis[2];
-  	rotm[2][0] = t * rotaxis[0] * rotaxis[2] + s * rotaxis[1];
-    
-  	rotm[0][1] = t * rotaxis[0] * rotaxis[1] + s * rotaxis[2];
-  	rotm[1][1] = t * pow(rotaxis[1], 2) + c;
-  	rotm[2][1] = t * rotaxis[1] * rotaxis[2] - s * rotaxis[0];
-    
- 	rotm[0][2] = t * rotaxis[0] * rotaxis[2] - s * rotaxis[1];
-  	rotm[1][2] = t * rotaxis[1] * rotaxis[2] + s * rotaxis[0];
-  	rotm[2][2] = t * pow(rotaxis[2], 2) + c;
+    if(s < 0.0){
+        
+        double u, v, w;
+        u = rotaxis[0];
+        v = rotaxis[1];
+        w = rotaxis[2];
+        
+        rotm[0][0] = u * u;
+        rotm[1][0] = u * v + w;
+        rotm[2][0] = u * w - v;
+        
+        //rotm[0][0] = t * pow(rotaxis[0], 2) + c;
+        //rotm[1][0] = t * rotaxis[0] * rotaxis[1] - s * rotaxis[2];
+        //rotm[2][0] = t * rotaxis[0] * rotaxis[2] + s * rotaxis[1];
+        
+        rotm[0][1] = v * u - w;
+        rotm[1][1] = v * v;
+        rotm[2][1] = v * w + u;
+        //rotm[0][1] = t * rotaxis[0] * rotaxis[1] + s * rotaxis[2];
+        //rotm[1][1] = t * pow(rotaxis[1], 2) + c;
+        //rotm[2][1] = t * rotaxis[1] * rotaxis[2] - s * rotaxis[0];
+        
+        rotm[0][1] = w * u + v;
+        rotm[1][1] = w * v - u;
+        rotm[2][1] = w * w;
+        //rotm[0][2] = t * rotaxis[0] * rotaxis[2] - s * rotaxis[1];
+        //rotm[1][2] = t * rotaxis[1] * rotaxis[2] + s * rotaxis[0];
+        //rotm[2][2] = t * pow(rotaxis[2], 2) + c;
+    }else{
+        rotm[0][0] = 1.0;
+        rotm[1][0] = 0.0;
+        rotm[2][0] = 0.0;
+        
+        rotm[0][1] = 0.0;
+        rotm[1][1] = 1.0;
+        rotm[2][1] = 0.0;
+        
+        rotm[0][2] = 0.0;
+        rotm[1][2] = 0.0;
+        rotm[2][2] = 1.0;
+        
+        if(cos(ophi) > 0.0){
+            rotm[0][0] = -1.0;
+            rotm[1][1] = -1.0;
+        }
+    }
     
 	//cout << "ROT[0][0] " << rotmatrix[0][0] << endl;
     
