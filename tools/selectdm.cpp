@@ -106,7 +106,7 @@ int main(int argn, char ** argv){
         }
         
         
-        if(i == (partlist[partind] - 1)){
+        if(i == (partlist[partind])){
             all_dm_particles[partind] = dp;
             partind ++;
         }

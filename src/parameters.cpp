@@ -92,6 +92,7 @@ void Parameters::setupParams(){
         params.cvel[i] = info.centervel[i];
         params.opos[i] = obs_pos[i];
     }
+    
 	params.otheta = 0.0;
 	params.ophi = 0.0;
 	params.Lbox_in_Mpc = info.Lbox_in_Mpc;
@@ -131,6 +132,9 @@ void Parameters::setupOthers(){
 }
 
 void Parameters::setupRotation(){
+    //rotate the along an axis by 90 degree so that the original -z direction will be in +x direction
+    //after that, apply a align vector, rotate alone the x-direction
+    
     double otheta = params.otheta;
   	double ophi = params.ophi;
     
