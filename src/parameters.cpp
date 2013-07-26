@@ -164,23 +164,23 @@ void Parameters::setupRotation(){
         w = rotaxis[2];
         
         rotm[0][0] = u * u;
-        rotm[1][0] = u * v + w;
-        rotm[2][0] = u * w - v;
+        rotm[0][1] = u * v + w;
+        rotm[0][2] = u * w - v;
         
         //rotm[0][0] = t * pow(rotaxis[0], 2) + c;
         //rotm[1][0] = t * rotaxis[0] * rotaxis[1] - s * rotaxis[2];
         //rotm[2][0] = t * rotaxis[0] * rotaxis[2] + s * rotaxis[1];
         
-        rotm[0][1] = v * u - w;
+        rotm[1][0] = v * u - w;
         rotm[1][1] = v * v;
-        rotm[2][1] = v * w + u;
+        rotm[1][2] = v * w + u;
         //rotm[0][1] = t * rotaxis[0] * rotaxis[1] + s * rotaxis[2];
         //rotm[1][1] = t * pow(rotaxis[1], 2) + c;
         //rotm[2][1] = t * rotaxis[1] * rotaxis[2] - s * rotaxis[0];
         
-        rotm[0][1] = w * u + v;
+        rotm[1][0] = w * u + v;
         rotm[1][1] = w * v - u;
-        rotm[2][1] = w * w;
+        rotm[1][2] = w * w;
         //rotm[0][2] = t * rotaxis[0] * rotaxis[2] - s * rotaxis[1];
         //rotm[1][2] = t * rotaxis[1] * rotaxis[2] + s * rotaxis[0];
         //rotm[2][2] = t * pow(rotaxis[2], 2) + c;
