@@ -176,7 +176,7 @@ void Parameters::setupRotation(){
 
     //http://inside.mines.edu/~gmurray/ArbitraryAxisRotation/
     if(rr > 0.0){
-        rotm[0][0] = u * u + (v*v + w*w) * c;
+        rotm[0][0] = u * u * t + c;
         rotm[0][1] = u * v * t + w * s;
         rotm[0][2] = u * w * t - v * s;
         
@@ -185,7 +185,7 @@ void Parameters::setupRotation(){
         //rotm[2][0] = t * rotaxis[0] * rotaxis[2] + s * rotaxis[1];
         
         rotm[1][0] = v * u * t - w * s;
-        rotm[1][1] = v * v + (u*u + w*w) * c;
+        rotm[1][1] = v * v * t + c;
         rotm[1][2] = v * w * t + u * s;
         //rotm[0][1] = t * rotaxis[0] * rotaxis[1] + s * rotaxis[2];
         //rotm[1][1] = t * pow(rotaxis[1], 2) + c;
@@ -193,7 +193,7 @@ void Parameters::setupRotation(){
         
         rotm[1][0] = w * u * t + v * s;
         rotm[1][1] = w * v * t - u * s;
-        rotm[1][2] = w * w + (u*u + v*v) * c;
+        rotm[1][2] = w * w * t + c;
         //rotm[0][2] = t * rotaxis[0] * rotaxis[2] - s * rotaxis[1];
         //rotm[1][2] = t * rotaxis[1] * rotaxis[2] + s * rotaxis[0];
         //rotm[2][2] = t * pow(rotaxis[2], 2) + c;
