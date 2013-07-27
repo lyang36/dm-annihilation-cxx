@@ -168,7 +168,7 @@ void Parameters::setupRotation(){
     
     //double s = ey \dot r;
     // ey = ez \x ex = [ 0, sin(theta) * sin(phi), cos(theta)]
-    double s = -rr;
+    double s = rr;
     
     
     double rotm[3][3];
