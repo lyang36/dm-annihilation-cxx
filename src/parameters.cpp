@@ -163,7 +163,7 @@ void Parameters::setupRotation(){
     v = v / rr;
     w = w / rr;
     
-    double c = -sin(otheta) * cos(ophi);
+    double c = sin(otheta) * cos(ophi);
   	double t = 1.0 - c;
     
     //double s = ey \dot r;
