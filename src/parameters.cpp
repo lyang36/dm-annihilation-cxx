@@ -114,7 +114,7 @@ void Parameters::setupParams(){
     
     double otheta = acos((params.opos[2] - params.cpos[2])/radius );
   	//double ophi = -PI + atan((params.opos[1]- params.cpos[1]) / (params.opos[0]- params.cpos[0]));
-    double ophi = -PI + atan2((params.opos[1]- params.cpos[1]), (params.opos[0]- params.cpos[0]));
+    double ophi = atan2((params.opos[1]- params.cpos[1]), (params.opos[0]- params.cpos[0]));
     
     
   	if (ophi < 0.0)
