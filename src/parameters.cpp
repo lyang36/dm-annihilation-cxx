@@ -158,7 +158,7 @@ void Parameters::setupRotation(){
     v = -cos(otheta);
     w = sin(otheta) * sin(ophi);
     
-    rr = sqrt(u*u + v*v + w*w);
+    double rr = sqrt(u*u + v*v + w*w);
     u = u / rr;
     v = v / rr;
     w = w / rr;
