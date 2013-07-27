@@ -230,7 +230,7 @@ void Parameters::setupRotation(){
                            + pow(params.opos[2] - params.cpos[2], 2.0));
     //printf("%f %f %f\n", align_vector[0], align_vector[1], align_vector[2]);
 
-  	/*double tmpvec[] = {params.cpos[0] + distance * align_vector[0] - params.opos[0],
+  	double tmpvec[] = {params.cpos[0] + distance * align_vector[0] - params.opos[0],
         params.cpos[1] + distance * align_vector[1] - params.opos[1],
         params.cpos[2] + distance * align_vector[2] - params.opos[2]};
     
@@ -258,11 +258,11 @@ void Parameters::setupRotation(){
     
   	double rotmatrix2[][3] = { 1.0, 0.0, 0.0,
         0.0, cos(gamma_t), sin(gamma_t),
-        0.0, -sin(gamma_t), cos(gamma_t)};*/
+        0.0, -sin(gamma_t), cos(gamma_t)};
     
-    double rotmatrix2[][3] = { 1.0, 0.0, 0.0,
+    /*double rotmatrix2[][3] = { 1.0, 0.0, 0.0,
         0.0, 1, 0,
-        0.0, 0, 1};
+        0.0, 0, 1};*/
     
 	//static double rottmp[3][3];
 	for (int i = 0; i<3; i++){
