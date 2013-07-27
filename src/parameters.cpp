@@ -122,10 +122,10 @@ void Parameters::setupParams(){
 	//cout << "Params Otheta:" << otheta << endl;
     
     
-    printf("%f %f %f %f %f %f\n", -sin(otheta)*cos(ophi), -sin(otheta)*sin(ophi), -cos(otheta)
-           , (params.opos[0]- params.cpos[0]) / radius,
-            (params.opos[1]- params.cpos[1]) / radius,
-           (params.opos[2] - params.cpos[2])/radius );
+    //printf("%f %f %f %f %f %f\n", -sin(otheta)*cos(ophi), -sin(otheta)*sin(ophi), -cos(otheta)
+    //       , (params.opos[0]- params.cpos[0]) / radius,
+    //        (params.opos[1]- params.cpos[1]) / radius,
+    //       (params.opos[2] - params.cpos[2])/radius );
     
   	params.otheta = otheta;
   	params.ophi = ophi;
