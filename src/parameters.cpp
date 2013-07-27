@@ -141,46 +141,59 @@ void Parameters::setupRotation(){
     double otheta = params.otheta;
   	double ophi = params.ophi;
     
+
+  	//double rotaxis[3];
+        
+
+    //rotaxis[0] = 0.0;
+    //rotaxis[1] = -cos(otheta);
+    //rotaxis[2] = sin(otheta) * sin(ophi);
+    
+    //rotate the angle
+    // r=[-sin(theta)*cos(phi), -sin(theta)*sin(phi), -cos(theta)]
+    // r \cross e1 = [0, -cos(theta), sin(theta) * sin(phi)]
+    
+    double u, v, w;
+    u = 0;
+    v = -cos(otheta);
+    w = sin(otheta) * sin(ophi);
+    
+    rr = sqrt(u*u + v*v + w*w);
+    u = u / rr;
+    v = v / rr;
+    w = w / rr;
+    
     double c = -sin(otheta) * cos(ophi);
-  	double s = -sqrt(pow(sin(otheta) * sin(ophi), 2)+ pow(cos(otheta), 2));
   	double t = 1.0 - c;
     
-  	double rotaxis[3];
-        
-    if(s < 0.0){
-        rotaxis[0] = 0.0;
-        rotaxis[1] = - cos(otheta) / s;
-        rotaxis[2] = sin(otheta) * sin(ophi) / s;
-    }
+    //double s = ey \dot r;
+    // ey = ez \x ex = [ 0, sin(theta) * sin(phi), cos(theta)]
+    double s = -rr;
     
     
     double rotm[3][3];
-    
-    if(s < 0.0){
-        
-        double u, v, w;
-        u = rotaxis[0];
-        v = rotaxis[1];
-        w = rotaxis[2];
-        
-        rotm[0][0] = u * u;
-        rotm[0][1] = u * v + w;
-        rotm[0][2] = u * w - v;
+
+
+    //http://inside.mines.edu/~gmurray/ArbitraryAxisRotation/
+    if(rr > 0.0){
+        rotm[0][0] = u * u + (v*v + w*w) * c;
+        rotm[0][1] = u * v * t + w * s;
+        rotm[0][2] = u * w * t - v * s;
         
         //rotm[0][0] = t * pow(rotaxis[0], 2) + c;
         //rotm[1][0] = t * rotaxis[0] * rotaxis[1] - s * rotaxis[2];
         //rotm[2][0] = t * rotaxis[0] * rotaxis[2] + s * rotaxis[1];
         
-        rotm[1][0] = v * u - w;
-        rotm[1][1] = v * v;
-        rotm[1][2] = v * w + u;
+        rotm[1][0] = v * u * t - w * s;
+        rotm[1][1] = v * v + (u*u + w*w) * c;
+        rotm[1][2] = v * w * t + u * s;
         //rotm[0][1] = t * rotaxis[0] * rotaxis[1] + s * rotaxis[2];
         //rotm[1][1] = t * pow(rotaxis[1], 2) + c;
         //rotm[2][1] = t * rotaxis[1] * rotaxis[2] - s * rotaxis[0];
         
-        rotm[1][0] = w * u + v;
-        rotm[1][1] = w * v - u;
-        rotm[1][2] = w * w;
+        rotm[1][0] = w * u * t + v * s;
+        rotm[1][1] = w * v * t - u * s;
+        rotm[1][2] = w * w + (u*u + v*v) * c;
         //rotm[0][2] = t * rotaxis[0] * rotaxis[2] - s * rotaxis[1];
         //rotm[1][2] = t * rotaxis[1] * rotaxis[2] + s * rotaxis[0];
         //rotm[2][2] = t * pow(rotaxis[2], 2) + c;
