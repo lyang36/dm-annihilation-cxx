@@ -163,7 +163,7 @@ void Parameters::setupRotation(){
     v = v / rr;
     w = w / rr;
     
-    double c = sin(otheta) * cos(ophi);
+    double c = - sin(otheta) * cos(ophi);
   	double t = 1.0 - c;
     
     //double s = ey \dot r;
@@ -191,9 +191,9 @@ void Parameters::setupRotation(){
         //rotm[1][1] = t * pow(rotaxis[1], 2) + c;
         //rotm[2][1] = t * rotaxis[1] * rotaxis[2] - s * rotaxis[0];
         
-        rotm[1][0] = w * u * t + v * s;
-        rotm[1][1] = w * v * t - u * s;
-        rotm[1][2] = w * w * t + c;
+        rotm[2][0] = w * u * t + v * s;
+        rotm[2][1] = w * v * t - u * s;
+        rotm[2][2] = w * w * t + c;
         //rotm[0][2] = t * rotaxis[0] * rotaxis[2] - s * rotaxis[1];
         //rotm[1][2] = t * rotaxis[1] * rotaxis[2] + s * rotaxis[0];
         //rotm[2][2] = t * pow(rotaxis[2], 2) + c;
