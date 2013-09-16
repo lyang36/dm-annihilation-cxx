@@ -18,7 +18,7 @@ using namespace std;
 
 int main(int argc, const char **argv){
     if(argc != 6){
-        printf("Usage: %s <fitsfilename>, <num of bins>, <angular radius>, <theta>, <phi>\n", argv[0]);
+        printf("Usage: %s <fitsfilename>, <num of bins>, <angular radius (degree)>, <theta>, <phi>\n", argv[0]);
         exit(1);
     }
     
