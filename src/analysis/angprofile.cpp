@@ -93,7 +93,7 @@ int main(int argc, const char **argv){
             databins[i] = 0.0;
         }
         
-        printf("%f %f\n", i * dtheta, databins[i]);
+        printf("%f %0.20f\n", i * dtheta, databins[i]);
     }
     
     delete databins;
