@@ -80,8 +80,9 @@ MAPTYPE HaloCore::coreFunc(float x, float y, float z,
             ratio = pow(r / radius, 0.6);
         else
             ratio = pow(r / SAT_RADIUS / radius, 0.6);*/
-        if(r > 0)
+	if(r > 0)
             ratio = 0.55 * pow(r / radius, -0.9);
+	//printf("%f %f %f\n", r, radius, ratio);
     }
     return ratio;
 }
