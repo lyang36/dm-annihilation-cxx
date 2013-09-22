@@ -16,7 +16,7 @@
 #include "halocore.h"
 #include "cudahalocore.h"
 #define RADIUS_RATIO (18.2 / 402.0)
-#define SAT_RADIUS (1.0 / 40000.0 / RADIUS_RATIO)
+#define SAT_RADIUS (1.0 / (40000.0 * 0.73) / RADIUS_RATIO)
 
 namespace cuda_halo_core{
     static const string halo_core_file_name_ = "./halocore/VL2_Halos.data";
@@ -40,11 +40,15 @@ __device__ MAPTYPE coreFunc(float x, float y, float z,
     MAPTYPE r = sqrt(xx*xx + yy*yy + zz*zz);
     MAPTYPE ratio = 1.0;
     if( r < radius){
-        if( r > SAT_RADIUS * radius)
+        /*if( r > SAT_RADIUS * radius)
             ratio = pow(r / radius, 0.6);
-            //ratio = 0.0;    //remove the center
         else
-            ratio = pow(r / SAT_RADIUS / radius, 0.6);
+            ratio = pow(r / SAT_RADIUS / radius, 0.6);*/
+
+        // For simplified adabiatic contraction
+        if(r > 0){
+            ratio = 0.55 * pow(r / radius, -0.9);
+        }
     }
     return ratio;
 }
@@ -65,7 +69,7 @@ __global__ void calculateCoreCorrectionGPU(int numParts, int numHalos,
 		correction *= coreFunc(xp, yp, zp, halos[i].xc, 
                         halos[i].yc,
                         halos[i].zc, 
-                        halos[i].radius * RADIUS_RATIO / 40000.0);	
+                        halos[i].radius / (0.73 * 40000.0));	
 	}
 	results[id] = correction;
 }

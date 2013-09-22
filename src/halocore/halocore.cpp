@@ -54,7 +54,7 @@ MAPTYPE HaloCore::getCorrection(float x, float y, float z){
         r *= coreFunc(xp, yp, zp, halos_[i].xc, 
                         halos_[i].yc,
                         halos_[i].zc, 
-                        halos_[i].radius * RADIUS_RATIO / 40000.0);
+                        halos_[i].radius  / (0.73 * 40000.0));
         /*printf("%f %f %f %f %f %f %f\n", xp, yp, zp,
                         halos_[i].xc,
                         halos_[i].yc,
@@ -76,10 +76,12 @@ MAPTYPE HaloCore::coreFunc(float x, float y, float z,
     //if(r < 0.002)
         //printf("%f %f\n", r, radius);
     if( r < radius){
-        if( r > SAT_RADIUS * radius)
+        /*if( r > SAT_RADIUS * radius)
             ratio = pow(r / radius, 0.6);
         else
-            ratio = pow(r / SAT_RADIUS / radius, 0.6);
+            ratio = pow(r / SAT_RADIUS / radius, 0.6);*/
+        if(r > 0)
+            ratio = 0.55 * pow(r / radius, -0.9);
     }
     return ratio;
 }
