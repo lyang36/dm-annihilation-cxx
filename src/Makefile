@@ -63,13 +63,13 @@ decay: comp
 cuda-all: cuda-ann-nosop cuda-ann-sopv cuda-ann-sopv2 cuda-decay cuda-ann-core-nosop
 
 cuda-ann-nosop:
-	nvcc -c -arch=sm_13 kernel.cu genmap_cuda.cpp $(IFLAG)
+	nvcc -c -arch=compute_13 kernel.cu genmap_cuda.cpp $(IFLAG)
 	nvcc -o annmap_cuda_nosop main.o flux_ann_nosop.o datareader.o\
 		   	tipsy_io.o parameters.o mapgenerator.o\
 			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
 
 cuda-ann-core-nosop:
-	nvcc -c -arch=sm_13 kernel.cu genmap_cuda_core.cpp $(COREDIR)/cudahalocore.cu $(IFLAG)
+	nvcc -c -arch=compute_13 kernel.cu genmap_cuda_core.cpp $(COREDIR)/cudahalocore.cu $(IFLAG)
 	nvcc -o annmap_cuda_core_nosop main.o \
 			halocore.o flux_ann_nosop.o cudahalocore.o\
 			datareader.o tipsy_io.o parameters.o \
@@ -77,19 +77,19 @@ cuda-ann-core-nosop:
 			anglefuncs.o kernel.o $(LFLAGS)	
 
 cuda-ann-sopv:
-	nvcc -c -arch=sm_13 kernel.cu genmap_cuda.cpp $(IFLAG)
+	nvcc -c -arch=compute_13 kernel.cu genmap_cuda.cpp $(IFLAG)
 	nvcc -o annmap_cuda_sopv main.o flux_ann_sopv.o datareader.o\
 		   	tipsy_io.o parameters.o mapgenerator.o\
 			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
 
 cuda-ann-sopv2:
-	nvcc -c -arch=sm_13 kernel.cu genmap_cuda.cpp $(IFLAG)
+	nvcc -c -arch=compute_13 kernel.cu genmap_cuda.cpp $(IFLAG)
 	nvcc -o annmap_cuda_sopv2 main.o flux_ann_sopv2.o datareader.o\
 		   	tipsy_io.o parameters.o mapgenerator.o\
 			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
 
 cuda-decay:
-	nvcc -c -arch=sm_13 kernel.cu genmap_cuda.cpp $(IFLAG)
+	nvcc -c -arch=compute_13 kernel.cu genmap_cuda.cpp $(IFLAG)
 	nvcc -o decaymap_cuda_nocorr main.o flux_decay.o datareader.o\
 		   	tipsy_io.o parameters.o mapgenerator.o\
 			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
