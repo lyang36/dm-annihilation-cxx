@@ -6,7 +6,9 @@
 
 #include "../flux.h"
 
-#define SAT_V 0.000991235   // 1km/s
+/**
+ *The p-wave annihilatoin, <sigma v> \propto v^2
+ */
 
 MAPTYPE getflux(Parameters * par_, DMParticle & current_part, MAPTYPE distances){
        MAPTYPE unit_factor = pow(pow((par_ -> natconst.c_in_cgs), 2) /
@@ -16,11 +18,13 @@ MAPTYPE getflux(Parameters * par_, DMParticle & current_part, MAPTYPE distances)
        MAPTYPE v = current_part.sigmav;//sqrt(current_part.velx * current_part.velx +
                    //     current_part.vely * current_part.vely +
                    //     current_part.velz * current_part.velz);
-       if(v < SAT_V) v = SAT_V; 
+       //if(v < SAT_V) v = SAT_V;
 
-       MAPTYPE sophomer_v =  par_->natconst.c_in_cgs / (v * par_->codeunits.velocity_to_cgs);
+       MAPTYPE somer_v = (v * par_->codeunits.velocity_to_cgs) / par_->natconst.c_in_cgs;
+    
+        somer_v = somer_v * somer_v;
 
-       fluxes = unit_factor * sophomer_v * current_part.dens 
+       fluxes = unit_factor * somer_v * current_part.dens
                * current_part.mass / (4.0 * PI * distances * distances);
        return fluxes;
 }

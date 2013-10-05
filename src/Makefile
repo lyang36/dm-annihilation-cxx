@@ -1,8 +1,8 @@
 #must setup these 2 lib to compile
-#FITSIOLIB=/Users/lyang/Tools/cfitsio
-#HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
-FITSIOLIB=/home/lyang/Tools/cfitsio
-HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
+FITSIOLIB=/Users/lyang/Tools/cfitsio
+HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
+#FITSIOLIB=/home/lyang/Tools/cfitsio
+#HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
 
 
 HEALPIXSRC = $(HEALPIXHOME)/src/cxx/basic_gcc/include
@@ -26,7 +26,7 @@ IFLAG=-I $(HEALPIXSRC) -I$(FITSIOLIB)
 
 
 
-all: ann-nosop ann-sopv ann-sopv2 ann-core-nosop decay others
+all: ann-nosom ann-somv ann-somv2 ann-pwave ann-core-nosom decay others
 
 others:
 	@cd dataconverter; make
@@ -37,21 +37,25 @@ comp:
 		   	parameters.cpp mapgenerator.cpp genmap.cpp\
 			anglefuncs.cpp $(IFLAG)
 
-ann-nosop: comp
-	$(CC) -c $(FLUXDIR)/flux_ann_nosop.cpp
-	$(CC) -o annmap_nosop flux_ann_nosop.o $(OBJS) $(LFLAGS)
+ann-nosom: comp
+	$(CC) -c $(FLUXDIR)/flux_ann_nosom.cpp
+	$(CC) -o annmap_nosom flux_ann_nosom.o $(OBJS) $(LFLAGS)
 
-ann-core-nosop: comp
-	$(CC) -c $(FLUXDIR)/flux_ann_core_nosop.cpp $(COREDIR)/halocore.cpp
-	$(CC) -o annmap_core_nosop flux_ann_core_nosop.o halocore.o $(OBJS) $(LFLAGS)
+ann-core-nosom: comp
+	$(CC) -c $(FLUXDIR)/flux_ann_core_nosom.cpp $(COREDIR)/halocore.cpp
+	$(CC) -o annmap_core_nosom flux_ann_core_nosom.o halocore.o $(OBJS) $(LFLAGS)
 
-ann-sopv: comp
-	$(CC) -c $(FLUXDIR)/flux_ann_sopv.cpp
-	$(CC) -o annmap_sopv flux_ann_sopv.o $(OBJS) $(LFLAGS)
+ann-somv: comp
+	$(CC) -c $(FLUXDIR)/flux_ann_somv.cpp
+	$(CC) -o annmap_somv flux_ann_somv.o $(OBJS) $(LFLAGS)
 	
-ann-sopv2: comp
-	$(CC) -c $(FLUXDIR)/flux_ann_sopv2.cpp
-	$(CC) -o annmap_sopv2 flux_ann_sopv2.o $(OBJS) $(LFLAGS)
+ann-somv2: comp
+	$(CC) -c $(FLUXDIR)/flux_ann_somv2.cpp
+	$(CC) -o annmap_somv2 flux_ann_somv2.o $(OBJS) $(LFLAGS)
+
+ann-pwave: comp
+	$(CC) -c $(FLUXDIR)/flux_ann_pwave.cpp
+	$(CC) -o annmap_pwave flux_ann_pwave.o $(OBJS) $(LFLAGS)
 	
 decay: comp
 	$(CC) -c $(FLUXDIR)/flux_decay.cpp
@@ -60,33 +64,40 @@ decay: comp
 
 
 
-cuda-all: cuda-ann-nosop cuda-ann-sopv cuda-ann-sopv2 cuda-decay cuda-ann-core-nosop
+cuda-all: cuda-ann-nosom cuda-ann-somv cuda-ann-somv2 cuda-ann-pwave cuda-decay cuda-ann-core-nosom
 
-cuda-ann-nosop:
+cuda-ann-nosom:
 	nvcc -c -arch=compute_13 kernel.cu genmap_cuda.cpp $(IFLAG)
-	nvcc -o annmap_cuda_nosop main.o flux_ann_nosop.o datareader.o\
+	nvcc -o annmap_cuda_nosom main.o flux_ann_nosom.o datareader.o\
 		   	tipsy_io.o parameters.o mapgenerator.o\
 			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
 
-cuda-ann-core-nosop:
+cuda-ann-core-nosom:
 	nvcc -c -arch=compute_13 kernel.cu genmap_cuda_core.cpp $(COREDIR)/cudahalocore.cu $(IFLAG)
-	nvcc -o annmap_cuda_core_nosop main.o \
-			halocore.o flux_ann_nosop.o cudahalocore.o\
+	nvcc -o annmap_cuda_core_nosom main.o \
+			halocore.o flux_ann_nosom.o cudahalocore.o\
 			datareader.o tipsy_io.o parameters.o \
 			mapgenerator.o genmap_cuda_core.o \
 			anglefuncs.o kernel.o $(LFLAGS)	
 
-cuda-ann-sopv:
+cuda-ann-somv:
 	nvcc -c -arch=compute_13 kernel.cu genmap_cuda.cpp $(IFLAG)
-	nvcc -o annmap_cuda_sopv main.o flux_ann_sopv.o datareader.o\
+	nvcc -o annmap_cuda_somv main.o flux_ann_somv.o datareader.o\
 		   	tipsy_io.o parameters.o mapgenerator.o\
 			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
 
-cuda-ann-sopv2:
+cuda-ann-somv2:
 	nvcc -c -arch=compute_13 kernel.cu genmap_cuda.cpp $(IFLAG)
-	nvcc -o annmap_cuda_sopv2 main.o flux_ann_sopv2.o datareader.o\
+	nvcc -o annmap_cuda_somv2 main.o flux_ann_somv2.o datareader.o\
 		   	tipsy_io.o parameters.o mapgenerator.o\
 			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
+
+cuda-ann-pwave:
+	nvcc -c -arch=compute_13 kernel.cu genmap_cuda.cpp $(IFLAG)
+	nvcc -o annmap_cuda_pwave main.o flux_ann_pwave.o datareader.o\
+		   	tipsy_io.o parameters.o mapgenerator.o\
+			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
+
 
 cuda-decay:
 	nvcc -c -arch=compute_13 kernel.cu genmap_cuda.cpp $(IFLAG)
@@ -98,28 +109,30 @@ cuda-decay:
 cuda-debug:
 	nvcc -c -arch=sm_13 -g -G kernel.cu genmap_cuda.cpp $(IFLAG)
 	nvcc -o annmap_cuda_debug main.o datareader.o tipsy_io.o parameters.o mapgenerator.o\
-		genmap_cuda.o anglefuncs.o -g -G kernel.o flux_ann_nosop.o $(LFLAGS)	
+		genmap_cuda.o anglefuncs.o -g -G kernel.o flux_ann_nosom.o $(LFLAGS)	
 	nvcc -c -arch=sm_13 -g -G kernel.cu -g -G genmap_cuda_core.cpp \
 			-g -G $(COREDIR)/cudahalocore.cu $(IFLAG)
-	nvcc -o annmap_cuda_core_nosop_debug main.o \
-			halocore.o flux_ann_nosop.o cudahalocore.o\
+	nvcc -o annmap_cuda_core_nosom_debug main.o \
+			halocore.o flux_ann_nosom.o cudahalocore.o\
 			datareader.o tipsy_io.o parameters.o \
 			mapgenerator.o genmap_cuda_core.o \
 			anglefuncs.o -g -G kernel.o $(LFLAGS)
 
 clean:
 	rm -fr *.o
-	rm -fr annmap_nosop
-	rm -fr annmap_sopv
-	rm -fr annmap_sopv2
-	rm -fr annmap_cuda_nosop
-	rm -fr annmap_cuda_sopv
-	rm -fr annmap_cuda_sopv2
-	rm -fr annmap_cuda_core_nosop
-	rm -fr annmap_core_nosop
+	rm -fr annmap_nosom
+	rm -fr annmap_somv
+	rm -fr annmap_somv2
+	rm -fr annmap_pwave
+	rm -fr annmap_cuda_nosom
+	rm -fr annmap_cuda_somv
+	rm -fr annmap_cuda_somv2
+	rm -fr annmap_cuda_core_nosom
+	rm -fr annmap_core_nosom
+	rm -fr annmap_cuda_pwave
 	rm -fr decaymap_nocorr
 	rm -fr decaymap_cuda_nocorr
 	rm -fr annmap_cuda_debug
-	rm -fr annmap_cuda_core_nosop_debug
+	rm -fr annmap_cuda_core_nosom_debug
 	@cd dataconverter; make clean
 	@cd test; make clean

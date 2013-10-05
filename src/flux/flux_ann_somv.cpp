@@ -6,7 +6,12 @@
 
 #include "../flux.h"
 
-#define SAT_V 0.00495617 // 5 km/s
+/**
+ *The first somerfield enhancement, <sigma v> \propto 1 / v
+ */
+
+
+#define SAT_V 1   // 1km/s
 
 MAPTYPE getflux(Parameters * par_, DMParticle & current_part, MAPTYPE distances){
        MAPTYPE unit_factor = pow(pow((par_ -> natconst.c_in_cgs), 2) /
@@ -18,11 +23,9 @@ MAPTYPE getflux(Parameters * par_, DMParticle & current_part, MAPTYPE distances)
                    //     current_part.velz * current_part.velz);
        if(v < SAT_V) v = SAT_V; 
 
-       MAPTYPE sophomer_v =  par_->natconst.c_in_cgs / (v * par_->codeunits.velocity_to_cgs);
-    
-       sophomer_v = sophomer_v * sophomer_v;
+       MAPTYPE somer_v =  par_->natconst.c_in_cgs / (v * par_->codeunits.velocity_to_cgs);
 
-       fluxes = unit_factor * sophomer_v * current_part.dens 
+       fluxes = unit_factor * somer_v * current_part.dens 
                * current_part.mass / (4.0 * PI * distances * distances);
        return fluxes;
 }
