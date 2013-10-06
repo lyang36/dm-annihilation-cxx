@@ -5,6 +5,7 @@
  * [value[i]]        //the value, in certain format
  */
 
+#include <cstdlib>
 #include <fstream>
 #include <string>
 #include <sstream>
