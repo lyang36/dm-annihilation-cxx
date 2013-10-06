@@ -177,5 +177,5 @@ void MapGenerator::start(){
     }
 
     delete ringmap;
-    printf("%e\n%e\n%e", map_[0], map_[100], map_[10000]);
+    //printf("%e\n%e\n%e", map_[0], map_[100], map_[10000]);
 }

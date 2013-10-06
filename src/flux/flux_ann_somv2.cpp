@@ -18,11 +18,12 @@ MAPTYPE getflux(Parameters * par_, DMParticle & current_part, MAPTYPE distances)
                               (par_->units.eV_in_cgs * 1.0e9), 2) / (par_->units.Mpc_in_cgs * 1.0e-3)
                             * par_->codeunits.annihilation_flux_to_cgs;
        MAPTYPE fluxes;
-       MAPTYPE v = current_part.sigmav;
+       MAPTYPE v = current_part.sigmav * par_->codeunits.velocity_to_cgs;
     
-       if(v < SAT_V) v = SAT_V; 
-
-       MAPTYPE somer_v =  par_->natconst.c_in_cgs / (v * par_->codeunits.velocity_to_cgs);
+       if(v < SAT_V / 100000.0)
+           v = SAT_V / 100000.0;
+    
+       MAPTYPE somer_v =  par_->natconst.c_in_cgs / v;
     
        somer_v = somer_v * somer_v;
 
