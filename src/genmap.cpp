@@ -78,6 +78,7 @@ void MapGenerator::start(){
 			
 			//ignore the low resolution mass
             //use density < 0 to set the mask
+			//printf("current mas: %f %f\n", current_part.mass, hires_particle_mass );
 			if(current_part.mass >= hires_particle_mass * 1.1 
              ||current_part.dens < 0){
 				continue;
