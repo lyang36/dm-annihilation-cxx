@@ -13,6 +13,8 @@ HEALPIXC  = $(HEALPIXHOME)/cxx/Healpix_cxx
 FLUXDIR = ./flux
 COREDIR = ./halocore
 
+NVCCARGS=-arch=compute_13
+
 C=gcc
 CC=g++
 OBJS=main.o datareader.o tipsy_io.o parameters.o mapgenerator.o\
@@ -67,13 +69,13 @@ decay: comp
 cuda-all: cuda-ann-nosom cuda-ann-somv cuda-ann-somv2 cuda-ann-pwave cuda-decay cuda-ann-core-nosom
 
 cuda-ann-nosom:
-	nvcc -c -arch=compute_13 kernel.cu genmap_cuda.cpp $(IFLAG)
+	nvcc -c $(NVCCARGS) kernel.cu genmap_cuda.cpp $(IFLAG)
 	nvcc -o annmap_cuda_nosom main.o flux_ann_nosom.o datareader.o\
 		   	tipsy_io.o parameters.o mapgenerator.o\
 			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
 
 cuda-ann-core-nosom:
-	nvcc -c -arch=compute_13 kernel.cu genmap_cuda_core.cpp $(COREDIR)/cudahalocore.cu $(IFLAG)
+	nvcc -c $(NVCCARGS) kernel.cu genmap_cuda_core.cpp $(COREDIR)/cudahalocore.cu $(IFLAG)
 	nvcc -o annmap_cuda_core_nosom main.o \
 			halocore.o flux_ann_nosom.o cudahalocore.o\
 			datareader.o tipsy_io.o parameters.o \
@@ -81,26 +83,26 @@ cuda-ann-core-nosom:
 			anglefuncs.o kernel.o $(LFLAGS)	
 
 cuda-ann-somv:
-	nvcc -c -arch=compute_13 kernel.cu genmap_cuda.cpp $(IFLAG)
+	nvcc -c $(NVCCARGS) kernel.cu genmap_cuda.cpp $(IFLAG)
 	nvcc -o annmap_cuda_somv main.o flux_ann_somv.o datareader.o\
 		   	tipsy_io.o parameters.o mapgenerator.o\
 			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
 
 cuda-ann-somv2:
-	nvcc -c -arch=compute_13 kernel.cu genmap_cuda.cpp $(IFLAG)
+	nvcc -c $(NVCCARGS) kernel.cu genmap_cuda.cpp $(IFLAG)
 	nvcc -o annmap_cuda_somv2 main.o flux_ann_somv2.o datareader.o\
 		   	tipsy_io.o parameters.o mapgenerator.o\
 			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
 
 cuda-ann-pwave:
-	nvcc -c -arch=compute_13 kernel.cu genmap_cuda.cpp $(IFLAG)
+	nvcc -c $(NVCCARGS) kernel.cu genmap_cuda.cpp $(IFLAG)
 	nvcc -o annmap_cuda_pwave main.o flux_ann_pwave.o datareader.o\
 		   	tipsy_io.o parameters.o mapgenerator.o\
 			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
 
 
 cuda-decay:
-	nvcc -c -arch=compute_13 kernel.cu genmap_cuda.cpp $(IFLAG)
+	nvcc -c $(NVCCARGS) kernel.cu genmap_cuda.cpp $(IFLAG)
 	nvcc -o decaymap_cuda_nocorr main.o flux_decay.o datareader.o\
 		   	tipsy_io.o parameters.o mapgenerator.o\
 			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
