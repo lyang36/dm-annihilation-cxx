@@ -178,6 +178,11 @@ void getFlag(){
                     numPartsRead_ = 0;
                 }
             }
+            
+            if(numPartsRead_ > 0){
+                doSearch(numPartsRead_, dev_searchParts_, dev_searchResult_, dev_val);
+                numPartsRead_ = 0;
+            }
         }else{
             string line;
             if(isAHFPartFileBin){
@@ -193,10 +198,7 @@ void getFlag(){
 
     }
     
-    if(numPartsRead_ > 0){
-        doSearch(numPartsRead_, dev_searchParts_, dev_searchResult_, dev_val);
-        numPartsRead_ = 0;
-    }
+
     printf("\n");
     haloInputFile_.close();
     
