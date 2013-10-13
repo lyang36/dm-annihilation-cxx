@@ -184,9 +184,8 @@ void getFlag(){
                 haloInputFile_.seekg(sizeof(int) * numHaloParts, ios_base::cur);
             }else{
                 for(int j = 0; j < numHaloParts; j++){
-                    //haloInputFile_ >> partindex;
-                    //haloInputFile_ >> ch;
                     getline(haloInputFile_, line);
+                    printf("%s\n", line.c_str());
                 }
             }
             
