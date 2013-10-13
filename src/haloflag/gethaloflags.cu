@@ -181,8 +181,7 @@ void getFlag(){
         }else{
             string line;
             if(isAHFPartFileBin){
-                ios_base::seekdir way = sizeof(int) * numHaloParts;
-                haloInputFile_.seekg(ios_base::cur, way);
+                haloInputFile_.seekg(sizeof(int) * numHaloParts, ios_base::cur);
             }else{
                 for(int j = 0; j < numHaloParts; j++){
                     //haloInputFile_ >> partindex;
