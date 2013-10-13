@@ -18,16 +18,16 @@ using namespace std;
 
 //the particle index in the r200 file
 bool isIndexBin = true;
-string index_file_txt =  "/home/lyang/data/vl2b.00400.r200.index";
-string index_file_bin =  "/home/lyang/data/vl2b.00400.r200.index";
+string index_file_txt =  "";//"/home/lyang/data/vl2b.00400.r200.index";
+string index_file_bin =  "";// "/home/lyang/data/vl2b.00400.r200.index";
 
 //the particle file in the AHF particles
 bool isAHFPartFileBin = false;
-string ahf_part_file_txt = "/home/lyang/halodata/vl_400_rhovesc.z0.000.AHF_particles";
-string ahf_part_file_bin = "/home/lyang/halodata/vl_400_rhovesc.z0.000.AHF_particles";
+string ahf_part_file_txt = "";//"/home/lyang/halodata/vl_400_rhovesc.z0.000.AHF_particles";
+string ahf_part_file_bin = "";//"/home/lyang/halodata/vl_400_rhovesc.z0.000.AHF_particles";
 
 //the output halo flags (a binary file)
-string output_file = "vl2b.00400.r200.ahf.haloflags";
+string output_file = "";//"vl2b.00400.r200.ahf.haloflags";
 
 //halo ids to be selected
 //the first int is a number of total number to be selected
@@ -153,6 +153,13 @@ void getFlag(){
         for(int j = 0; j < numHaloParts; j++){
             int partindex;
             int ch;
+
+            if(!(thrust::binary_search(dev_searchHaloIds_.begin(),
+                dev_searchHaloIds_.end(), i,      
+                thrust::less<int>()))){
+                
+            }
+
             if(isAHFPartFileBin){
                 haloInputFile_.read((char *) &partindex, sizeof(int));
                 haloInputFile_.read((char *) &ch, sizeof(int));
@@ -189,11 +196,21 @@ void getFlag(){
     delete searchResult_;
 }
 
+void printUsage(const char * name){
+   printf("%s \n%s \n%s \n%s \n%s\n", name,
+	"-[bin/txt]_index <index file>",
+	"-[bin/txt]_ahf <AHF particle output file>",
+	"-[bin/txt]_haloid <ids of halo to be selected>",
+	"-output <outputfile>");
+}
 
 int main(int argc, const char **argv){
     int m=1;
 
-    
+    if(argc < 9){
+    	printUsage(argv[0]);
+	exit(1);
+    } 
     while (m<argc)
     {
         string arg = argv[m];
@@ -216,10 +233,6 @@ int main(int argc, const char **argv){
         }else if (arg == "-output") {
             output_file = argv[m+1];
             m+=1;
-        }else if (arg == "-txt_index") {
-            isIndexBin = false;
-            index_file_txt = argv[m+1];
-            m+=1;
         }else if (arg == "-bin_haloid") {
             isHaloIdsBin = true;
             haloids_to_be_selected_bin = argv[m+1];
@@ -231,7 +244,7 @@ int main(int argc, const char **argv){
         }
         //else if (arg == "-verbose") { verbose = true;}
         else{
-            cout << "Usage:" << endl;
+            printUsage(argv[0]);
             exit(0);
         }
         m++;
@@ -270,19 +283,20 @@ int main(int argc, const char **argv){
         }
         dataInputFile_.close();
     }
-    
+  
     ifstream haloidsStream_;
+    //printf("%d %s\n", isHaloIdsBin, )
     if(isHaloIdsBin){
-        haloidsStream_.open(haloids_to_be_selected_bin.c_str(), ios::binary | ios::in);
+        haloidsStream_.open(haloids_to_be_selected_bin.c_str(), ios::binary);
         if(!haloidsStream_.good()){
-            printf("Halo Id error: %s !\n", haloids_to_be_selected_bin.c_str());
+            printf("Halo Id error: %s!\n", haloids_to_be_selected_bin.c_str());
             exit(1);
         }
         haloidsStream_.read((char *) &numOfHalos_, sizeof(int));
     }else{
-        haloidsStream_.open(haloids_to_be_selected_bin.c_str(),  ios::in);
+        haloidsStream_.open(haloids_to_be_selected_txt.c_str());
         if(!haloidsStream_.good()){
-            printf("Halo Id error: %s !\n", haloids_to_be_selected_bin.c_str());
+            printf("Halo Id error: %s!\n", haloids_to_be_selected_txt.c_str());
             exit(1);
         }
         haloidsStream_ >> numOfHalos_;
