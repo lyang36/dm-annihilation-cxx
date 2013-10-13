@@ -186,7 +186,7 @@ void getFlag(){
                 for(int j = 0; j < numHaloParts; j++){
                     //haloInputFile_ >> partindex;
                     //haloInputFile_ >> ch;
-                    getline(line, haloInputFile_);
+                    getline(haloInputFile_, line);
                 }
             }
             
