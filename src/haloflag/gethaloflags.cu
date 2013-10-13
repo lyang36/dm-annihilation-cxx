@@ -141,7 +141,7 @@ void getFlag(){
     }
     
     int numPartsRead_ = 0;
-    printf("Number halos: %d.\nStart reading halo particles...\n", numOfHalos_);
+    printf("Start reading halo particles...\n", numOfHalos_);
     
 
     for(int i = 0; i < totalNumHalos; i ++){
