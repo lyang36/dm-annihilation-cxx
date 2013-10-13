@@ -152,7 +152,7 @@ void getFlag(){
             haloInputFile_ >> numHaloParts;
         }
 
-        
+        //printf("%d %d\n", i, numHaloParts); 
         if(thrust::binary_search(dev_searchHaloIds_.begin(),
                                  dev_searchHaloIds_.end(),
                                  i,
@@ -190,8 +190,9 @@ void getFlag(){
             }else{
                 for(int j = 0; j < numHaloParts + 1; j++){
                     getline(haloInputFile_, line);
+                    //haloInputFile_.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 }
-                printf("%s\n", line.c_str());
+                //printf("%s\n", line.c_str());
             }
             
         }
