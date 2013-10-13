@@ -190,8 +190,8 @@ void getFlag(){
             }else{
                 for(int j = 0; j < numHaloParts; j++){
                     getline(haloInputFile_, line);
-                    printf("%s\n", line.c_str());
                 }
+                printf("%s\n", line.c_str());
             }
             
         }
