@@ -188,7 +188,7 @@ void getFlag(){
             if(isAHFPartFileBin){
                 haloInputFile_.seekg(sizeof(int) * numHaloParts, ios_base::cur);
             }else{
-                for(int j = 0; j < numHaloParts; j++){
+                for(int j = 0; j < numHaloParts + 1; j++){
                     getline(haloInputFile_, line);
                 }
                 printf("%s\n", line.c_str());
