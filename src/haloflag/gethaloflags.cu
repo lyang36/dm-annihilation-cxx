@@ -142,6 +142,8 @@ void getFlag(){
     
     int numPartsRead_ = 0;
     printf("Number halos: %d.\nStart reading halo particles...\n", numOfHalos_);
+    
+
     for(int i = 0; i < totalNumHalos; i ++){
         int numHaloParts;
         if(isAHFPartFileBin){
@@ -149,36 +151,45 @@ void getFlag(){
         }else{
             haloInputFile_ >> numHaloParts;
         }
-        printf("Halo: %d, Particles: %d.\n", i, numHaloParts);
-        for(int j = 0; j < numHaloParts; j++){
-            int partindex;
-            int ch;
 
-            if(!(thrust::binary_search(dev_searchHaloIds_.begin(),
-                dev_searchHaloIds_.end(), i,      
-                thrust::less<int>()))){
+        
+        if(thrust::binary_search(dev_searchHaloIds_.begin(),
+                                 dev_searchHaloIds_.end(),
+                                 i,
+                                 thrust::less<int>())){
+            printf("Halo: %d, Particles: %d.\n", i, numHaloParts);
+            
+            for(int j = 0; j < numHaloParts; j++){
+                int partindex;
+                int ch;
                 
-            }
-
-            if(isAHFPartFileBin){
-                haloInputFile_.read((char *) &partindex, sizeof(int));
-                haloInputFile_.read((char *) &ch, sizeof(int));
-            }else{
-                haloInputFile_ >> partindex;
-                haloInputFile_ >> ch;
-            }
-            if(thrust::binary_search(dev_searchHaloIds_.begin(),
-                                     dev_searchHaloIds_.end(),
-                                     i,
-                                     thrust::less<int>())){
+                if(isAHFPartFileBin){
+                    haloInputFile_.read((char *) &partindex, sizeof(int));
+                    haloInputFile_.read((char *) &ch, sizeof(int));
+                }else{
+                    haloInputFile_ >> partindex;
+                    haloInputFile_ >> ch;
+                }
                 haloParticles_[numPartsRead_] = partindex;
                 numPartsRead_ ++;
+                
+                if(numPartsRead_ >= GPU_MEM){
+                    doSearch(numPartsRead_, dev_searchParts_, dev_searchResult_, dev_val);
+                    numPartsRead_ = 0;
+                }
+            }
+        }else{
+            string line;
+            if(isAHFPartFileBin){
+                haloInputFile_.seekg(ios_base::cur, sizeof(int) * numHaloParts);
+            }else{
+                for(int j = 0; j < numHaloParts; j++){
+                    //haloInputFile_ >> partindex;
+                    //haloInputFile_ >> ch;
+                    getline(line, haloInputFile_);
+                }
             }
             
-            if(numPartsRead_ >= GPU_MEM){
-                doSearch(numPartsRead_, dev_searchParts_, dev_searchResult_, dev_val);
-                numPartsRead_ = 0;
-            }
         }
 
     }
