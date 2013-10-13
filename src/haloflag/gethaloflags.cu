@@ -12,7 +12,7 @@
 #include <thrust/binary_search.h>
 #include <thrust/pair.h>
 
-#define GPU_MEM 100000000
+#define GPU_MEM 10000000
 
 using namespace std;
 
