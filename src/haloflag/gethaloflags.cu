@@ -33,8 +33,8 @@ string output_file = "vl2b.00400.r200.ahf.haloflags";
 //the first int is a number of total number to be selected
 //followed by the list of halo ids
 bool isHaloIdsBin = false;
-string haloids_to_be_selected_bin = "to_be_seleted.ids"
-string haloids_to_be_selected_txt = ""
+string haloids_to_be_selected_bin = "to_be_seleted.ids";
+string haloids_to_be_selected_txt = "";
 
 int * haloParticles_;
 int * haloIds_;
@@ -114,7 +114,7 @@ void getFlag(){
     thrust::sort(dev_searchHaloIds_.begin(), dev_searchHaloIds_.begin() + numOfHalos_);
     
     
-    int currentHalo = 0;
+    //int currentHalo = 0;
     int totalNumHalos = 0;
     for(int i = 0; i < numParts_; i++){
         flags_[i] = 0;
@@ -128,10 +128,10 @@ void getFlag(){
 
     ifstream haloInputFile_;
     if(isAHFPartFileBin){
-        haloInputFile_.open(ahf_part_file.c_str()), ios::binary | ios::in);
-        haloInputFile_.read(&totalNumHalos, sizeof(int));
+        haloInputFile_.open(ahf_part_file_bin.c_str(), ios::binary | ios::in);
+        haloInputFile_.read((char *)&totalNumHalos, sizeof(int));
     }else{
-        haloInputFile_.open(ahf_part_file.c_str());
+        haloInputFile_.open(ahf_part_file_txt.c_str());
         haloInputFile_ >> totalNumHalos;
     }
     
@@ -145,7 +145,7 @@ void getFlag(){
     for(int i = 0; i < totalNumHalos; i ++){
         int numHaloParts;
         if(isAHFPartFileBin){
-            haloInputFile_.read(&numHaloParts, sizeof(int));
+            haloInputFile_.read((char *) &numHaloParts, sizeof(int));
         }else{
             haloInputFile_ >> numHaloParts;
         }
@@ -154,8 +154,8 @@ void getFlag(){
             int partindex;
             int ch;
             if(isAHFPartFileBin){
-                haloInputFile_.read(&partindex, sizeof(int));
-                haloInputFile_.read(&ch, sizeof(int));
+                haloInputFile_.read((char *) &partindex, sizeof(int));
+                haloInputFile_.read((char *) &ch, sizeof(int));
             }else{
                 haloInputFile_ >> partindex;
                 haloInputFile_ >> ch;
@@ -241,7 +241,7 @@ int main(int argc, const char **argv){
     if(isIndexBin){
         dataInputFile_.open(index_file_bin.c_str(), ios::binary | ios::in);
         if(!dataInputFile_.good()){
-            printf("Datafile error: %s !\n", index_file.c_str());
+            printf("Datafile error: %s !\n", index_file_bin.c_str());
             exit(1);
         }
         
@@ -249,7 +249,7 @@ int main(int argc, const char **argv){
     }else{
         dataInputFile_.open(index_file_txt.c_str(), ios::in);
         if(!dataInputFile_.good()){
-            printf("Datafile error: %s !\n", index_file.c_str());
+            printf("Datafile error: %s !\n", index_file_txt.c_str());
             exit(1);
         }
         
@@ -275,14 +275,14 @@ int main(int argc, const char **argv){
     if(isHaloIdsBin){
         haloidsStream_.open(haloids_to_be_selected_bin.c_str(), ios::binary | ios::in);
         if(!haloidsStream_.good()){
-            printf("Halo Id error: %s !\n", index_file.c_str());
+            printf("Halo Id error: %s !\n", haloids_to_be_selected_bin.c_str());
             exit(1);
         }
         haloidsStream_.read((char *) &numOfHalos_, sizeof(int));
     }else{
         haloidsStream_.open(haloids_to_be_selected_bin.c_str(),  ios::in);
         if(!haloidsStream_.good()){
-            printf("Halo Id error: %s !\n", index_file.c_str());
+            printf("Halo Id error: %s !\n", haloids_to_be_selected_bin.c_str());
             exit(1);
         }
         haloidsStream_ >> numOfHalos_;
