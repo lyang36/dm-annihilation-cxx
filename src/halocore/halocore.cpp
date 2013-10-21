@@ -73,16 +73,9 @@ MAPTYPE HaloCore::coreFunc(float x, float y, float z,
     MAPTYPE zz = (z - hzc);
     MAPTYPE r = sqrt(xx*xx + yy*yy + zz*zz);
     MAPTYPE ratio = 1.0;
-    //if(r < 0.002)
-        //printf("%f %f\n", r, radius);
     if( r < radius){
-        /*if( r > SAT_RADIUS * radius)
-            ratio = pow(r / radius, 0.6);
-        else
-            ratio = pow(r / SAT_RADIUS / radius, 0.6);*/
 	if(r > 0)
             ratio = 0.55 * pow(r / radius, -0.9);
-	//printf("%f %f %f\n", r, radius, ratio);
     }
     return ratio;
 }

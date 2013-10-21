@@ -40,11 +40,6 @@ __device__ MAPTYPE coreFunc(float x, float y, float z,
     MAPTYPE r = sqrt(xx*xx + yy*yy + zz*zz);
     MAPTYPE ratio = 1.0;
     if( r < radius){
-        /*if( r > SAT_RADIUS * radius)
-            ratio = pow(r / radius, 0.6);
-        else
-            ratio = pow(r / SAT_RADIUS / radius, 0.6);*/
-
         // For simplified adabiatic contraction
         if(r > 0){
             ratio = 0.55 * pow(r / radius, -0.9);
