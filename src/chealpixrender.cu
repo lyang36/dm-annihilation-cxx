@@ -52,6 +52,9 @@ cudaError_t initializeCUDA(int nside, int numofparts){
 
 cudaError_t calculateMapByGPU(renderpart * parts, int num_of_parts){
     int blocks = num_of_parts;
+    if(num_of_parts == 0){
+        return cudaSuccess;
+    }
     //cuda mem copy
     //copy particle data to GPU
     cudaError_t cudaStatus = cudaMemcpy(d_parts, parts, num_of_parts * sizeof(renderpart), cudaMemcpyHostToDevice);

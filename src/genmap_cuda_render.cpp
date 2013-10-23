@@ -50,6 +50,7 @@ void MapGenerator::start(){
     float * map1_ = (float *) calloc(Npix, sizeof(float));
     int Np = reader_->getPartNum();
     int rec = Np / par_->memParts / 50;
+    if(rec < 1) rec = 1;
     cout << "Creating map!!!" << endl;
 	cout << "---10---20---30---40---50---60---70---80---90--100%\n";
     
@@ -73,9 +74,12 @@ void MapGenerator::start(){
     
 
     cudaError_t status;
+    
+    //printf("ok3\n");
     //initialize
     status = initializeCUDA(Nside, par_->memParts);
-    
+    //printf("ok4\n");
+
     if(status != cudaSuccess){
     	printf("CUDA initialize error!\n");
     	exit(1);
@@ -83,7 +87,8 @@ void MapGenerator::start(){
     
     int count = 0;
     int rendercount = 0;
-    
+   
+     
     while(reader_->hasNext()){
     	parts = reader_->getBuf();
     	count += reader_->getMemparts();
@@ -144,12 +149,14 @@ void MapGenerator::start(){
 		}
 		
 		//pass particles to CUDA, calculating
-		status = calculateMapByGPU(renderparts, rendercount);
+		//printf("Ok0\n");
+        status = calculateMapByGPU(renderparts, rendercount);
 	    if(status != cudaSuccess){
 	    	printf("CUDA initialize error!\n");
 	    	exit(1);
 	    }
 		rendercount = 0;
+        //printf("Ok2\n");
 		reader_->loadBuffer();
     }
     
@@ -162,7 +169,7 @@ void MapGenerator::start(){
     cout << "\nFinished!." << endl;
     
     
-
+    //printf("dOmega->%f\n", par_->map.dOmega);
     for(int i = 0; i < Npix; i++){
         map_[i] += map1_[i];
         map_[i] /= par_->map.dOmega;
