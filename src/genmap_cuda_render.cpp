@@ -47,7 +47,7 @@ void MapGenerator::start(){
     
     map_ = (float *) calloc(Npix, sizeof(float));
     //use map1_ to get the value from device
-    map1_ = (float *) calloc(Npix, sizeof(float));
+    float * map1_ = (float *) calloc(Npix, sizeof(float));
     int Np = reader_->getPartNum();
 
     cout << "Creating map!!!" << endl;
@@ -107,11 +107,14 @@ void MapGenerator::start(){
 			
 			//fluxes = unit_factor * current_part.dens * current_part.mass / (4.0 * PI * distances * distances);
 			fluxes = getflux(par_, current_part, distances);
-
+            
+            double ct, ph;
 			calc_angles(current_part.posx-oposx, current_part.posy-oposy,
 						current_part.posz-oposz, distances, par_,
-						costheta, phi);
-			
+						ct, ph);
+			costheta = ct;
+            phi = ph
+            
 			theta = acos(costheta);
 			angular_radius = current_part.hsmooth / distances;
 			

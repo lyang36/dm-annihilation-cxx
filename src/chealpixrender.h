@@ -6,7 +6,7 @@ public:
     float theta;
     float phi;
     float x, y, z;
-    float angular_radius
+    float angular_radius;
     float flux;
 };
 
@@ -23,7 +23,7 @@ struct healpix_par{
     float theta_per_pix;
 };
 
-__global__ calcfluxGPU(int nside,
+__global__ void calcfluxGPU(int nside,
                        float * map,
                        int numOfParts,
                        renderpart * parts);
