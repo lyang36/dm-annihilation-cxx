@@ -23,12 +23,12 @@
 
 
 void MapGenerator::start(){
-    float distances;
-    float fluxes;
-    float angular_radius;
-    float costheta;
-	float theta;
-	float phi;
+    double distances;
+    double fluxes;
+    double angular_radius;
+    double costheta;
+	double theta;
+	double phi;
     
     float unit_factor = pow(pow((par_ -> natconst.c_in_cgs), 2) /
                               (par_->units.eV_in_cgs * 1.0e9), 2) / (par_->units.Mpc_in_cgs * 1.0e-3)
@@ -108,12 +108,10 @@ void MapGenerator::start(){
 			//fluxes = unit_factor * current_part.dens * current_part.mass / (4.0 * PI * distances * distances);
 			fluxes = getflux(par_, current_part, distances);
             
-            double ct, ph;
+
 			calc_angles(current_part.posx-oposx, current_part.posy-oposy,
 						current_part.posz-oposz, distances, par_,
-						ct, ph);
-			costheta = ct;
-            phi = ph
+						costheta, phi);
             
 			theta = acos(costheta);
 			angular_radius = current_part.hsmooth / distances;
