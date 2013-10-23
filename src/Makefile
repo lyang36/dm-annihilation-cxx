@@ -110,34 +110,34 @@ cuda-decay:
 
 cuda-render: cuda-ann-nosom-render cuda-ann-somv-render cuda-ann-somv2-render cuda-ann-pwave-render cuda-decay-render
 cuda-ann-nosom-render:
-	nvcc -c $(NVCCARGS) kernel.cu genmap_cuda_render.cpp $(IFLAG)
+	nvcc -c $(NVCCARGS) chealpixrender.cu genmap_cuda_render.cpp $(IFLAG)
 	nvcc -o annmap_cuda_nosom main.o flux_ann_nosom.o datareader.o\
 		   	tipsy_io.o parameters.o mapgenerator.o\
-			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
+			genmap_cuda.o anglefuncs.o chealpixrender.o $(LFLAGS)
 
 cuda-ann-somv-render:
-	nvcc -c $(NVCCARGS) kernel.cu genmap_cuda_render.cpp $(IFLAG)
+	nvcc -c $(NVCCARGS) chealpixrender.cu genmap_cuda_render.cpp $(IFLAG)
 	nvcc -o annmap_cuda_somv main.o flux_ann_somv.o datareader.o\
 		   	tipsy_io.o parameters.o mapgenerator.o\
-			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
+			genmap_cuda.o anglefuncs.o chealpixrender.o $(LFLAGS)
 
 cuda-ann-somv2-render:
-	nvcc -c $(NVCCARGS) kernel.cu genmap_cuda_render.cpp $(IFLAG)
+	nvcc -c $(NVCCARGS) chealpixrender.cu genmap_cuda_render.cpp $(IFLAG)
 	nvcc -o annmap_cuda_somv2 main.o flux_ann_somv2.o datareader.o\
 		   	tipsy_io.o parameters.o mapgenerator.o\
-			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
+			genmap_cuda.o anglefuncs.o chealpixrender.o $(LFLAGS)
 
 cuda-ann-pwave-render:
-	nvcc -c $(NVCCARGS) kernel.cu genmap_cuda_render.cpp $(IFLAG)
+	nvcc -c $(NVCCARGS) chealpixrender.cu genmap_cuda_render.cpp $(IFLAG)
 	nvcc -o annmap_cuda_pwave main.o flux_ann_pwave.o datareader.o\
 		   	tipsy_io.o parameters.o mapgenerator.o\
-			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
+			genmap_cuda.o anglefuncs.o chealpixrender.o $(LFLAGS)
 
 cuda-decay-render:
-	nvcc -c $(NVCCARGS) kernel.cu genmap_cuda_render.cpp $(IFLAG)
+	nvcc -c $(NVCCARGS) chealpixrender.cu genmap_cuda_render.cpp $(IFLAG)
 	nvcc -o decaymap_cuda_nocorr main.o flux_decay.o datareader.o\
 		   	tipsy_io.o parameters.o mapgenerator.o\
-			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
+			genmap_cuda.o anglefuncs.o chealpixrender.o $(LFLAGS)
 
 
 cuda-debug:
