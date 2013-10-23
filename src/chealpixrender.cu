@@ -64,6 +64,8 @@ cudaError_t calculateMapByGPU(renderpart * parts, int num_of_parts){
                                                    d_map,
                                                    num_of_parts,
                                                    d_parts);
+    
+    return cudaStatus;
 }
 
 cudaError_t getMap(float * map){
