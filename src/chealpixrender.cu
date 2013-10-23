@@ -11,7 +11,7 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include "driver_functions.h"
-#include "kernel_new.h"
+#include "chealpixrender.h"
 
 #ifndef M_PI
 #define M_PI           3.14159265358979323846
