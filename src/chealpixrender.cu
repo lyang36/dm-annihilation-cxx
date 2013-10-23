@@ -32,7 +32,7 @@ int nside_;
 cudaError_t initializeCUDA(int nside, int numofparts){
     nside_ = nside;
     int npix = 12 * nside * nside;
-    cudaStatus = cudaMalloc((void**)&d_map, npix * sizeof(float));
+    cudaError_t cudaStatus = cudaMalloc((void**)&d_map, npix * sizeof(float));
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "cudaMalloc failed -- allocating HEALPix map memory!\n");
         return cudaStatus;
@@ -54,7 +54,7 @@ cudaError_t calculateMapByGPU(renderpart * parts, int num_of_parts){
     int blocks = num_of_parts;
     //cuda mem copy
     //copy particle data to GPU
-    cudaStatus = cudaMemcpy(d_parts, parts, num_of_parts * sizeof(renderpart), cudaMemcpyHostToDevice);
+    cudaError_t cudaStatus = cudaMemcpy(d_parts, parts, num_of_parts * sizeof(renderpart), cudaMemcpyHostToDevice);
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "cudaMemcpy failed -- copying particle data to device!\n");
         return cudaStatus;
@@ -69,12 +69,13 @@ cudaError_t calculateMapByGPU(renderpart * parts, int num_of_parts){
 }
 
 cudaError_t getCUDAMap(float * map){
-    int npix = 12 * nside * nside;
-    cudaStatus = cudaMemcpy(map, d_map, npix * sizeof(float), cudaMemcpyDeviceToHost);
+    int npix = 12 * nside_ * nside_;
+    cudaError_t cudaStatus = cudaMemcpy(map, d_map, npix * sizeof(float), cudaMemcpyDeviceToHost);
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "cudaMemcpy failed -- copying map data to host!\n");
-        return cudaStatus;
+
     }
+    return cudaStatus;
 }
 
 void cudaCleaingUp(){
@@ -153,16 +154,16 @@ __device__ void angle2pix(healpix_par &par,
 
 //6 flops
 __device__ void pix2vec(healpix_par &par, int r, int c, float &x, float &y, float &z, float &ct, float &phi){
-    float sintheta, costheta;
+    float sintheta;
     if(r <= par.nside){
-        ct = costheta = 1.0 - 4.0 * r * r / (float) par.npix;
+        ct  = 1.0 - 4.0 * r * r / (float) par.npix;
         phi = (c + 0.5) / (2.0 * r) * M_PI;
     }else if (r < par.nl3){
-        ct = costheta = 2.0 / 3.0 * (2.0 * par.nside - r) / (float) par.nside;
+        ct  = 2.0 / 3.0 * (2.0 * par.nside - r) / (float) par.nside;
         phi = (c + 0.5 * (1 - (r + par.nside) % 2)) / (2.0 * par.nside) * M_PI;
     }else{
         float cr = par.nl4 - r;
-        ct = costheta = -1.0 + 4.0 * cr * cr / (float)par.npix;
+        ct = -1.0 + 4.0 * cr * cr / (float)par.npix;
         phi = (c + 0.5) / (2 * cr) * M_PI;
     }
     sintheta = sqrt(1 - ct * ct);
@@ -281,7 +282,7 @@ __global__ void calcfluxGPU(int nside,
             npixNorthPole = 2 * rmin * (rmin - 1);
     
     if(isSouthPolarIn)
-            npixSouthPole = par.npix - 2 * (par.nl4 - rmax) * (par.nl4 - rmax - 1);
+            npixSouthPole = pars.npix - 2 * (pars.nl4 - rmax) * (pars.nl4 - rmax - 1);
 
     totalPix = numPix + npixNorthPole + npixSouthPole;
     
@@ -307,12 +308,12 @@ __global__ void calcfluxGPU(int nside,
         }
         
         //calculate the pixel id
-        if (k < NpixNorthPole){
+        if (k < npixNorthPole){
             p=k;
-            pr = pix2ring(par, p);
-            pc = pix2icol(par, pr, p);
+            pr = pix2ring(pars, p);
+            pc = pix2icol(pars, pr, p);
         }
-        else if {k < NpixNorthPole + NpixSouthPole}{
+        else if {k < npixNorthPole + npixSouthPole}{
             p = par.npix - (k - NpixNorthPole) - 1;
             pr = pix2ring(par, p);
             pc = pix2icol(par, pr, p);
