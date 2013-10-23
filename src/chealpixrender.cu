@@ -17,12 +17,12 @@
 #define M_PI           3.14159265358979323846
 #endif
 
-#define piover2  (0.5*M_PI)
+#define PIOVER2  (0.5*M_PI)
 #define PI M_PI
-#define twopi (2.0*M_PI)
-#define z0 (2.0/3.0)
-#define twothird z0
-#define ns_max 8192
+#define TWOPI (2.0*M_PI)
+#define Z0 (2.0/3.0)
+#define TWOTHIRD Z0
+#define NS_MAX 8192
 
 
 float * d_map;
@@ -114,11 +114,11 @@ __device__ void angle2pix(healpix_par &par,
     int ir, ip, kshift;
     
     float za = fabs(z);
-    if( phi >= twopi)  phi = phi - twopi;
-    if (phi < 0.)     phi = phi + twopi;
-    tt = phi / piover2;//  ! in [0,4)
+    if( phi >= TWOPI)  phi = phi - TWOPI;
+    if (phi < 0.)     phi = phi + TWOPI;
+    tt = phi / PIOVER2;//  ! in [0,4)
     
-    if( za <= z0 ) {
+    if( za <= Z0 ) {
         jp = (int)floor(par.nside*(0.5 + tt - z*0.75)); /*index of ascending edge line*/
         jm = (int)floor(par.nside*(0.5 + tt + z*0.75)); /*index of descending edge line*/
         ir = par.nside + 1 + jp - jm;// ! in {1,2n+1} (ring number counted from z=2/3)
@@ -207,7 +207,7 @@ __device__ int pix2ring(healpix_par &par, int ipix){
 //get the ring num of certain z
 __device__ int ring_above (long nside_, float z){
     float az=abs(z);
-    if (az>twothird) // polar caps
+    if (az>TWOTHIRD) // polar caps
     {
         int iring = int(nside_*sqrt(3*(1-az)));
         return (z>0) ? iring : 4*nside_-iring-1;
