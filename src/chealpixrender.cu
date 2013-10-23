@@ -68,7 +68,7 @@ cudaError_t calculateMapByGPU(renderpart * parts, int num_of_parts){
     return cudaStatus;
 }
 
-cudaError_t getMap(float * map){
+cudaError_t getCUDAMap(float * map){
     int npix = 12 * nside * nside;
     cudaStatus = cudaMemcpy(map, d_map, npix * sizeof(float), cudaMemcpyDeviceToHost);
     if (cudaStatus != cudaSuccess) {

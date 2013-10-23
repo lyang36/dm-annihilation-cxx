@@ -31,6 +31,6 @@ __global__ void calcfluxGPU(int nside,
 cudaError_t initializeCUDA(int nside, int numofparts);
 cudaError_t calculateMapByGPU(renderpart * parts, int num_of_parts);
 //get the map from the device
-cudaError_t getMap(float * map);
+cudaError_t getCUDAMap(float * map);
 void cudaCleaingUp();
 #endif

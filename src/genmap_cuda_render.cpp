@@ -45,7 +45,7 @@ void MapGenerator::start(){
     //the actuall base
     Healpix_Base base(Nside, NEST, SET_NSIDE);
     
-    map_ = (float *) calloc(Npix, sizeof(float));
+    map_ = (double *) calloc(Npix, sizeof(double));
     //use map1_ to get the value from device
     float * map1_ = (float *) calloc(Npix, sizeof(float));
     int Np = reader_->getPartNum();
@@ -148,7 +148,7 @@ void MapGenerator::start(){
 		reader_->loadBuffer();
     }
     
-    getMap(map1_);
+    getCUDAMap(map1_);
     
     isFinished_ = true;
 
