@@ -89,6 +89,12 @@ void MapGenerator::start(){
     	count += reader_->getMemparts();
         
 		for( int i = 0; i< reader_->getMemparts(); i++){
+            
+            if(count % rec == 0){
+				cout << "#";
+				cout.flush();
+			}
+            
 			/////Particle calculating
 			DMParticle &current_part = parts[i];
 			
