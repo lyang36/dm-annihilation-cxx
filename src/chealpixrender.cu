@@ -33,11 +33,12 @@ cudaError_t initializeCUDA(int nside, int numofparts){
 
     int count = 0;
 	int i = 0;
+    cudaError_t cudaStatus;
 
 	cudaGetDeviceCount(&count);
 	if(count == 0) {
 		fprintf(stderr, "There is no device.\n");
-		return false;
+		return cudaErrorAssert;
 	}
 
 	for(i = 0; i < count; i++) {
@@ -50,7 +51,7 @@ cudaError_t initializeCUDA(int nside, int numofparts){
 	}
 	if(i == count) {
 		fprintf(stderr, "There is no device supporting CUDA.\n");
-		return false;
+		return cudaErrorAssert;
 	}
 	cudaSetDevice(i);
 
@@ -58,7 +59,7 @@ cudaError_t initializeCUDA(int nside, int numofparts){
 
     nside_ = nside;
     int npix = 12 * nside * nside;
-    cudaError_t cudaStatus = cudaMalloc((void**)&d_map, npix * sizeof(float));
+    cudaStatus = cudaMalloc((void**)&d_map, npix * sizeof(float));
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "cudaMalloc failed -- allocating HEALPix map memory!\n");
         return cudaStatus;
