@@ -49,7 +49,7 @@ void MapGenerator::start(){
     //use map1_ to get the value from device
     float * map1_ = (float *) calloc(Npix, sizeof(float));
     int Np = reader_->getPartNum();
-
+    int rec = Np / par_->memParts / 50;
     cout << "Creating map!!!" << endl;
 	cout << "---10---20---30---40---50---60---70---80---90--100%\n";
     
@@ -87,15 +87,14 @@ void MapGenerator::start(){
     while(reader_->hasNext()){
     	parts = reader_->getBuf();
     	count += reader_->getMemparts();
-        
+        if(count % rec == 0){
+                cout << "#";
+                cout.flush();
+        }
+
 		for( int i = 0; i< reader_->getMemparts(); i++){
-            
-            if(count % rec == 0){
-				cout << "#";
-				cout.flush();
-			}
-            
-			/////Particle calculating
+			
+            /////Particle calculating
 			DMParticle &current_part = parts[i];
 			
 			current_part.eps = 0;
