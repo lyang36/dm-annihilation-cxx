@@ -1,5 +1,5 @@
 #include <cstdio>
-#include <cmath>
+//#include <cmath>
 #include <rpc/types.h>
 #include <rpc/xdr.h>
 
@@ -126,7 +126,7 @@ __device__ void angle2pix(healpix_par &par,
         
         kshift = 0;
         if (ir % 2==0.) kshift = 1;// ! kshift=1 if ir even, 0 otherwise
-        ip = (int)floor( ( jp+jm - par.nside + kshift + 1 ) / 2 );// ! in {0,4n)
+        ip = ( ( jp+jm - par.nside + kshift + 1 ) / 2 );// ! in {0,4n)
         if( ip>par.nl4 ) ip = ip - par.nl4;
         icol = ip;
         ipix = par.ncap + par.nl4*(ir-1) + ip ;
@@ -194,12 +194,12 @@ __device__ int pix2icol(healpix_par &par, int ring, int pix){
 //3 flops
 __device__ int pix2ring(healpix_par &par, int ipix){
     if(ipix < par.ncap + par.nl4){
-        return (int)floor((sqrt(2*ipix + 1) + 1) / 2);
+        return ((sqrt(2.0 * ipix + 1) + 1) / 2);
     }else if (ipix < 10 * par.nsidesq - par.nl4){
-        return (int)floor((ipix - 2 * par.nsidesq - par.nl2)/par.nl4) + par.nside + 1;
+        return ((ipix - 2 * par.nsidesq - par.nl2)/par.nl4) + par.nside + 1;
     }else{
         //floor((sqrt(2*(12 * ns * ns - pix - 1) + 1) + 1) / 2)
-        return par.nl4 - (int)floor((sqrt(2*(par.npix - 1- ipix) + 1) + 1) / 2);
+        return par.nl4 - floor((sqrt(2.0*(par.npix - 1- ipix) + 1) + 1) / 2);
     }
 }
 
@@ -232,7 +232,7 @@ __global__ void calcfluxGPU(int nside,
     int startPix = 0;
     float z;
     float x, y;
-    float theta, phi;
+    float  phi;
     float norm = 0;
     
     if(blockIdx.x >= numOfParts){
@@ -255,7 +255,7 @@ __global__ void calcfluxGPU(int nside,
     x = particle.x;
     y = particle.y;
     z = particle.z;
-    theta = particle.theta;
+    //theta = particle.theta;
     phi = particle.phi;
     float za = fabs(z);
     
@@ -313,34 +313,34 @@ __global__ void calcfluxGPU(int nside,
             pr = pix2ring(pars, p);
             pc = pix2icol(pars, pr, p);
         }
-        else if {k < npixNorthPole + npixSouthPole}{
-            p = par.npix - (k - NpixNorthPole) - 1;
-            pr = pix2ring(par, p);
-            pc = pix2icol(par, pr, p);
+        else if (k < npixNorthPole + npixSouthPole){
+            p = pars.npix - (k - npixNorthPole) - 1;
+            pr = pix2ring(pars, p);
+            pc = pix2icol(pars, pr, p);
         }else{
-            np = k - NpixNorthPole - NpixSouthPole;
+            int np = k - npixNorthPole - npixSouthPole;
             pr = np / (2 * dc +1)+rmin;
-            if(pr < 1 || pr > par.nl4){
+            if(pr < 1 || pr > pars.nl4){
                 isIgnored = true;
             }else{
-                if(pr <= par.nside){
+                if(pr <= pars.nside){
                     c0 = (int)(2 * (phi - particle.angular_radius) * pr / M_PI) - 1;
                 }
-                else if(pr < par.nl3){
+                else if(pr < pars.nl3){
                     c0 = int(phi - particle.angular_radius)
-                        / par.theta_per_pix - 1;
+                        / pars.theta_per_pix - 1;
                 }else{
                     c0 = (int)(2 * (phi - particle.angular_radius) *
-                        (par.nl4 - pr) / M_PI) - 1;
+                        (pars.nl4 - pr) / M_PI) - 1;
                 }
                 pc = np % (2 * dc +1)+c0;
                 if((pc < 0) ||
-                   (pr <= par.nside && pc >= 4 * pr) ||
-                   (pr < par.nl3 && pc >= par.nl4) ||
-                   (pr >= par.nl3 && pc > 4 * (par.nl4 - pr))){
+                   (pr <= pars.nside && pc >= 4 * pr) ||
+                   (pr < pars.nl3 && pc >= pars.nl4) ||
+                   (pr >= pars.nl3 && pc > 4 * (pars.nl4 - pr))){
                     isIgnored = true;
                 }else{
-                    p = cr2pix(par, pc, pr);
+                    p = cr2pix(pars, pc, pr);
                 }
             }
 
@@ -349,8 +349,8 @@ __global__ void calcfluxGPU(int nside,
         //calculate the value
         if(!isIgnored){
             float x1, y1, z1, ct, phi;
-            pix2vec(par, pr, pc, x1, y1, z1, ct, phi);
-            weight = pixval[i] = flux(par, x1, y1, z1,
+            pix2vec(pars, pr, pc, x1, y1, z1, ct, phi);
+            weight = pixval[i] = flux(pars, x1, y1, z1,
                             x, y, z,
                             particle.angular_radius);
         }
@@ -361,7 +361,7 @@ __global__ void calcfluxGPU(int nside,
         int halfThreadNum = NUM_THREADS_PER_BLOCK / 2;
         while(halfThreadNum > 0){
             if(threadIdx.x < halfThreadNum){
-                pixval[threadIdx.x] += pixval[halfThreadNum + threadIdx.x]
+                pixval[threadIdx.x] += pixval[halfThreadNum + threadIdx.x];
             }
             __syncthreads();
             halfThreadNum /= 2;
@@ -396,38 +396,38 @@ __global__ void calcfluxGPU(int nside,
     startPix = 0;
     for(int i = 0; i < numPixPerThread; i++){
         //calculate the pixel id
-        if (k < NpixNorthPole){
+        if (k < npixNorthPole){
             p=k;
-            pr = pix2ring(par, p);
+            pr = pix2ring(pars, p);
         }
-        else if {k < NpixNorthPole + NpixSouthPole}{
-            p = par.npix - (k - NpixNorthPole) - 1;
-            pr = pix2ring(par, p);
+        else if (k < npixNorthPole + npixSouthPole){
+            p = pars.npix - (k - npixNorthPole) - 1;
+            pr = pix2ring(pars, p);
             
         }else{
-            np = k - NpixNorthPole - NpixSouthPole;
+            int np = k - npixNorthPole - npixSouthPole;
             pr = np / (2 * dc +1)+rmin;
-            if(pr < 1 || pr > par.nl4){
+            if(pr < 1 || pr > pars.nl4){
                 isIgnored = true;
             }else{
-                if(pr <= par.nside){
+                if(pr <= pars.nside){
                     c0 = (int)(2 * (phi - particle.angular_radius) * pr / M_PI) - 1;
                 }
-                else if(pr < par.nl3){
+                else if(pr < pars.nl3){
                     c0 = int(phi - particle.angular_radius)
-                    / par.theta_per_pix - 1;
+                    / pars.theta_per_pix - 1;
                 }else{
                     c0 = (int)(2 * (phi - particle.angular_radius) *
-                               (par.nl4 - pr) / M_PI) - 1;
+                               (pars.nl4 - pr) / M_PI) - 1;
                 }
                 pc = np % (2 * dc +1)+c0;
                 if((pc < 0) ||
-                   (pr <= par.nside && pc >= 4 * pr) ||
-                   (pr < par.nl3 && pc >= par.nl4) ||
-                   (pr >= par.nl3 && pc > 4 * (par.nl4 - pr))){
+                   (pr <= pars.nside && pc >= 4 * pr) ||
+                   (pr < pars.nl3 && pc >= pars.nl4) ||
+                   (pr >= pars.nl3 && pc > 4 * (pars.nl4 - pr))){
                     isIgnored = true;
                 }else{
-                    p = cr2pix(par, pc, pr);
+                    p = cr2pix(pars, pc, pr);
                 }
             }
             
@@ -436,8 +436,8 @@ __global__ void calcfluxGPU(int nside,
         //calculate the value
         if(!isIgnored){
             float x1, y1, z1, ct, phi;
-            pix2vec(par, pr, pc, x1, y1, z1, ct, phi);
-            weight = flux(par, x1, y1, z1,
+            pix2vec(pars, pr, pc, x1, y1, z1, ct, phi);
+            weight = flux(pars, x1, y1, z1,
                           x, y, z,
                           particle.angular_radius);
             atomicAdd(map + p, weight * particle.flux / norm);

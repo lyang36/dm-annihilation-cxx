@@ -13,7 +13,7 @@ HEALPIXC  = $(HEALPIXHOME)/cxx/Healpix_cxx
 FLUXDIR = ./flux
 COREDIR = ./halocore
 
-NVCCARGS=-arch=compute_13
+NVCCARGS=-arch=sm_20
 
 C=gcc
 CC=g++
