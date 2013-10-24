@@ -95,6 +95,10 @@ cudaError_t calculateMapByGPU(renderpart * parts, int num_of_parts){
                                                    num_of_parts,
                                                    d_parts);
     
+    cudaStatus = cudaThreadSynchronize();
+    if (cudaStatus != cudaSuccess) {
+        printf("cudaThreadSynchronize error: %s\n", cudaGetErrorString(cudaStatus));
+    }
     return cudaStatus;
 }
 

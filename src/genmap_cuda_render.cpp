@@ -51,9 +51,6 @@ void MapGenerator::start(){
     int Np = reader_->getPartNum();
     int rec = Np / par_->memParts / 50;
     if(rec < 1) rec = 1;
-    cout << "Creating map!!!" << endl;
-	cout << "---10---20---30---40---50---60---70---80---90--100%\n";
-    
 
     //remove low resolution particles
     float hires_particle_mass = 1.0e9f;
@@ -88,11 +85,15 @@ void MapGenerator::start(){
     int count = 0;
     int rendercount = 0;
    
-     
+
+    cout << "Creating map!!!" << endl;
+	cout << "---10---20---30---40---50---60---70---80---90--100%\n";
+    
+
     while(reader_->hasNext()){
     	parts = reader_->getBuf();
     	count += reader_->getMemparts();
-        if(count % rec == 0){
+        if((count / par_->memParts) % rec == 0){
                 cout << "#";
                 cout.flush();
         }

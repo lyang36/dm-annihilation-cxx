@@ -66,7 +66,8 @@ decay: comp
 
 
 
-cuda-all: cuda-ann-nosom cuda-ann-somv cuda-ann-somv2 cuda-ann-pwave cuda-decay cuda-ann-core-nosom
+cuda-all: cuda-ann-nosom 
+#cuda-ann-somv cuda-ann-somv2 cuda-ann-pwave cuda-decay cuda-ann-core-nosom
 
 cuda-ann-nosom:
 	nvcc -c $(NVCCARGS) kernel.cu genmap_cuda.cpp $(IFLAG)
