@@ -38,7 +38,7 @@ cudaError_t initializeCUDA(int nside, int numofparts){
 	cudaGetDeviceCount(&count);
 	if(count == 0) {
 		fprintf(stderr, "There is no device.\n");
-		return cudaErrorAssert;
+		return cudaErrorNotReady;
 	}
 
 	for(i = 0; i < count; i++) {
@@ -51,7 +51,7 @@ cudaError_t initializeCUDA(int nside, int numofparts){
 	}
 	if(i == count) {
 		fprintf(stderr, "There is no device supporting CUDA.\n");
-		return cudaErrorAssert;
+		return cudaErrorNotReady;
 	}
 	cudaSetDevice(i);
 
