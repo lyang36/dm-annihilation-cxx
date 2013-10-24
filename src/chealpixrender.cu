@@ -415,7 +415,8 @@ __global__ void calcfluxGPU(int nside,
         if(!isIgnored){
             if(numPixPerThread == 1){
                 //map[p]  = weight / norm;
-                atomicAdd(map + p, weight * particle.flux / norm);
+				if(norm > 0)
+                	atomicAdd(map + p, weight * particle.flux / norm);
             }
         }
         
@@ -474,7 +475,8 @@ __global__ void calcfluxGPU(int nside,
             weight = flux(pars, x1, y1, z1,
                           x, y, z,
                           particle.angular_radius);
-            atomicAdd(map + p, weight * particle.flux / norm);
+			if(norm > 0)
+            	atomicAdd(map + p, weight * particle.flux / norm);
         }
 
     }
