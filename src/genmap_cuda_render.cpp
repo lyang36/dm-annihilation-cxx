@@ -180,6 +180,8 @@ void MapGenerator::start(){
     //printf("dOmega->%f\n", par_->map.dOmega);
     for(int i = 0; i < Npix; i++){
         map_[i] += map1_[i];
+		
+		//test
         map_[i] /= par_->map.dOmega;
     }
 

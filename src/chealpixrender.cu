@@ -169,9 +169,9 @@ __device__ float flux(healpix_par &par, float x1, float y1, float z1, float x2, 
     float prod = x1 * x2 + y1 * y2 + z1 * z2;
     if(prod > 1) prod = 1;
     float atheta = acos(prod);
-    //if(atheta > (par.theta_per_pix / 2.0 + r_angle)){
-    //    return 0;
-    //}
+    if(atheta > (par.theta_per_pix / 2.0 + r_angle)){
+        return 0;
+    }
     float d2 =  atheta / r_angle;
     d2 *= d2;
     return SPHKenerl(d2);
@@ -293,6 +293,53 @@ __host__ __device__ int ring_above (long nside_, float z){
         return (int)(nside_*(2-1.5f*z));
 }
 
+__device__ void getPixIdThread(
+                healpix_par &params, renderpart &particle,
+                int k, int dc, int rmin, float phi,
+                int  npixNorthPole, int npixSouthPole,
+                int &pr, int &pc, int &p){
+        int c0 = 0;
+        if (k < npixNorthPole){
+                
+                p=k;
+                pr = pix2ring(params, p);
+                pc = pix2icol(params, pr, p);
+                
+            }
+            else if (k < npixNorthPole + npixSouthPole){
+                
+                p = params.npix - (k - npixNorthPole) - 1;
+                pr = pix2ring(params, p);
+                pc = pix2icol(params, pr, p);
+                
+            }else{
+                int np = k - npixNorthPole - npixSouthPole;
+                pr = np / (2 * dc +1)+rmin;
+                if(pr < 1 || pr > params.nl4){
+                }else{
+                    int  npixatthisring = params.nl4;
+                    if(pr <= params.nside){
+                        c0 = (int)(2 * (phi - particle.angular_radius) * pr / M_PI) - 1;
+                        npixatthisring = 4 * pr;
+                    }
+                    else if(pr < params.nl3){
+                        c0 = (int)((phi - particle.angular_radius)
+                                   / params.theta_per_pix - 1);
+                        npixatthisring = params.nl4;
+                    }else{
+                        c0 = (int)(2 * (phi - particle.angular_radius) *
+                                   (params.nl4 - pr) / M_PI) - 1;
+                        npixatthisring = 4 * (params.nl4 - pr);
+                    }
+                    pc = np % (2 * dc +1)+c0;
+                    if(pc < 0) pc += npixatthisring;
+                    if(pc > npixatthisring) pc = pc % npixatthisring;
+                    p = cr2pix(params, pc, pr);
+                    
+                }
+            }    
+}
+
 //count flops
 __global__ void calcfluxGPU(
                             healpix_par params,
@@ -359,12 +406,12 @@ __global__ void calcfluxGPU(
     
     
     numPixPerThread = totalPix / NUM_THREADS_PER_BLOCK
-        + (totalPix % NUM_THREADS_PER_BLOCK == 0) ? 0 : 1;
+        + ((totalPix % NUM_THREADS_PER_BLOCK == 0) ? 0 : 1);
     
     startPix = 0;
     
 
-    int c0;
+    //int c0;
     int p = 0;
     int pr = 0;
     int pc = 0;
@@ -372,68 +419,31 @@ __global__ void calcfluxGPU(
     int k = 0; 
     norm = 0.0;
     
-    bool isIgnored = false;
     for(int i = 0; i < numPixPerThread; i++){
         pixval[threadIdx.x] = 0;
         __syncthreads();
         
-        isIgnored = false;
         k = threadIdx.x + startPix;
-        if( k > totalPix){
-            isIgnored = true;
+        if( k >= totalPix){
             pixval[threadIdx.x] = 0.0;
         }else{
         
             //calculate the pixel id
-            if (k < npixNorthPole){
+                                
+            getPixIdThread(params, particle,
+                    k, dc, rmin, phi,
+                    npixNorthPole, npixSouthPole,
+                    pr, pc, p);
                 
-                p=k;
-                pr = pix2ring(params, p);
-                pc = pix2icol(params, pr, p);
-                
-            }
-            else if (k < npixNorthPole + npixSouthPole){
-                
-                p = params.npix - (k - npixNorthPole) - 1;
-                pr = pix2ring(params, p);
-                pc = pix2icol(params, pr, p);
-                
-            }else{
-                int np = k - npixNorthPole - npixSouthPole;
-                pr = np / (2 * dc +1)+rmin;
-                if(pr < 1 || pr > params.nl4){
-                    isIgnored = true;
-                }else{
-                    int  npixatthisring = params.nl4;
-                    if(pr <= params.nside){
-                        c0 = (int)(2 * (phi - particle.angular_radius) * pr / M_PI) - 1;
-                        npixatthisring = 4 * pr;
-                    }
-                    else if(pr < params.nl3){
-                        c0 = (int)((phi - particle.angular_radius)
-                                   / params.theta_per_pix - 1);
-                        npixatthisring = params.nl4;
-                    }else{
-                        c0 = (int)(2 * (phi - particle.angular_radius) *
-                                   (params.nl4 - pr) / M_PI) - 1;
-                        npixatthisring = 4 * (params.nl4 - pr);
-                    }
-                    pc = np % (2 * dc +1)+c0;
-                    if(pc < 0) pc += npixatthisring;
-                    if(pc > npixatthisring) pc = pc % npixatthisring;
-                    p = cr2pix(params, pc, pr);
-                    
-                }
-                
-            }
+            
             
             //calculate the value
             float x1, y1, z1, ct, phi;
             pix2vec(params, pr, pc, x1, y1, z1, ct, phi);
             //test
-            weight = 1.0;//flux(params, x1, y1, z1,
-                     //     x, y, z,
-                     //     particle.angular_radius);
+            weight = flux(params, x1, y1, z1,
+                          x, y, z,
+                          particle.angular_radius);
             pixval[threadIdx.x] = weight;
         }
         
@@ -462,80 +472,50 @@ __global__ void calcfluxGPU(
         ////////////////////////////////////////////////////////////
         
         //calculated the result and record them to the global memory
-        if(!isIgnored){
-            if(numPixPerThread == 1){
-				if(norm > 0)
-                	atomicAdd(map + p, weight * particle.flux / norm);
-            }
+        
+        if(numPixPerThread == 1){
+			if(norm > 0){
+				//test
+                atomicAdd(map + p, weight * particle.flux / norm);
+				//atomicAdd(map + p, weight / norm);
+				//map[p] = 0;
+			}
         }
+
         
         //continue to next block
         startPix += NUM_THREADS_PER_BLOCK;
     }
     
-    if(numPixPerThread == 1){
+    if(numPixPerThread <= 1){
         return;
     }
     
     startPix = 0;
     for(int i = 0; i < numPixPerThread; i++){
         k = threadIdx.x + startPix;
-        if( k > totalPix){
+        if( k >= totalPix){
         }else{
             
             //calculate the pixel id
-            if (k < npixNorthPole){
-                
-                p=k;
-                pr = pix2ring(params, p);
-                pc = pix2icol(params, pr, p);
-                
-            }
-            else if (k < npixNorthPole + npixSouthPole){
-                
-                p = params.npix - (k - npixNorthPole) - 1;
-                pr = pix2ring(params, p);
-                pc = pix2icol(params, pr, p);
-                
-            }else{
-                int np = k - npixNorthPole - npixSouthPole;
-                pr = np / (2 * dc +1)+rmin;
-                if(pr < 1 || pr > params.nl4){
-                    isIgnored = true;
-                }else{
-                    int  npixatthisring = params.nl4;
-                    if(pr <= params.nside){
-                        c0 = (int)(2 * (phi - particle.angular_radius) * pr / M_PI) - 1;
-                        npixatthisring = 4 * pr;
-                    }
-                    else if(pr < params.nl3){
-                        c0 = (int)((phi - particle.angular_radius)
-                                   / params.theta_per_pix - 1);
-                        npixatthisring = params.nl4;
-                    }else{
-                        c0 = (int)(2 * (phi - particle.angular_radius) *
-                                   (params.nl4 - pr) / M_PI) - 1;
-                        npixatthisring = 4 * (params.nl4 - pr);
-                    }
-                    pc = np % (2 * dc +1)+c0;
-                    if(pc < 0) pc += npixatthisring;
-                    if(pc > npixatthisring) pc = pc % npixatthisring;
-                    p = cr2pix(params, pc, pr);
-                    
-                }
-                
-            }
+            getPixIdThread(params, particle,
+                    k, dc, rmin, phi,
+                    npixNorthPole, npixSouthPole,
+                    pr, pc, p);
             
             //calculate the value
             float x1, y1, z1, ct, phi;
             pix2vec(params, pr, pc, x1, y1, z1, ct, phi);
             
             //test
-            weight = 1.0;//flux(params, x1, y1, z1,
-                     //     x, y, z,
-                     //     particle.angular_radius);
-			if(norm > 0)
+            weight = flux(params, x1, y1, z1,
+                          x, y, z,
+                          particle.angular_radius);
+			if(norm > 0){
+				//test
             	atomicAdd(map + p, weight * particle.flux / norm);
+				//atomicAdd(map + p, weight / norm);
+			}
         }
         
         startPix += NUM_THREADS_PER_BLOCK;
