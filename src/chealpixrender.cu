@@ -233,15 +233,15 @@ __host__ __device__ void angle2pix(healpix_par &par,
 __host__ __device__ void pix2vec(healpix_par &par, int r, int c, float &x, float &y, float &z, float &ct, float &phi){
     float sintheta;
     if(r <= par.nside){
-        ct  = 1.0f - 4.0f * r * r / (float) par.npix;
-        phi = (c + 0.5f) / (2.0f * r) * M_PI;
+        ct  = 1.0 - 4.0 * r * r / (float) par.npix;
+        phi = (c + 0.5) / (2.0 * r) * M_PI;
     }else if (r < par.nl3){
-        ct  = 2.0f / 3.0f * (2.0f * par.nside - r) / (float) par.nside;
-        phi = (c + 0.5f * (1f - (r + par.nside) % 2f)) / (2.0f * par.nside) * M_PI;
+        ct  = 2.0 / 3.0 * (2.0 * par.nside - r) / (float) par.nside;
+        phi = (c + 0.5 * (1 - (r + par.nside) % 2)) / (2.0 * par.nside) * M_PI;
     }else{
         float cr = par.nl4 - r;
-        ct = -1.0f + 4.0f * cr * cr / (float)par.npix;
-        phi = (c + 0.5f) / (2f * cr) * M_PI;
+        ct = -1.0 + 4.0 * cr * cr / (float)par.npix;
+        phi = (c + 0.5) / (2 * cr) * M_PI;
     }
     sintheta = sqrt(1 - ct * ct);
     x = sintheta * cos(phi);
@@ -271,12 +271,12 @@ __host__ __device__ int pix2icol(healpix_par &par, int ring, int pix){
 //3 flops
 __host__ __device__ int pix2ring(healpix_par &par, int ipix){
     if(ipix < par.ncap + par.nl4){
-        return (int)((sqrt(2.0f * ipix + 1.0f) + 1.0f) / 2.0);
+        return (int)((sqrt(2.0 * ipix + 1.0) + 1.0) / 2.0);
     }else if (ipix < 10 * par.nsidesq - par.nl4){
-        return ((ipix - 2f * par.nsidesq - par.nl2)/par.nl4) + par.nside + 1f;
+        return ((ipix - 2 * par.nsidesq - par.nl2)/par.nl4) + par.nside + 1;
     }else{
         //floor((sqrt(2*(12 * ns * ns - pix - 1) + 1) + 1) / 2)
-        return par.nl4 - (int) floor((sqrt(2.0f*(par.npix - 1.0f - ipix) + 1.0f) + 1.0f) / 2.0f);
+        return par.nl4 - (int) floor((sqrt(2.0*(par.npix - 1.0 - ipix) + 1.0) + 1.0) / 2.0);
     }
 }
 
