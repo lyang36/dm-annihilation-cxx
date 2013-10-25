@@ -15,7 +15,7 @@ HEALPIXC  = $(HEALPIXHOME)/cxx/Healpix_cxx
 FLUXDIR = ./flux
 COREDIR = ./halocore
 
-NVCCARGS=-arch=sm_20 -g -G
+NVCCARGS=-arch=sm_20
 
 C=gcc
 CC=g++
@@ -68,8 +68,7 @@ decay: comp
 
 
 
-cuda-all: cuda-ann-nosom 
-#cuda-ann-somv cuda-ann-somv2 cuda-ann-pwave cuda-decay cuda-ann-core-nosom
+cuda-all: cuda-ann-nosom cuda-ann-somv cuda-ann-somv2 cuda-ann-pwave cuda-decay cuda-ann-core-nosom
 
 cuda-ann-nosom:
 	nvcc -c $(NVCCARGS) kernel.cu genmap_cuda.cpp $(IFLAG)

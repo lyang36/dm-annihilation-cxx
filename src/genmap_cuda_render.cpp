@@ -138,8 +138,10 @@ void MapGenerator::start(){
             
 			if( 2.0*angular_radius < theta0 ) {
 				int pix = base.ang2pix(p);
+
                 //test
 				map_[pix] += fluxes;
+
 				current_part.eps = -1;
 			}else{
                 renderparts[rendercount].theta = theta;
@@ -148,8 +150,11 @@ void MapGenerator::start(){
                 renderparts[rendercount].y = vec.y;
                 renderparts[rendercount].z = vec.z;
                 renderparts[rendercount].angular_radius = angular_radius;
+
                 //test
-                renderparts[rendercount].flux = fluxes;
+                renderparts[rendercount].flux = fluxes * 1.0e10;
+
+
                 renderparts[rendercount].setup(Nside);
                 rendercount ++;
             }
@@ -179,7 +184,7 @@ void MapGenerator::start(){
     
     //printf("dOmega->%f\n", par_->map.dOmega);
     for(int i = 0; i < Npix; i++){
-        map_[i] += map1_[i];
+        map_[i] += map1_[i] / 1.0e10;
 		
 		//test
         map_[i] /= par_->map.dOmega;

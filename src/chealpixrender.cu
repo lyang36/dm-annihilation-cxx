@@ -127,17 +127,22 @@ void renderpart::setup(int nside){
     //the ring number
     int iring;
     int icol;
+   
+    if( phi >= TWOPI)  phi = phi - TWOPI;
+    if (phi < 0.)     phi = phi + TWOPI;    
     
+
+
     int ipix, dr;
-    float rlat1 = theta - angular_radius;
+    float rlat1 = theta - 2.0 * angular_radius;
     float zmax = cos(rlat1);
-    rmin = ring_above (nside, zmax) + 1;
-    float rlat2 = theta + angular_radius;
+    rmin = ring_above (nside, zmax);
+    float rlat2 = theta + 2.0 * angular_radius;
     float zmin = cos(rlat2);
     rmax = ring_above (nside, zmin) + 1;
     angle2pix(params_, z, phi, iring, icol, ipix);
     
-    dc = (int)(angular_radius / params.theta_per_pix) + 1;
+    dc = (int)(4.0 * angular_radius / params.theta_per_pix +0.5) + 2;
     dr = rmax - rmin;
     
     numPix = (2 * dc + 1) * dr;
@@ -161,17 +166,28 @@ void renderpart::setup(int nside){
 
 
 __device__ float SPHKenerl(float d2){
+    //test
 	return exp(-0.5 * d2 / 0.333);
+    //return exp(- 10 * d2 );
+
 }
 
 //(x1, y1, z1), (x2, y2, z2) must be normalized
 __device__ float flux(healpix_par &par, float x1, float y1, float z1, float x2, float y2, float z2, float r_angle){
     float prod = x1 * x2 + y1 * y2 + z1 * z2;
+    //test
+    //return 1.0;
+
     if(prod > 1) prod = 1;
+    if(prod < -1) prod = -1;
     float atheta = acos(prod);
-    if(atheta > (par.theta_per_pix / 2.0 + r_angle)){
+    if(atheta > (par.theta_per_pix / 2.0 + r_angle * 2)){
         return 0;
     }
+
+    //test
+    //return 1.0;
+
     float d2 =  atheta / r_angle;
     d2 *= d2;
     return SPHKenerl(d2);
@@ -287,7 +303,7 @@ __host__ __device__ int ring_above (long nside_, float z){
     if (az>TWOTHIRD) // polar caps
     {
         int iring = (int)(nside_*sqrt(3*(1-az)));
-        return (z>0) ? iring : 4*nside_-iring-1;
+        return (z>0) ? iring : (4*nside_-iring-1);
     }
     else // ----- equatorial region ---------
         return (int)(nside_*(2-1.5f*z));
@@ -299,14 +315,14 @@ __device__ void getPixIdThread(
                 int  npixNorthPole, int npixSouthPole,
                 int &pr, int &pc, int &p){
         int c0 = 0;
-        if (k < npixNorthPole){
+        if (k < (npixNorthPole)){
                 
                 p=k;
                 pr = pix2ring(params, p);
                 pc = pix2icol(params, pr, p);
                 
             }
-            else if (k < npixNorthPole + npixSouthPole){
+            else if (k < (npixNorthPole + npixSouthPole)){
                 
                 p = params.npix - (k - npixNorthPole) - 1;
                 pr = pix2ring(params, p);
@@ -318,19 +334,29 @@ __device__ void getPixIdThread(
                 if(pr < 1 || pr > params.nl4){
                 }else{
                     int  npixatthisring = params.nl4;
+                        //c0 = (int)((phi - 2.0 * particle.angular_radius)
+                        //             / params.theta_per_pix - 1);
                     if(pr <= params.nside){
-                        c0 = (int)(2 * (phi - particle.angular_radius) * pr / M_PI) - 1;
+                        //c0 = (int)floor(2 * (phi - (2.0 * particle.angular_radius)) * pr / M_PI
+                        //                - 0.5)
+                        //                + 1;
                         npixatthisring = 4 * pr;
                     }
                     else if(pr < params.nl3){
-                        c0 = (int)((phi - particle.angular_radius)
-                                   / params.theta_per_pix - 1);
+                        //c0 = (int)floor((phi - 2.0 * particle.angular_radius)
+                        //           / params.theta_per_pix - 0.5) + 1;
                         npixatthisring = params.nl4;
                     }else{
-                        c0 = (int)(2 * (phi - particle.angular_radius) *
-                                   (params.nl4 - pr) / M_PI) - 1;
+                        //c0 = (int)floor(2 * (phi - 2.0 * particle.angular_radius) *
+                        //           (params.nl4 - pr) / M_PI 
+                        //           - 0.5) + 1;
                         npixatthisring = 4 * (params.nl4 - pr);
                     }
+				
+					c0 = floor(npixatthisring/TWOPI*(phi) - 0.5) - dc;
+                    //int ip_hi = floor(npixatthisring/TWOPI*(phi0+dphi) - 0.5);
+
+
                     pc = np % (2 * dc +1)+c0;
                     if(pc < 0) pc += npixatthisring;
                     if(pc > npixatthisring) pc = pc % npixatthisring;
@@ -438,8 +464,8 @@ __global__ void calcfluxGPU(
             
             
             //calculate the value
-            float x1, y1, z1, ct, phi;
-            pix2vec(params, pr, pc, x1, y1, z1, ct, phi);
+            float x1, y1, z1, ct, phi1;
+            pix2vec(params, pr, pc, x1, y1, z1, ct, phi1);
             //test
             weight = flux(params, x1, y1, z1,
                           x, y, z,
@@ -476,9 +502,10 @@ __global__ void calcfluxGPU(
         if(numPixPerThread == 1){
 			if(norm > 0){
 				//test
-                atomicAdd(map + p, weight * particle.flux / norm);
+                float fofp = weight * particle.flux / norm;
+                atomicAdd(map + p, fofp);
 				//atomicAdd(map + p, weight / norm);
-				//map[p] = 0;
+				//map[p] = particle.flux;
 			}
         }
 
@@ -504,14 +531,15 @@ __global__ void calcfluxGPU(
                     pr, pc, p);
             
             //calculate the value
-            float x1, y1, z1, ct, phi;
-            pix2vec(params, pr, pc, x1, y1, z1, ct, phi);
+            float x1, y1, z1, ct, phi1;
+            pix2vec(params, pr, pc, x1, y1, z1, ct, phi1);
             
-            //test
-            weight = flux(params, x1, y1, z1,
+			if(norm > 0){
+                //test 
+                weight = flux(params, x1, y1, z1,
                           x, y, z,
                           particle.angular_radius);
-			if(norm > 0){
+
 				//test
             	atomicAdd(map + p, weight * particle.flux / norm);
 				//atomicAdd(map + p, weight / norm);
