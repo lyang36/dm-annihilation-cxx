@@ -412,7 +412,7 @@ __global__ void calcfluxGPU(
                 else if(pr < params.nl3){
                     c0 = (int)((phi - particle.angular_radius)
                         / params.theta_per_pix - 1);
-                    npixatthisring = 4 * pr * params.nside;
+                    npixatthisring = params.nl4;
                 }else{
                     c0 = (int)(2 * (phi - particle.angular_radius) *
                         (params.nl4 - pr) / M_PI) - 1;
@@ -515,7 +515,7 @@ __global__ void calcfluxGPU(
                 else if(pr < params.nl3){
                     c0 = (int)((phi - particle.angular_radius)
                                / params.theta_per_pix - 1);
-                    npixatthisring = 4 * pr * params.nside;
+                    npixatthisring = params.nl4;
                 }else{
                     c0 = (int)(2 * (phi - particle.angular_radius) *
                                (params.nl4 - pr) / M_PI) - 1;
