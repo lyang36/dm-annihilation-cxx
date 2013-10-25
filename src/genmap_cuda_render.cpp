@@ -139,7 +139,7 @@ void MapGenerator::start(){
 			if( 2.0*angular_radius < theta0 ) {
 				int pix = base.ang2pix(p);
                 //test
-				map_[pix] += 1;//fluxes;
+				map_[pix] += fluxes;
 				current_part.eps = -1;
 			}else{
                 renderparts[rendercount].theta = theta;
@@ -149,7 +149,7 @@ void MapGenerator::start(){
                 renderparts[rendercount].z = vec.z;
                 renderparts[rendercount].angular_radius = angular_radius;
                 //test
-                renderparts[rendercount].flux = 1;//fluxes;
+                renderparts[rendercount].flux = fluxes;
                 renderparts[rendercount].setup(Nside);
                 rendercount ++;
             }
