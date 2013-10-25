@@ -357,6 +357,7 @@ __global__ void calcfluxGPU(
     
     totalPix = numPix + npixNorthPole + npixSouthPole;
     
+    
     numPixPerThread = totalPix / NUM_THREADS_PER_BLOCK
         + (totalPix % NUM_THREADS_PER_BLOCK == 0) ? 0 : 1;
     
@@ -379,6 +380,7 @@ __global__ void calcfluxGPU(
         isIgnored = false;
         k = threadIdx.x + startPix;
         if( k > totalPix){
+            isIgnored = true;
             break;
         }
         
@@ -481,6 +483,7 @@ __global__ void calcfluxGPU(
         isIgnored = false;
         k = threadIdx.x + startPix;
         if( k > totalPix){
+            isIgnored = true;
             break;
         }
         
