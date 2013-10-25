@@ -636,11 +636,11 @@ cudaError_t calulateMapWithCUDA(MAPTYPE * map, DMParticle * parts, int numParts)
     //step2:
     //cudaStatus = calulatePartsListH(numParts);
     //if(cudaStatus != cudaSuccess) return cudaSuccess;
-    printf("Step 1: calcuate how many particles in each super pixel...\n");
+    //printf("Step 1: calcuate how many particles in each super pixel...\n");
     calculatePartsListByCPU(parts, numParts);
     
     //step3:
-    printf("Step 3: calcuate map...\n");
+    //printf("Step 3: calcuate map...\n");
     cudaStatus = calulateMapH(numParts);
     if(cudaStatus != cudaSuccess) return cudaSuccess;
 

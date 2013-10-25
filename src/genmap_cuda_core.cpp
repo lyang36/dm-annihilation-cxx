@@ -54,11 +54,14 @@ void MapGenerator::start(){
     
     map_ = (MAPTYPE *) calloc(Npix, sizeof(MAPTYPE));
     int Np = reader_->getPartNum();
-    
+    int rec = Np / par_->memParts / 50;
+    if(rec < 1) rec = 1;
+
+
     //int rec = Np / 50;
     //int ll = 0;
     cout << "Creating map!!!" << endl;
-	//cout << "---10---20---30---40---50---60---70---80---90--100%\n";
+	cout << "---10---20---30---40---50---60---70---80---90--100%\n";
     
 
     //remove low resolution particles
@@ -101,7 +104,14 @@ void MapGenerator::start(){
     while(reader_->hasNext()){
     	parts = reader_->getBuf();
     	count += reader_->getMemparts();
-        printf("Particles: %d\n", count);
+
+        if((count / par_->memParts) % rec == 0){
+                cout << "#";
+                cout.flush();
+        }
+
+
+        //printf("Particles: %d\n", count);
     	//first step -- filter the particles
 		applyingCore(parts, reader_->getMemparts(), coreCorr);
 		for( int i = 0; i< reader_->getMemparts(); i++){
