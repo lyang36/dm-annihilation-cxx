@@ -434,7 +434,7 @@ __global__ void calcfluxGPU(
             weight = flux(params, x1, y1, z1,
                             x, y, z,
                             particle.angular_radius);
-            pixval[i] = weight;
+            pixval[threadIdx.x] = weight;
         }
         
         
