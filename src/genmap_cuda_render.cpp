@@ -144,6 +144,7 @@ void MapGenerator::start(){
                 renderparts[rendercount].z = vec.z;
                 renderparts[rendercount].angular_radius = angular_radius;
                 renderparts[rendercount].flux = fluxes;
+                renderparts[rendercount].setup(Nside);
                 rendercount ++;
             }
 
