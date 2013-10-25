@@ -120,18 +120,22 @@ void cudaCleaingUp(){
 	cudaFree(d_parts);
 }
 
-renderpart::setup(int nside){
+void renderpart::setup(int nside){
     healpix_par params_;
     params_.setup(nside);
     
-    int ipix;
-    float rlat1 = particle.theta - particle.angular_radius;
+    int ipix, dr, dc;
+    float rlat1 = theta - angular_radius;
     float zmax = cos(rlat1);
     rmin = ring_above (nside, zmax) + 1;
-    float rlat2 = particle.theta + particle.angular_radius;
+    float rlat2 = theta + angular_radius;
     float zmin = cos(rlat2);
     rmax = ring_above (nside, zmin) + 1;
     angle2pix(params_, z, phi, iring, icol, ipix);
+    
+    dc = particle.angular_radius / params.theta_per_pix + 1;
+    dr = particle.rmax - particle.rmin;
+    
     numPix = (2 * dc + 1) * dr;
     
     bool isNorthPolarIn = (rlat1 <= 0.0);
@@ -295,6 +299,7 @@ __global__ void calcfluxGPU(
 
     __shared__ float pixval[NUM_THREADS_PER_BLOCK];
     __shared__ renderpart listOfParticles[NUM_THREADS_PER_BLOCK];
+    renderpart particle;
     
     if(blockIdx.x >= numOfParts){
         return;
@@ -302,7 +307,7 @@ __global__ void calcfluxGPU(
     
     ////////////////////////Read Particles/////////////////////////
     if(threadIdx.x == 0){
-        renderpart particle = parts[blockIdx.x];
+        particle = parts[blockIdx.x];
         listOfParticles[0] = particle;
     }
     __syncthreads();
@@ -321,7 +326,7 @@ __global__ void calcfluxGPU(
     ////////////////////////////////////////////////////////////////
     
     int nside = params.nside;
-    int icol, iring, dc, rmin, dr;
+    int icol, iring, rmin;
     int dc, dr;
     int numPix, npixNorthPole, npixSouthPole, totalPix;
     
