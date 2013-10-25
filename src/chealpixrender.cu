@@ -124,7 +124,11 @@ void renderpart::setup(int nside){
     healpix_par params_;
     params_.setup(nside);
     
-    int ipix, dr, dc;
+    //the ring number
+    int iring;
+    int icol;
+    
+    int ipix, dr;
     float rlat1 = theta - angular_radius;
     float zmax = cos(rlat1);
     rmin = ring_above (nside, zmax) + 1;
@@ -338,8 +342,7 @@ __global__ void calcfluxGPU(
     float norm = 0;
 
     
-    dc = particle.angular_radius / params.theta_per_pix + 1;
-    dr = particle.rmax - particle.rmin;
+    dc = particle.dc;
     x = particle.x;
     y = particle.y;
     z = particle.z;
@@ -347,8 +350,6 @@ __global__ void calcfluxGPU(
     numPix = particle.numPix;
     npixNorthPole = particle.npixNorthPole;
     npixSouthPole = particle.npixSouthPole;
-    icol = particle.icol;
-    iring = particle.iring;
     rmin = particle.rmin;
     
     float za = fabs(z);
