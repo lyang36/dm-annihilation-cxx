@@ -381,62 +381,60 @@ __global__ void calcfluxGPU(
         k = threadIdx.x + startPix;
         if( k > totalPix){
             isIgnored = true;
-            break;
-        }
-        
-        //calculate the pixel id
-        if (k < npixNorthPole){
-            
-            p=k;
-            pr = pix2ring(params, p);
-            pc = pix2icol(params, pr, p);
-            
-        }
-        else if (k < npixNorthPole + npixSouthPole){
-            
-            p = params.npix - (k - npixNorthPole) - 1;
-            pr = pix2ring(params, p);
-            pc = pix2icol(params, pr, p);
-            
+            pixval[threadIdx.x] = 0.0;
         }else{
-            int np = k - npixNorthPole - npixSouthPole;
-            pr = np / (2 * dc +1)+rmin;
-            if(pr < 1 || pr > params.nl4){
-                isIgnored = true;
-            }else{
-                int  npixatthisring = params.nl4;
-                if(pr <= params.nside){
-                    c0 = (int)(2 * (phi - particle.angular_radius) * pr / M_PI) - 1;
-                    npixatthisring = 4 * pr;
-                }
-                else if(pr < params.nl3){
-                    c0 = (int)((phi - particle.angular_radius)
-                        / params.theta_per_pix - 1);
-                    npixatthisring = params.nl4;
-                }else{
-                    c0 = (int)(2 * (phi - particle.angular_radius) *
-                        (params.nl4 - pr) / M_PI) - 1;
-                    npixatthisring = 4 * (params.nl4 - pr); 
-                }
-                pc = np % (2 * dc +1)+c0;
-                if(pc < 0) pc += npixatthisring;
-                if(pc > npixatthisring) pc = pc % npixatthisring;		
-                p = cr2pix(params, pc, pr);
+        
+            //calculate the pixel id
+            if (k < npixNorthPole){
+                
+                p=k;
+                pr = pix2ring(params, p);
+                pc = pix2icol(params, pr, p);
                 
             }
-
-        }
- 
-        //calculate the value
-        if(!isIgnored){
+            else if (k < npixNorthPole + npixSouthPole){
+                
+                p = params.npix - (k - npixNorthPole) - 1;
+                pr = pix2ring(params, p);
+                pc = pix2icol(params, pr, p);
+                
+            }else{
+                int np = k - npixNorthPole - npixSouthPole;
+                pr = np / (2 * dc +1)+rmin;
+                if(pr < 1 || pr > params.nl4){
+                    isIgnored = true;
+                }else{
+                    int  npixatthisring = params.nl4;
+                    if(pr <= params.nside){
+                        c0 = (int)(2 * (phi - particle.angular_radius) * pr / M_PI) - 1;
+                        npixatthisring = 4 * pr;
+                    }
+                    else if(pr < params.nl3){
+                        c0 = (int)((phi - particle.angular_radius)
+                                   / params.theta_per_pix - 1);
+                        npixatthisring = params.nl4;
+                    }else{
+                        c0 = (int)(2 * (phi - particle.angular_radius) *
+                                   (params.nl4 - pr) / M_PI) - 1;
+                        npixatthisring = 4 * (params.nl4 - pr);
+                    }
+                    pc = np % (2 * dc +1)+c0;
+                    if(pc < 0) pc += npixatthisring;
+                    if(pc > npixatthisring) pc = pc % npixatthisring;
+                    p = cr2pix(params, pc, pr);
+                    
+                }
+                
+            }
+            
+            //calculate the value
             float x1, y1, z1, ct, phi;
             pix2vec(params, pr, pc, x1, y1, z1, ct, phi);
             weight = flux(params, x1, y1, z1,
-                            x, y, z,
-                            particle.angular_radius);
+                          x, y, z,
+                          particle.angular_radius);
             pixval[threadIdx.x] = weight;
         }
-        
         
         /////////////////////Calculating Norm////////////////////////
         //calculate the norm (reduce-sweeping algorithm)
@@ -480,59 +478,54 @@ __global__ void calcfluxGPU(
     
     startPix = 0;
     for(int i = 0; i < numPixPerThread; i++){
-        isIgnored = false;
         k = threadIdx.x + startPix;
         if( k > totalPix){
-            isIgnored = true;
-            break;
-        }
-        
-        //calculate the pixel id
-        if (k < npixNorthPole){
-            
-            p=k;
-            pr = pix2ring(params, p);
-            pc = pix2icol(params, pr, p);
-            
-        }
-        else if (k < npixNorthPole + npixSouthPole){
-            
-            p = params.npix - (k - npixNorthPole) - 1;
-            pr = pix2ring(params, p);
-            pc = pix2icol(params, pr, p);
-            
         }else{
-            int np = k - npixNorthPole - npixSouthPole;
-            pr = np / (2 * dc +1)+rmin;
-            if(pr < 1 || pr > params.nl4){
-                isIgnored = true;
+            
+            //calculate the pixel id
+            if (k < npixNorthPole){
+                
+                p=k;
+                pr = pix2ring(params, p);
+                pc = pix2icol(params, pr, p);
+                
+            }
+            else if (k < npixNorthPole + npixSouthPole){
+                
+                p = params.npix - (k - npixNorthPole) - 1;
+                pr = pix2ring(params, p);
+                pc = pix2icol(params, pr, p);
+                
             }else{
-                int  npixatthisring = params.nl4;
-                if(pr <= params.nside){
-                    c0 = (int)(2 * (phi - particle.angular_radius) * pr / M_PI) - 1;
-                    npixatthisring = 4 * pr;
-                }
-                else if(pr < params.nl3){
-                    c0 = (int)((phi - particle.angular_radius)
-                               / params.theta_per_pix - 1);
-                    npixatthisring = params.nl4;
+                int np = k - npixNorthPole - npixSouthPole;
+                pr = np / (2 * dc +1)+rmin;
+                if(pr < 1 || pr > params.nl4){
+                    isIgnored = true;
                 }else{
-                    c0 = (int)(2 * (phi - particle.angular_radius) *
-                               (params.nl4 - pr) / M_PI) - 1;
-                    npixatthisring = 4 * (params.nl4 - pr);
+                    int  npixatthisring = params.nl4;
+                    if(pr <= params.nside){
+                        c0 = (int)(2 * (phi - particle.angular_radius) * pr / M_PI) - 1;
+                        npixatthisring = 4 * pr;
+                    }
+                    else if(pr < params.nl3){
+                        c0 = (int)((phi - particle.angular_radius)
+                                   / params.theta_per_pix - 1);
+                        npixatthisring = params.nl4;
+                    }else{
+                        c0 = (int)(2 * (phi - particle.angular_radius) *
+                                   (params.nl4 - pr) / M_PI) - 1;
+                        npixatthisring = 4 * (params.nl4 - pr);
+                    }
+                    pc = np % (2 * dc +1)+c0;
+                    if(pc < 0) pc += npixatthisring;
+                    if(pc > npixatthisring) pc = pc % npixatthisring;
+                    p = cr2pix(params, pc, pr);
+                    
                 }
-                pc = np % (2 * dc +1)+c0;
-                if(pc < 0) pc += npixatthisring;
-                if(pc > npixatthisring) pc = pc % npixatthisring;
-                p = cr2pix(params, pc, pr);
                 
             }
             
-        }
-        
-        
-        //calculate the value
-        if(!isIgnored){
+            //calculate the value
             float x1, y1, z1, ct, phi;
             pix2vec(params, pr, pc, x1, y1, z1, ct, phi);
             weight = flux(params, x1, y1, z1,
@@ -541,6 +534,7 @@ __global__ void calcfluxGPU(
 			if(norm > 0)
             	atomicAdd(map + p, weight * particle.flux / norm);
         }
+        
         startPix += NUM_THREADS_PER_BLOCK;
 
     }
