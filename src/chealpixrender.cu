@@ -126,9 +126,9 @@ __device__ float flux(healpix_par &par, float x1, float y1, float z1, float x2, 
     float prod = x1 * x2 + y1 * y2 + z1 * z2;
     if(prod > 1) prod = 1;
     float atheta = acos(prod);
-    if(atheta > (par.theta_per_pix / 2.0 + r_angle)){
-        return 0;
-    }
+    //if(atheta > (par.theta_per_pix / 2.0 + r_angle)){
+    //    return 0;
+    //}
     float d2 =  atheta / r_angle;
     d2 *= d2;
     return SPHKenerl(d2);
@@ -331,7 +331,8 @@ __global__ void calcfluxGPU(int nside,
     int pr = 0;
     int pc = 0;
     float weight = 0;
-    int k = 0;
+    int k = 0; 
+    norm = 0.0;
     for(int i = 0; i < numPixPerThread; i++){
         pixval[threadIdx.x] = 0;
         __syncthreads();
@@ -357,17 +358,26 @@ __global__ void calcfluxGPU(int nside,
             if(pr < 1 || pr > pars.nl4){
                 isIgnored = true;
             }else{
+		int  npixatthisring = pars.nl4;
                 if(pr <= pars.nside){
                     c0 = (int)(2 * (phi - particle.angular_radius) * pr / M_PI) - 1;
+		    pc = np % (2 * dc +1) + c0;
+		    npixatthisring = 4 * pr;
+		    //if(pc < 0) pc += npixatthisring;
+		    //if(pc > npixatthisring) pc = pc % npixatthisring;
                 }
                 else if(pr < pars.nl3){
-                    c0 = int(phi - particle.angular_radius)
-                        / pars.theta_per_pix - 1;
+                    c0 = (int)((phi - particle.angular_radius)
+                        / pars.theta_per_pix - 1);
+		    npixatthisring = 4 * pr * pars.nside;
                 }else{
                     c0 = (int)(2 * (phi - particle.angular_radius) *
                         (pars.nl4 - pr) / M_PI) - 1;
+		    npixatthisring = 4 * (pars.nl4 - pr); 
                 }
                 pc = np % (2 * dc +1)+c0;
+		if(pc < 0) pc += npixatthisring;
+	        if(pc > npixatthisring) pc = pc % npixatthisring;		
                 if((pc < 0) ||
                    (pr <= pars.nside && pc >= 4 * pr) ||
                    (pr < pars.nl3 && pc >= pars.nl4) ||
@@ -409,7 +419,7 @@ __global__ void calcfluxGPU(int nside,
             __syncthreads();
             halfThreadNum *= 2;
         }
-        norm = pixval[threadIdx.x];
+        norm += pixval[threadIdx.x];
         
         //calculated the result and record them to the global memory
         if(!isIgnored){
@@ -430,6 +440,7 @@ __global__ void calcfluxGPU(int nside,
     
     startPix = 0;
     for(int i = 0; i < numPixPerThread; i++){
+	k = threadIdx.x + startPix;
         //calculate the pixel id
         if (k < npixNorthPole){
             p=k;
@@ -442,21 +453,28 @@ __global__ void calcfluxGPU(int nside,
         }else{
             int np = k - npixNorthPole - npixSouthPole;
             pr = np / (2 * dc +1)+rmin;
+	    int npixatthisring = pars.nl4;
             if(pr < 1 || pr > pars.nl4){
                 isIgnored = true;
             }else{
                 if(pr <= pars.nside){
                     c0 = (int)(2 * (phi - particle.angular_radius) * pr / M_PI) - 1;
+		    npixatthisring = 4 * pr;
                 }
                 else if(pr < pars.nl3){
-                    c0 = int(phi - particle.angular_radius)
-                    / pars.theta_per_pix - 1;
+                    c0 = int((phi - particle.angular_radius)
+                    / pars.theta_per_pix - 1);
+		    npixatthisring = pars.nl4;
                 }else{
                     c0 = (int)(2 * (phi - particle.angular_radius) *
                                (pars.nl4 - pr) / M_PI) - 1;
+		    npixatthisring = 4 * (pars.nl4 - pr);
                 }
                 pc = np % (2 * dc +1)+c0;
-                if((pc < 0) ||
+                if(pc < 0) pc += npixatthisring;
+		if(pc > npixatthisring) pc = pc % npixatthisring; 	
+	
+		if((pc < 0) ||
                    (pr <= pars.nside && pc >= 4 * pr) ||
                    (pr < pars.nl3 && pc >= pars.nl4) ||
                    (pr >= pars.nl3 && pc > 4 * (pars.nl4 - pr))){
@@ -478,6 +496,7 @@ __global__ void calcfluxGPU(int nside,
 			if(norm > 0)
             	atomicAdd(map + p, weight * particle.flux / norm);
         }
+	startPix += NUM_THREADS_PER_BLOCK;
 
     }
 }

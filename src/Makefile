@@ -1,8 +1,10 @@
 #must setup these 2 lib to compile
 #FITSIOLIB=/Users/lyang/Tools/cfitsio
 #HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
-FITSIOLIB=/home/lyang/Tools/cfitsio
-HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
+#FITSIOLIB=/home/lyang/Tools/cfitsio
+#HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
+FITSIOLIB=/scratch0/hhpc-hn7/lyang/Tools/cfitsio
+HEALPIXHOME=/scratch0/hhpc-hn7/lyang/Tools/Healpix_3.00
 
 
 HEALPIXSRC = $(HEALPIXHOME)/src/cxx/basic_gcc/include

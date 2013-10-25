@@ -139,11 +139,11 @@ void MapGenerator::start(){
 			}else{
                 renderparts[rendercount].theta = theta;
                 renderparts[rendercount].phi = phi;
-                renderparts[rendercount].x = sin(theta) * cos(phi);
-                renderparts[rendercount].y = sin(theta) * sin(phi);
-                renderparts[rendercount].z = cos(theta);
+                renderparts[rendercount].x = vec.x;
+                renderparts[rendercount].y = vec.y;
+                renderparts[rendercount].z = vec.z;
                 renderparts[rendercount].angular_radius = angular_radius;
-                renderparts[rendercount].flux = 1;
+                renderparts[rendercount].flux = fluxes;
                 rendercount ++;
             }
 

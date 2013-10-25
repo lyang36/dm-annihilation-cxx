@@ -1,5 +1,5 @@
 #ifndef __KERNEL__LY
-#define NUM_THREADS_PER_BLOCK 256
+#define NUM_THREADS_PER_BLOCK 512
 
 class renderpart{
 public:
