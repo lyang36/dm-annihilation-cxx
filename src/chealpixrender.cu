@@ -310,7 +310,7 @@ __global__ void calcfluxGPU(
     }
     
     ////////////////////////Read Particles/////////////////////////
-    listOfParticles[blockIdx.x] = particle;
+    //listOfParticles[blockIdx.x] = particle;
     if(threadIdx.x == 0){
         particle = parts[blockIdx.x];
         listOfParticles[0] = particle;
