@@ -89,7 +89,8 @@ void MapGenerator::start(){
     cout << "Creating map!!!" << endl;
 	cout << "---10---20---30---40---50---60---70---80---90--100%\n";
     
-
+    
+    int t_count = 0;
     while(reader_->hasNext()){
     	parts = reader_->getBuf();
     	count += reader_->getMemparts();
@@ -132,9 +133,13 @@ void MapGenerator::start(){
 			vec3 vec;
 			ang2vec(theta,phi,&vec);
 			
+            
+            t_count ++;
+            
 			if( 2.0*angular_radius < theta0 ) {
 				int pix = base.ang2pix(p);
-				map_[pix] += fluxes;
+                //test
+				map_[pix] += 1;//fluxes;
 				current_part.eps = -1;
 			}else{
                 renderparts[rendercount].theta = theta;
@@ -143,7 +148,8 @@ void MapGenerator::start(){
                 renderparts[rendercount].y = vec.y;
                 renderparts[rendercount].z = vec.z;
                 renderparts[rendercount].angular_radius = angular_radius;
-                renderparts[rendercount].flux = fluxes;
+                //test
+                renderparts[rendercount].flux = 1;//fluxes;
                 renderparts[rendercount].setup(Nside);
                 rendercount ++;
             }
@@ -168,7 +174,7 @@ void MapGenerator::start(){
 
     cudaCleaingUp();
     
-    cout << "\nFinished!." << endl;
+    cout << "\nFinished, " << t_count <<" particles rendered!." << endl;
     
     
     //printf("dOmega->%f\n", par_->map.dOmega);
