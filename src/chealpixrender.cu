@@ -133,7 +133,7 @@ void renderpart::setup(int nside){
     rmax = ring_above (nside, zmin) + 1;
     angle2pix(params_, z, phi, iring, icol, ipix);
     
-    dc = angular_radius / params.theta_per_pix + 1;
+    dc = (int)(angular_radius / params.theta_per_pix) + 1;
     dr = rmax - rmin;
     
     numPix = (2 * dc + 1) * dr;
@@ -267,12 +267,12 @@ __host__ __device__ int pix2icol(healpix_par &par, int ring, int pix){
 //3 flops
 __host__ __device__ int pix2ring(healpix_par &par, int ipix){
     if(ipix < par.ncap + par.nl4){
-        return ((sqrt(2.0 * ipix + 1) + 1) / 2);
+        return (int)((sqrt(2.0 * ipix + 1.0) + 1.0) / 2.0);
     }else if (ipix < 10 * par.nsidesq - par.nl4){
         return ((ipix - 2 * par.nsidesq - par.nl2)/par.nl4) + par.nside + 1;
     }else{
         //floor((sqrt(2*(12 * ns * ns - pix - 1) + 1) + 1) / 2)
-        return par.nl4 - floor((sqrt(2.0*(par.npix - 1- ipix) + 1) + 1) / 2);
+        return par.nl4 - floor((sqrt(2.0*(par.npix - 1.0 - ipix) + 1.0) + 1.0) / 2.0);
     }
 }
 
@@ -325,9 +325,8 @@ __global__ void calcfluxGPU(
     particle = listOfParticles[threadIdx.x];
     ////////////////////////////////////////////////////////////////
     
-    int nside = params.nside;
-    int icol, iring, rmin;
-    int dc, dr;
+    int rmin;
+    int dc;
     int numPix, npixNorthPole, npixSouthPole, totalPix;
     
     int numPixPerThread;
