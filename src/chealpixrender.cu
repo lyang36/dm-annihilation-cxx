@@ -430,9 +430,10 @@ __global__ void calcfluxGPU(
             //calculate the value
             float x1, y1, z1, ct, phi;
             pix2vec(params, pr, pc, x1, y1, z1, ct, phi);
-            weight = flux(params, x1, y1, z1,
-                          x, y, z,
-                          particle.angular_radius);
+            //test
+            weight = 1.0;//flux(params, x1, y1, z1,
+                     //     x, y, z,
+                     //     particle.angular_radius);
             pixval[threadIdx.x] = weight;
         }
         
@@ -528,9 +529,11 @@ __global__ void calcfluxGPU(
             //calculate the value
             float x1, y1, z1, ct, phi;
             pix2vec(params, pr, pc, x1, y1, z1, ct, phi);
-            weight = flux(params, x1, y1, z1,
-                          x, y, z,
-                          particle.angular_radius);
+            
+            //test
+            weight = 1.0;//flux(params, x1, y1, z1,
+                     //     x, y, z,
+                     //     particle.angular_radius);
 			if(norm > 0)
             	atomicAdd(map + p, weight * particle.flux / norm);
         }
