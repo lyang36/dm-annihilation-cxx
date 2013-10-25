@@ -133,8 +133,8 @@ void renderpart::setup(int nside){
     rmax = ring_above (nside, zmin) + 1;
     angle2pix(params_, z, phi, iring, icol, ipix);
     
-    dc = particle.angular_radius / params.theta_per_pix + 1;
-    dr = particle.rmax - particle.rmin;
+    dc = angular_radius / params.theta_per_pix + 1;
+    dr = rmax - rmin;
     
     numPix = (2 * dc + 1) * dr;
     
