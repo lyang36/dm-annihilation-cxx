@@ -98,16 +98,20 @@ cudaError_t calculateMapByGPU(renderpart * parts, int num_of_parts){
                                                    num_of_parts,
                                                    d_parts);
     
-    cudaStatus = cudaThreadSynchronize();
-    if (cudaStatus != cudaSuccess) {
-        printf("cudaThreadSynchronize error: %s\n", cudaGetErrorString(cudaStatus));
-    }
+
     return cudaStatus;
 }
 
 cudaError_t getCUDAMap(float * map){
+
+	cudaError_t cudaStatus = cudaThreadSynchronize();
+    if (cudaStatus != cudaSuccess) {
+        printf("cudaThreadSynchronize error: %s\n", cudaGetErrorString(cudaStatus));
+		return cudaStatus;
+    }
+
     int npix = 12 * nside_ * nside_;
-    cudaError_t cudaStatus = cudaMemcpy(map, d_map, npix * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaStatus = cudaMemcpy(map, d_map, npix * sizeof(float), cudaMemcpyDeviceToHost);
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "cudaMemcpy failed -- copying map data to host!\n");
 
