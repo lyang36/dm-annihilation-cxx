@@ -43,7 +43,7 @@ void MapGenerator::start(){
     //int NpixCoase_;
     //NpixCoase_ = Npix / BLOCK_N_DIVIDER / BLOCK_N_DIVIDER;
     //the actuall base
-    Healpix_Base base(Nside, NEST, SET_NSIDE);
+    Healpix_Base base(Nside, RING, SET_NSIDE);
     
     map_ = (double *) calloc(Npix, sizeof(double));
     //use map1_ to get the value from device
@@ -135,6 +135,9 @@ void MapGenerator::start(){
 			
             
             t_count ++;
+
+            //test
+            //angular_radius /= 100.0;
             
 			if( 2.0*angular_radius < theta0 ) {
 				int pix = base.ang2pix(p);
@@ -149,7 +152,9 @@ void MapGenerator::start(){
                 renderparts[rendercount].x = vec.x;
                 renderparts[rendercount].y = vec.y;
                 renderparts[rendercount].z = vec.z;
-                renderparts[rendercount].angular_radius = angular_radius;
+
+                //test
+                renderparts[rendercount].angular_radius = angular_radius;// / 100.0;
 
                 //test
                 renderparts[rendercount].flux = fluxes * 1.0e10;

@@ -140,13 +140,13 @@ void renderpart::setup(int nside){
     int ipix, dr;
     MAPTYPE rlat1 = theta - 2.0 * angular_radius;
     MAPTYPE zmax = cos(rlat1);
-    rmin = ring_above (nside, zmax) - 1;
+    rmin = ring_above (nside, zmax) - 2;
     MAPTYPE rlat2 = theta + 2.0 * angular_radius;
     MAPTYPE zmin = cos(rlat2);
-    rmax = ring_above (nside, zmin) + 1;
+    rmax = ring_above (nside, zmin) + 2;
     angle2pix(params_, z, phi, iring, icol, ipix);
     
-    dc = (int)(4.0 * angular_radius / params.theta_per_pix +0.5) + 2;
+    dc = (int)(4.0 * angular_radius / params.theta_per_pix +0.5) + 3;
     dr = rmax - rmin;
     
     numPix = (2 * dc + 1) * dr;
@@ -185,7 +185,7 @@ __device__ MAPTYPE flux(healpix_par &par, MAPTYPE x1, MAPTYPE y1, MAPTYPE z1, MA
     if(prod > 1) prod = 1;
     if(prod < -1) prod = -1;
     MAPTYPE atheta = acos(prod);
-    if(atheta > (par.theta_per_pix / 2.0 + r_angle * 2)){
+    if(atheta > (par.theta_per_pix / 2.0 + r_angle * 2 )){
         return 0;
     }
 
@@ -525,7 +525,7 @@ __global__ void calcfluxGPU(
         //calculated the result and record them to the global memory
         
         if(numPixPerThread == 1){
-			if((norm > 0) && (p != -1)){
+			if((norm > 0.0) && (p != -1)){
 				//test
                 MAPTYPE fofp = weight * particle.flux / norm;
                 atomicAdd(map + p, fofp);
@@ -543,6 +543,9 @@ __global__ void calcfluxGPU(
         return;
     }
     
+    //test
+    //return;
+
     startPix = 0;
     for(int i = 0; i < numPixPerThread; i++){
         k = threadIdx.x + startPix;
