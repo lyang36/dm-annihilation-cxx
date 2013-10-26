@@ -25,7 +25,7 @@
 #define NS_MAX 8192
 
 
-float * d_map;
+MAPTYPE * d_map;
 renderpart * d_parts;
 healpix_par params;
 int nside_;
@@ -62,14 +62,14 @@ cudaError_t initializeCUDA(int nside, int numofparts){
     params.setup(nside);
     
     int npix = 12 * nside * nside;
-    cudaStatus = cudaMalloc((void**)&d_map, npix * sizeof(float));
+    cudaStatus = cudaMalloc((void**)&d_map, npix * sizeof(MAPTYPE));
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "cudaMalloc failed -- allocating HEALPix map memory!\n");
         return cudaStatus;
     }
     
     //clear the memory
-    cudaMemset(d_map, 0, npix * sizeof(float));
+    cudaMemset(d_map, 0, npix * sizeof(MAPTYPE));
     
     cudaStatus = cudaMalloc((void**)&d_parts, numofparts * sizeof(renderpart));
     if (cudaStatus != cudaSuccess) {
@@ -102,7 +102,7 @@ cudaError_t calculateMapByGPU(renderpart * parts, int num_of_parts){
     return cudaStatus;
 }
 
-cudaError_t getCUDAMap(float * map){
+cudaError_t getCUDAMap(MAPTYPE * map){
 
 	cudaError_t cudaStatus = cudaThreadSynchronize();
     if (cudaStatus != cudaSuccess) {
@@ -111,7 +111,7 @@ cudaError_t getCUDAMap(float * map){
     }
 
     int npix = 12 * nside_ * nside_;
-    cudaStatus = cudaMemcpy(map, d_map, npix * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaStatus = cudaMemcpy(map, d_map, npix * sizeof(MAPTYPE), cudaMemcpyDeviceToHost);
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "cudaMemcpy failed -- copying map data to host!\n");
 
@@ -138,11 +138,11 @@ void renderpart::setup(int nside){
 
 
     int ipix, dr;
-    float rlat1 = theta - 2.0 * angular_radius;
-    float zmax = cos(rlat1);
-    rmin = ring_above (nside, zmax);
-    float rlat2 = theta + 2.0 * angular_radius;
-    float zmin = cos(rlat2);
+    MAPTYPE rlat1 = theta - 2.0 * angular_radius;
+    MAPTYPE zmax = cos(rlat1);
+    rmin = ring_above (nside, zmax) - 1;
+    MAPTYPE rlat2 = theta + 2.0 * angular_radius;
+    MAPTYPE zmin = cos(rlat2);
     rmax = ring_above (nside, zmin) + 1;
     angle2pix(params_, z, phi, iring, icol, ipix);
     
@@ -169,7 +169,7 @@ void renderpart::setup(int nside){
 }
 
 
-__device__ float SPHKenerl(float d2){
+__device__ MAPTYPE SPHKenerl(MAPTYPE d2){
     //test
 	return exp(-0.5 * d2 / 0.333);
     //return exp(- 10 * d2 );
@@ -177,14 +177,14 @@ __device__ float SPHKenerl(float d2){
 }
 
 //(x1, y1, z1), (x2, y2, z2) must be normalized
-__device__ float flux(healpix_par &par, float x1, float y1, float z1, float x2, float y2, float z2, float r_angle){
-    float prod = x1 * x2 + y1 * y2 + z1 * z2;
+__device__ MAPTYPE flux(healpix_par &par, MAPTYPE x1, MAPTYPE y1, MAPTYPE z1, MAPTYPE x2, MAPTYPE y2, MAPTYPE z2, MAPTYPE r_angle){
+    MAPTYPE prod = x1 * x2 + y1 * y2 + z1 * z2;
     //test
     //return 1.0;
 
     if(prod > 1) prod = 1;
     if(prod < -1) prod = -1;
-    float atheta = acos(prod);
+    MAPTYPE atheta = acos(prod);
     if(atheta > (par.theta_per_pix / 2.0 + r_angle * 2)){
         return 0;
     }
@@ -192,7 +192,7 @@ __device__ float flux(healpix_par &par, float x1, float y1, float z1, float x2, 
     //test
     //return 1.0;
 
-    float d2 =  atheta / r_angle;
+    MAPTYPE d2 =  atheta / r_angle;
     d2 *= d2;
     return SPHKenerl(d2);
 }
@@ -200,17 +200,17 @@ __device__ float flux(healpix_par &par, float x1, float y1, float z1, float x2, 
 
 // 27 flops
 __host__ __device__ void angle2pix(healpix_par &par,
-                          float z,
-                          float phi,
+                          MAPTYPE z,
+                          MAPTYPE phi,
                           int & iring,
                           int & icol,
                           int & ipix){
     
     int jp, jm;
-    float  tt, tp, tmp;
+    MAPTYPE  tt, tp, tmp;
     int ir, ip, kshift;
     
-    float za = fabs(z);
+    MAPTYPE za = fabs(z);
     if( phi >= TWOPI)  phi = phi - TWOPI;
     if (phi < 0.)     phi = phi + TWOPI;
     tt = phi / PIOVER2;//  ! in [0,4)
@@ -250,17 +250,17 @@ __host__ __device__ void angle2pix(healpix_par &par,
 }
 
 //6 flops
-__host__ __device__ void pix2vec(healpix_par &par, int r, int c, float &x, float &y, float &z, float &ct, float &phi){
-    float sintheta;
+__host__ __device__ void pix2vec(healpix_par &par, int r, int c, MAPTYPE &x, MAPTYPE &y, MAPTYPE &z, MAPTYPE &ct, MAPTYPE &phi){
+    MAPTYPE sintheta;
     if(r <= par.nside){
-        ct  = 1.0 - 4.0 * r * r / (float) par.npix;
+        ct  = 1.0 - 4.0 * r * r / (MAPTYPE) par.npix;
         phi = (c + 0.5) / (2.0 * r) * M_PI;
     }else if (r < par.nl3){
-        ct  = 2.0 / 3.0 * (2.0 * par.nside - r) / (float) par.nside;
+        ct  = 2.0 / 3.0 * (2.0 * par.nside - r) / (MAPTYPE) par.nside;
         phi = (c + 0.5 * (1 - (r + par.nside) % 2)) / (2.0 * par.nside) * M_PI;
     }else{
-        float cr = par.nl4 - r;
-        ct = -1.0 + 4.0 * cr * cr / (float)par.npix;
+        MAPTYPE cr = par.nl4 - r;
+        ct = -1.0 + 4.0 * cr * cr / (MAPTYPE)par.npix;
         phi = (c + 0.5) / (2 * cr) * M_PI;
     }
     sintheta = sqrt(1 - ct * ct);
@@ -302,8 +302,8 @@ __host__ __device__ int pix2ring(healpix_par &par, int ipix){
 
 //4 flops
 //get the ring num of certain z
-__host__ __device__ int ring_above (long nside_, float z){
-    float az=abs(z);
+__host__ __device__ int ring_above (long nside_, MAPTYPE z){
+    MAPTYPE az=abs(z);
     if (az>TWOTHIRD) // polar caps
     {
         int iring = (int)(nside_*sqrt(3*(1-az)));
@@ -315,27 +315,29 @@ __host__ __device__ int ring_above (long nside_, float z){
 
 __device__ void getPixIdThread(
                 healpix_par &params, renderpart &particle,
-                int k, int dc, int rmin, float phi,
+                int k, int dc, int rmin, MAPTYPE phi,
                 int  npixNorthPole, int npixSouthPole,
                 int &pr, int &pc, int &p){
         int c0 = 0;
+        p = -1;
         if (k < (npixNorthPole)){
                 
                 p=k;
                 pr = pix2ring(params, p);
                 pc = pix2icol(params, pr, p);
                 
-            }
-            else if (k < (npixNorthPole + npixSouthPole)){
+        }
+        else if (k < (npixNorthPole + npixSouthPole)){
                 
                 p = params.npix - (k - npixNorthPole) - 1;
                 pr = pix2ring(params, p);
                 pc = pix2icol(params, pr, p);
                 
-            }else{
+        }else{
                 int np = k - npixNorthPole - npixSouthPole;
                 pr = np / (2 * dc +1)+rmin;
                 if(pr < 1 || pr > params.nl4){
+                        p = -1;
                 }else{
                     int  npixatthisring = params.nl4;
                         //c0 = (int)((phi - 2.0 * particle.angular_radius)
@@ -366,19 +368,39 @@ __device__ void getPixIdThread(
                     if(pc > npixatthisring) pc = pc % npixatthisring;
                     p = cr2pix(params, pc, pr);
                     
-                }
-            }    
+              }
+       }
+       if((p < 0) || (p > params.npix)){
+              p = -1;
+       }
+                
 }
+
+
+__device__ double atomicAdd(double* address, double val)
+{
+	unsigned long long int* address_as_ull =
+                                         (unsigned long long int*)address;
+    unsigned long long int old = *address_as_ull, assumed;
+    do {
+       assumed = old;
+       old = atomicCAS(address_as_ull, assumed,
+       __double_as_longlong(val +__longlong_as_double(assumed)));
+       } while (assumed != old);
+    return __longlong_as_double(old);
+}
+
+
 
 //count flops
 __global__ void calcfluxGPU(
                             healpix_par params,
-                            float * map,
+                            MAPTYPE * map,
                             int numOfParts,
                             renderpart * parts
                             ){
 
-    __shared__ float pixval[NUM_THREADS_PER_BLOCK];
+    __shared__ MAPTYPE pixval[NUM_THREADS_PER_BLOCK];
     __shared__ renderpart listOfParticles[NUM_THREADS_PER_BLOCK];
     renderpart particle;
     
@@ -414,10 +436,10 @@ __global__ void calcfluxGPU(
     int numPixPerThread;
     int startPix = 0;
     
-    float x, y, z;
+    MAPTYPE x, y, z;
     
-    float  phi;
-    float norm = 0;
+    MAPTYPE  phi;
+    MAPTYPE norm = 0;
 
     
     dc = particle.dc;
@@ -430,7 +452,7 @@ __global__ void calcfluxGPU(
     npixSouthPole = particle.npixSouthPole;
     rmin = particle.rmin;
     
-    float za = fabs(z);
+    MAPTYPE za = fabs(z);
     
     totalPix = numPix + npixNorthPole + npixSouthPole;
     
@@ -445,18 +467,15 @@ __global__ void calcfluxGPU(
     int p = 0;
     int pr = 0;
     int pc = 0;
-    float weight = 0;
+    MAPTYPE weight = 0;
     int k = 0; 
     norm = 0.0;
     
     for(int i = 0; i < numPixPerThread; i++){
-        pixval[threadIdx.x] = 0;
-        __syncthreads();
-        
+        weight = 0;
+
         k = threadIdx.x + startPix;
-        if( k >= totalPix){
-            pixval[threadIdx.x] = 0.0;
-        }else{
+        if( k < totalPix){
         
             //calculate the pixel id
                                 
@@ -465,17 +484,19 @@ __global__ void calcfluxGPU(
                     npixNorthPole, npixSouthPole,
                     pr, pc, p);
                 
+            if(p != -1){ 
             
-            
-            //calculate the value
-            float x1, y1, z1, ct, phi1;
-            pix2vec(params, pr, pc, x1, y1, z1, ct, phi1);
-            //test
-            weight = flux(params, x1, y1, z1,
+                //calculate the value
+                MAPTYPE x1, y1, z1, ct, phi1;
+                pix2vec(params, pr, pc, x1, y1, z1, ct, phi1);
+                //test
+                weight = flux(params, x1, y1, z1,
                           x, y, z,
                           particle.angular_radius);
-            pixval[threadIdx.x] = weight;
+                //pixval[threadIdx.x] = weight;
+            }
         }
+        pixval[threadIdx.x] = weight;
         
         /////////////////////Calculating Norm////////////////////////
         //calculate the norm (reduce-sweeping algorithm)
@@ -504,9 +525,9 @@ __global__ void calcfluxGPU(
         //calculated the result and record them to the global memory
         
         if(numPixPerThread == 1){
-			if(norm > 0){
+			if((norm > 0) && (p != -1)){
 				//test
-                float fofp = weight * particle.flux / norm;
+                MAPTYPE fofp = weight * particle.flux / norm;
                 atomicAdd(map + p, fofp);
 				//atomicAdd(map + p, weight / norm);
 				//map[p] = particle.flux;
@@ -534,20 +555,23 @@ __global__ void calcfluxGPU(
                     npixNorthPole, npixSouthPole,
                     pr, pc, p);
             
-            //calculate the value
-            float x1, y1, z1, ct, phi1;
-            pix2vec(params, pr, pc, x1, y1, z1, ct, phi1);
+            if(p != -1 ){
+                //calculate the value
+                MAPTYPE x1, y1, z1, ct, phi1;
+                pix2vec(params, pr, pc, x1, y1, z1, ct, phi1);
             
-			if(norm > 0){
-                //test 
-                weight = flux(params, x1, y1, z1,
+			    if(norm > 0){
+                    //test 
+                    weight = flux(params, x1, y1, z1,
                           x, y, z,
                           particle.angular_radius);
 
-				//test
-            	atomicAdd(map + p, weight * particle.flux / norm);
-				//atomicAdd(map + p, weight / norm);
-			}
+				    //test
+            	    atomicAdd(map + p, weight * particle.flux / norm);
+				    //atomicAdd(map + p, weight / norm);
+			    }
+
+            }
         }
         
         startPix += NUM_THREADS_PER_BLOCK;

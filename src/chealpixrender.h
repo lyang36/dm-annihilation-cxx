@@ -1,14 +1,15 @@
 #ifndef __KERNEL__LY
 #define NUM_THREADS_PER_BLOCK 128 
+#include "datatypes.h"
 
 class renderpart{
 public:
     //these information must be setup
-    float theta;
-    float phi;
-    float x, y, z;
-    float angular_radius;
-    float flux;
+    MAPTYPE theta;
+    MAPTYPE phi;
+    MAPTYPE x, y, z;
+    MAPTYPE angular_radius;
+    MAPTYPE flux;
     
     
 
@@ -36,7 +37,7 @@ public:
     int nsidesq;
     int ncap;
     int npix;
-    float theta_per_pix;
+    MAPTYPE theta_per_pix;
     void setup(int nside){
         this->nl2 = 2*nside;
         this->nl4 = 4*nside;
@@ -52,23 +53,23 @@ public:
 };
 
 __global__ void calcfluxGPU(healpix_par pars,
-                            float * map,
+                            MAPTYPE * map,
                             int numOfParts,
                             renderpart * parts);
 
 cudaError_t initializeCUDA(int nside, int numofparts);
 cudaError_t calculateMapByGPU(renderpart * parts, int num_of_parts);
 //get the map from the device
-cudaError_t getCUDAMap(float * map);
+cudaError_t getCUDAMap(MAPTYPE * map);
 void cudaCleaingUp();
-__host__ __device__  int ring_above (long nside_, float z);
+__host__ __device__  int ring_above (long nside_, MAPTYPE z);
 __host__ __device__  int pix2ring(healpix_par &par, int ipix);
 __host__ __device__  int pix2icol(healpix_par &par, int ring, int pix);
 __host__ __device__  int cr2pix(healpix_par &par, int col, int ring);
-__host__ __device__  void pix2vec(healpix_par &par, int r, int c, float &x, float &y, float &z, float &ct, float &phi);
+__host__ __device__  void pix2vec(healpix_par &par, int r, int c, MAPTYPE &x, MAPTYPE &y, MAPTYPE &z, MAPTYPE &ct, MAPTYPE &phi);
 __host__ __device__  void angle2pix(healpix_par &par,
-               float z,
-               float phi,
+               MAPTYPE z,
+               MAPTYPE phi,
                int & iring,
                int & icol,
                int & ipix);

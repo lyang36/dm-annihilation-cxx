@@ -30,14 +30,14 @@ void MapGenerator::start(){
 	double theta;
 	double phi;
     
-    float unit_factor = pow(pow((par_ -> natconst.c_in_cgs), 2) /
+    MAPTYPE unit_factor = pow(pow((par_ -> natconst.c_in_cgs), 2) /
                               (par_->units.eV_in_cgs * 1.0e9), 2) / (par_->units.Mpc_in_cgs * 1.0e-3)
                             * par_->codeunits.annihilation_flux_to_cgs;
     
 	int Nside = par_->map.Nside;
 	int Npix = par_->map.Npix;
-    float dOmega = par_->map.dOmega;
-    float theta0 = acos( 1.0 - dOmega/(2.0*3.141592) );
+    MAPTYPE dOmega = par_->map.dOmega;
+    MAPTYPE theta0 = acos( 1.0 - dOmega/(2.0*3.141592) );
    
     
     //int NpixCoase_;
@@ -47,13 +47,13 @@ void MapGenerator::start(){
     
     map_ = (double *) calloc(Npix, sizeof(double));
     //use map1_ to get the value from device
-    float * map1_ = (float *) calloc(Npix, sizeof(float));
+    MAPTYPE * map1_ = (MAPTYPE *) calloc(Npix, sizeof(MAPTYPE));
     int Np = reader_->getPartNum();
     int rec = Np / par_->memParts / 50;
     if(rec < 1) rec = 1;
 
     //remove low resolution particles
-    float hires_particle_mass = 1.0e9f;
+    MAPTYPE hires_particle_mass = 1.0e9f;
     for(int i = 0; i < 10; i ++){
         if(par_->params.particle_masses[i] > 0 &&
            par_->params.particle_masses[i] < hires_particle_mass){
@@ -65,9 +65,9 @@ void MapGenerator::start(){
     renderpart * renderparts;
     renderparts = new renderpart[par_->memParts];
     
-    float oposx = par_->params.opos[0];
-    float oposy = par_->params.opos[1];
-    float oposz = par_->params.opos[2];
+    MAPTYPE oposx = par_->params.opos[0];
+    MAPTYPE oposy = par_->params.opos[1];
+    MAPTYPE oposz = par_->params.opos[2];
     
 
     cudaError_t status;
