@@ -140,13 +140,13 @@ void renderpart::setup(int nside){
     int ipix, dr;
     MAPTYPE rlat1 = theta - 2.0 * angular_radius;
     MAPTYPE zmax = cos(rlat1);
-    rmin = ring_above (nside, zmax) - 2;
+    rmin = ring_above (nside, zmax) - 1;
     MAPTYPE rlat2 = theta + 2.0 * angular_radius;
     MAPTYPE zmin = cos(rlat2);
-    rmax = ring_above (nside, zmin) + 2;
+    rmax = ring_above (nside, zmin) + 1;
     angle2pix(params_, z, phi, iring, icol, ipix);
     
-    dc = (int)(4.0 * angular_radius / params.theta_per_pix +0.5) + 3;
+    dc = (int)(4.0 * angular_radius / params.theta_per_pix +0.5) + 2;
     dr = rmax - rmin;
     
     numPix = (2 * dc + 1) * dr;
