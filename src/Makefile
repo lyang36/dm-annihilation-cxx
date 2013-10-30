@@ -1,10 +1,10 @@
 #must setup these 2 lib to compile
-#FITSIOLIB=/Users/lyang/Tools/cfitsio
-#HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
+FITSIOLIB=/Users/lyang/Tools/cfitsio
+HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
 #FITSIOLIB=/home/lyang/Tools/cfitsio
 #HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
-FITSIOLIB=/scratch0/hhpc-hn7/lyang/Tools/cfitsio
-HEALPIXHOME=/scratch0/hhpc-hn7/lyang/Tools/Healpix_3.00
+#FITSIOLIB=/scratch0/hhpc-hn7/lyang/Tools/cfitsio
+#HEALPIXHOME=/scratch0/hhpc-hn7/lyang/Tools/Healpix_3.00
 
 
 HEALPIXSRC = $(HEALPIXHOME)/src/cxx/basic_gcc/include
@@ -30,7 +30,7 @@ IFLAG=-I $(HEALPIXSRC) -I$(FITSIOLIB)
 
 
 
-all: ann-nosom ann-somv ann-somv2 ann-pwave ann-core-nosom decay others
+all: ann-nosom ann-somv ann-somv2 ann-pwave ann-core-nosom ann-ada decay others
 
 others:
 	@cd dataconverter; make
@@ -44,6 +44,10 @@ comp:
 ann-nosom: comp
 	$(CC) -c $(FLUXDIR)/flux_ann_nosom.cpp
 	$(CC) -o annmap_nosom flux_ann_nosom.o $(OBJS) $(LFLAGS)
+
+ann-ada: comp
+	$(CC) -c $(FLUXDIR)/flux_ann_adabiatic.cpp
+	$(CC) -o annmap_ada flux_ann_adabiatic.o $(OBJS) $(LFLAGS)
 
 ann-core-nosom: comp
 	$(CC) -c $(FLUXDIR)/flux_ann_core_nosom.cpp $(COREDIR)/halocore.cpp
