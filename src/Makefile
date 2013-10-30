@@ -1,8 +1,8 @@
 #must setup these 2 lib to compile
-FITSIOLIB=/Users/lyang/Tools/cfitsio
-HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
-#FITSIOLIB=/home/lyang/Tools/cfitsio
-#HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
+#FITSIOLIB=/Users/lyang/Tools/cfitsio
+#HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
+FITSIOLIB=/home/lyang/Tools/cfitsio
+HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
 #FITSIOLIB=/scratch0/hhpc-hn7/lyang/Tools/cfitsio
 #HEALPIXHOME=/scratch0/hhpc-hn7/lyang/Tools/Healpix_3.00
 
@@ -114,11 +114,17 @@ cuda-decay:
 			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
 
 
-cuda-render: cuda-ann-nosom-render cuda-ann-somv-render cuda-ann-somv2-render cuda-ann-pwave-render cuda-decay-render
+cuda-render: cuda-ann-ada-render cuda-ann-nosom-render cuda-ann-somv-render cuda-ann-somv2-render cuda-ann-pwave-render cuda-decay-render
 cuda-ann-nosom-render:
 	nvcc $(NVCCARGS) -c chealpixrender.cu genmap_cuda_render.cpp $(IFLAG)
 	nvcc -o annmap_cuda_nosom main.o flux_ann_nosom.o datareader.o\
 		   	tipsy_io.o parameters.o mapgenerator.o\
+			genmap_cuda_render.o anglefuncs.o chealpixrender.o $(LFLAGS)
+
+cuda-ann-ada-render:
+	nvcc $(NVCCARGS) -c chealpixrender.cu genmap_cuda_render.cpp $(IFLAG)
+	nvcc -o annmap_cuda_ada main.o flux_ann_adabiatic.o datareader.o\
+			tipsy_io.o parameters.o mapgenerator.o\
 			genmap_cuda_render.o anglefuncs.o chealpixrender.o $(LFLAGS)
 
 cuda-ann-somv-render:

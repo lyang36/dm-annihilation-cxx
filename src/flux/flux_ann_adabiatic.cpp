@@ -13,9 +13,9 @@ MAPTYPE getflux(Parameters * par_, DMParticle & current_part, MAPTYPE distances)
                             * par_->codeunits.annihilation_flux_to_cgs;
        
        //distance to the halo center
-       double dx = current_part.posx - par_->cpos[0];
-       double dy = current_part.posy - par_->cpos[1];
-       double dz = current_part.posz - par_->cpos[2];    
+       double dx = current_part.posx - par_->params.cpos[0];
+       double dy = current_part.posy - par_->params.cpos[1];
+       double dz = current_part.posz - par_->params.cpos[2];    
        //convert distance to kpc
        double r = sqrt(dx * dx + dy * dy + dz * dz) * (par_->codeunits.length_to_Mpc) / 1000;
         
