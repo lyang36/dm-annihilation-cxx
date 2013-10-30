@@ -16,8 +16,8 @@ MAPTYPE getflux(Parameters * par_, DMParticle & current_part, MAPTYPE distances)
        double dx = current_part.posx - par_->params.cpos[0];
        double dy = current_part.posy - par_->params.cpos[1];
        double dz = current_part.posz - par_->params.cpos[2];    
-       //convert distance to kpc
-       double r = sqrt(dx * dx + dy * dy + dz * dz) * (par_->codeunits.length_to_Mpc) / 1000;
+       //convert distance to kpc/h
+       double r = sqrt(dx * dx + dy * dy + dz * dz) * 40000.0 ;//* (par_->codeunits.length_to_Mpc) / 1000;
         
        double factor = (14.6534 * pow(1 + 0.0355872 * r, 1.76))/
                (pow(1 + 0.10888 * pow(r, 0.76), 3.34211) * pow(r, 0.13));
