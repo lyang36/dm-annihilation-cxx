@@ -173,11 +173,13 @@ clean:
 	rm -fr annmap_cuda_nosom
 	rm -fr annmap_cuda_somv
 	rm -fr annmap_cuda_somv2
+	rm -fr annmap_cuda_adi
 	rm -fr annmap_cuda_core_nosom
 	rm -fr annmap_core_nosom
 	rm -fr annmap_cuda_pwave
 	rm -fr decaymap_nocorr
 	rm -fr decaymap_cuda_nocorr
+	rm -fr annmap_adi
 	rm -fr annmap_cuda_debug
 	rm -fr annmap_cuda_core_nosom_debug
 	@cd dataconverter; make clean
