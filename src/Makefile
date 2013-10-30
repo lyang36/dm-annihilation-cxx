@@ -30,7 +30,7 @@ IFLAG=-I $(HEALPIXSRC) -I$(FITSIOLIB)
 
 
 
-all: ann-nosom ann-somv ann-somv2 ann-pwave ann-core-nosom ann-ada decay others
+all: ann-nosom ann-somv ann-somv2 ann-pwave ann-core-nosom ann-adi decay others
 
 others:
 	@cd dataconverter; make
@@ -45,9 +45,9 @@ ann-nosom: comp
 	$(CC) -c $(FLUXDIR)/flux_ann_nosom.cpp
 	$(CC) -o annmap_nosom flux_ann_nosom.o $(OBJS) $(LFLAGS)
 
-ann-ada: comp
-	$(CC) -c $(FLUXDIR)/flux_ann_adabiatic.cpp
-	$(CC) -o annmap_ada flux_ann_adabiatic.o $(OBJS) $(LFLAGS)
+ann-adi: comp
+	$(CC) -c $(FLUXDIR)/flux_ann_adiabatic.cpp
+	$(CC) -o annmap_adi flux_ann_adiabatic.o $(OBJS) $(LFLAGS)
 
 ann-core-nosom: comp
 	$(CC) -c $(FLUXDIR)/flux_ann_core_nosom.cpp $(COREDIR)/halocore.cpp
@@ -114,16 +114,16 @@ cuda-decay:
 			genmap_cuda.o anglefuncs.o kernel.o $(LFLAGS)
 
 
-cuda-render: cuda-ann-ada-render cuda-ann-nosom-render cuda-ann-somv-render cuda-ann-somv2-render cuda-ann-pwave-render cuda-decay-render
+cuda-render: cuda-ann-adi-render cuda-ann-nosom-render cuda-ann-somv-render cuda-ann-somv2-render cuda-ann-pwave-render cuda-decay-render
 cuda-ann-nosom-render:
 	nvcc $(NVCCARGS) -c chealpixrender.cu genmap_cuda_render.cpp $(IFLAG)
 	nvcc -o annmap_cuda_nosom main.o flux_ann_nosom.o datareader.o\
 		   	tipsy_io.o parameters.o mapgenerator.o\
 			genmap_cuda_render.o anglefuncs.o chealpixrender.o $(LFLAGS)
 
-cuda-ann-ada-render:
+cuda-ann-adi-render:
 	nvcc $(NVCCARGS) -c chealpixrender.cu genmap_cuda_render.cpp $(IFLAG)
-	nvcc -o annmap_cuda_ada main.o flux_ann_adabiatic.o datareader.o\
+	nvcc -o annmap_cuda_adi main.o flux_ann_adiabatic.o datareader.o\
 			tipsy_io.o parameters.o mapgenerator.o\
 			genmap_cuda_render.o anglefuncs.o chealpixrender.o $(LFLAGS)
 
