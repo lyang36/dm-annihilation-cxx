@@ -103,7 +103,8 @@ int main(int argc, const char **argv){
 
     double minsigmaav = 1.0e99;
     double maxsigmaav = 0.0;
-    
+    double totalmass = 0.0; 
+
     int cts = 0;
     while(reader.hasNext()){
         DMParticle * ps = reader.getBuf();
@@ -134,6 +135,7 @@ int main(int argc, const char **argv){
                 int ind = r / dr;
                 databins[ind] += part.dens * corr;
                 countbins[ind] ++;
+                totalmass += part.mass * corr;
             }
             cts ++;
         }
@@ -142,7 +144,7 @@ int main(int argc, const char **argv){
     }
     //printf("\n");
     
-    fprintf(stderr, "Sigma V range: [%f %f]\n", minsigmaav, maxsigmaav);
+    fprintf(stderr, "Sigma V range: [%f %f], total mass: %f\n", minsigmaav, maxsigmaav, totalmass);
     
     reader.close();
     
