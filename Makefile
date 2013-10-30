@@ -7,7 +7,7 @@ annmap:
 cuda: cuda-a copy
 
 cuda-a:
-	@cd src; make cuda-all
+	@cd src; make cuda-render
 
 copy:
 	cp src/annmap_* bin/.
