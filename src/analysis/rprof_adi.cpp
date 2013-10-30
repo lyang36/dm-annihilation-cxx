@@ -124,7 +124,7 @@ int main(int argc, const char **argv){
             //convert r to kpc/h
             r *= (40000.0);
             
-            if(r < radius){
+            if((r < radius) && (part.dens > 0)){
                 
                 //printf("%f %f %f %f %f %f\n", r, radius, radius * 18.0 / 400.0, part.posx, part.posy, part.posz);
                 double corr = 1.0;
@@ -136,7 +136,7 @@ int main(int argc, const char **argv){
                 //}
                 corr = (14.6534 * pow(1 + 0.0355872 * r, 1.76))/
                        (pow(1 + 0.10888 * pow(r, 0.76), 3.34211) * pow(r, 0.13));
-                 //printf("%f\n", corr);
+                //printf("%f\n", part.dens);
                 int ind = r / dr;
                 databins[ind] += part.dens * corr;
                 countbins[ind] ++;
