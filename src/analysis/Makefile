@@ -26,9 +26,14 @@ all: comp
 	$(CC) -o angprofile angprofile.o ../datareader.o ../tipsy_io.o ../halocore.o  ${LFLAGS}
 	$(CC) -o mapselect mapselect.o ../datareader.o ../tipsy_io.o ../halocore.o  ${LFLAGS}
 	$(CC) -o rprofile radialprofile.o ../datareader.o ../tipsy_io.o ../halocore.o ${LFLAGS}
+	$(CC) -o rprof_adi rprof_adi.o ../datareader.o ../tipsy_io.o ../halocore.o ${LFLAGS}
 
 comp:
-	$(CC) -c angprofile.cpp radialprofile.cpp mapselect.cpp $(IFLAG)
+	$(CC) -c angprofile.cpp rprof_adi.cpp radialprofile.cpp mapselect.cpp $(IFLAG)
 
-
+clean:
+	rm -f rprof_adi
+	rm -f mapselect
+	rm -f rprofile
+	rm -f rprof_adi
 
