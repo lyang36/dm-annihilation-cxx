@@ -144,7 +144,7 @@ int main(int argc, const char **argv){
     }
     //printf("\n");
     
-    fprintf(stderr, "Sigma V range: [%f %f], total mass: %f\n", minsigmaav, maxsigmaav, totalmass);
+    fprintf(stderr, "Sigma V range: [%f %f], total mass: %10e\n", minsigmaav, maxsigmaav, totalmass);
     
     reader.close();
     

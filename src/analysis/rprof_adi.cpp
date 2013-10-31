@@ -152,7 +152,7 @@ int main(int argc, const char **argv){
     //printf("\n");
     
     fprintf(stderr, "Sigma V range: [%f %f]\n", minsigmaav, maxsigmaav);
-    fprintf(stderr, "Total number of particles considered: %d, total mass (corrected): %f\n", 
+    fprintf(stderr, "Total number of particles considered: %d, total mass (corrected): %10e\n", 
                     cts, totalmass);
 
     reader.close();

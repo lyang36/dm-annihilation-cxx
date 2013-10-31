@@ -25,7 +25,7 @@ MAPTYPE getflux(Parameters * par_, DMParticle & current_part, MAPTYPE distances)
        
        MAPTYPE fluxes = unit_factor * current_part.dens * current_part.mass / (4.0 * PI * distances * distances);
        
-       factor *= (factor * factor); 
+       fluxes *= (factor * factor); 
 
        return fluxes;
 
