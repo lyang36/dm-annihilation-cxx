@@ -22,11 +22,18 @@ MAPTYPE getflux(Parameters * par_, DMParticle & current_part, MAPTYPE distances)
        MAPTYPE v = current_part.sigmav * par_->codeunits.velocity_to_cgs;
     
        //printf("veldisp: %f\n", v);
-       if(v < SAT_V * 100000.0)
+       /*if(v < SAT_V * 100000.0)
        {    
 	   //printf("veldisp: %f\n", v);
            v = SAT_V * 100000.0;
-       }
+       }*/
+    
+        //use units km/s
+       v /= 1.0e5;
+    if(v < SAT_V){
+        printf("Saturated: %f\n", v);
+        v = SAT_V
+    }
 
        MAPTYPE somer_v =  par_->natconst.c_in_cgs / v / FACTOR;
        //printf("somer factor: %f\n", somer_v);

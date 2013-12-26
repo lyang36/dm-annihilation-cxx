@@ -11,7 +11,7 @@
  */
 
 
-#define SAT_V 1  // 1km/s
+#define SAT_V 5  // 5km/s
 #define FACTOR 1.0e8 //avoid the final flux overflow
 
 MAPTYPE getflux(Parameters * par_, DMParticle & current_part, MAPTYPE distances){
@@ -21,12 +21,19 @@ MAPTYPE getflux(Parameters * par_, DMParticle & current_part, MAPTYPE distances)
        MAPTYPE fluxes;
        MAPTYPE v = current_part.sigmav * par_->codeunits.velocity_to_cgs;
     
-       //printf("veldisp: %f\n", v);
-       if(v < SAT_V * 100000.0)
-       {    
-	   //printf("veldisp: %f\n", v);
-           v = SAT_V * 100000.0;
-       }
+    //printf("veldisp: %f\n", v);
+    /*if(v < SAT_V * 100000.0)
+     {
+     //printf("veldisp: %f\n", v);
+     v = SAT_V * 100000.0;
+     }*/
+    
+    //use units km/s
+    v /= 1.0e5;
+    if(v < SAT_V){
+        printf("Saturated: %f\n", v);
+        v = SAT_V
+    }
 
        MAPTYPE somer_v =  par_->natconst.c_in_cgs / v;
        somer_v *= (somer_v / FACTOR);
