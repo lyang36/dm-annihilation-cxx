@@ -32,7 +32,7 @@ MAPTYPE getflux(Parameters * par_, DMParticle & current_part, MAPTYPE distances)
        v /= 1.0e5;
     if(v < SAT_V){
         printf("Saturated: %f\n", v);
-        v = SAT_V
+        v = SAT_V;
     }
 
        MAPTYPE somer_v =  par_->natconst.c_in_cgs / v / FACTOR;
