@@ -123,20 +123,20 @@ public:
 
 class Units{
 public:
-	static const double Msun_in_cgs = 1.9889212e+33;
-	static const double Mpc_in_cgs = 3.08568025e+24;
-	static const double eV_in_cgs = 1.602e-12;
+	static const double Msun_in_cgs;// = 1.9889212e+33;
+	static const double Mpc_in_cgs;// = 3.08568025e+24;
+	static const double eV_in_cgs;// = 1.602e-12;
 };
 
 class Natconst{
 public:    
 	double h100;
-	static const double G_in_cgs = 6.67259e-8;
+	static const double G_in_cgs;// = 6.67259e-8;
 	double rho_crit_in_cgs;
 	double Omega_m;
 	double Delta_vir;
     double Rvir_MW_in_Mpc;// = 0.275;
-	static const double c_in_cgs = 2.99792458e10;
+	static const double c_in_cgs;// = 2.99792458e10;
 };
 
 

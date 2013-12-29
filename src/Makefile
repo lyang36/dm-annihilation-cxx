@@ -1,8 +1,8 @@
 #must setup these 2 lib to compile
-#FITSIOLIB=/Users/lyang/Tools/cfitsio
-#HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
-FITSIOLIB=/home/lyang/Tools/cfitsio
-HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
+FITSIOLIB=/Users/lyang/Tools/cfitsio
+HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
+#FITSIOLIB=/home/lyang/Tools/cfitsio
+#HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
 #FITSIOLIB=/scratch0/hhpc-hn7/lyang/Tools/cfitsio
 #HEALPIXHOME=/scratch0/hhpc-hn7/lyang/Tools/Healpix_3.00
 
@@ -20,7 +20,7 @@ NVCCARGS=-arch=sm_20
 C=gcc
 CC=g++
 OBJS=main.o datareader.o tipsy_io.o parameters.o mapgenerator.o\
-	 genmap.o anglefuncs.o
+	 genmap.o anglefuncs.o datatypes.o
 
 LFLAGS=$(HEALPIXLIB)/libhealpix_cxx.a\
 	   $(HEALPIXLIB)/libcxxsupport.a\
@@ -39,7 +39,7 @@ others:
 comp:
 	$(CC) -c main.cpp  datareader.cpp  tipsy_io.c \
 		   	parameters.cpp mapgenerator.cpp genmap.cpp\
-			anglefuncs.cpp $(IFLAG)
+			anglefuncs.cpp datatypes.cpp $(IFLAG)
 
 ann-nosom: comp
 	$(CC) -c $(FLUXDIR)/flux_ann_nosom.cpp
