@@ -1,1 +1,12 @@
 *_cuda_* are only for CUDA
+
+3 method for producing the all-skymap.
+-- -CUDA:
+   make cuda-all:
+        Produce all skymap by method of super pixels.
+        First use a healpix map of lower resolution, with those super pixel calculated, calculate the which smaller pixel is in which super pixel. After that, do perform the calculation.
+
+-- -CUDA-RENDER:
+   make cuda-render:
+        Maybe a better method. Used shared memory to copy the particles,
+        used other fancy CUDA-technology
