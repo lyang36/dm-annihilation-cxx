@@ -25,6 +25,9 @@ OBJS=main.o datareader.o tipsy_io.o parameters.o mapgenerator.o\
 OBJS_CUDA=main.o datareader.o tipsy_io.o parameters.o mapgenerator.o\
 	 genmap_cuda.o anglefuncs.o datatypes.o
 
+OBJS_CUDA_RENDER=main.o datareader.o tipsy_io.o parameters.o mapgenerator.o\
+	  anglefuncs.o datatypes.o
+
 
 LFLAGS=$(HEALPIXLIB)/libhealpix_cxx.a\
 	   $(HEALPIXLIB)/libcxxsupport.a\
@@ -117,39 +120,33 @@ cuda-decay:
 cuda-render: cuda-ann-adi-render cuda-ann-nosom-render cuda-ann-somv-render cuda-ann-somv2-render cuda-ann-pwave-render cuda-decay-render
 cuda-ann-nosom-render:
 	nvcc $(NVCCARGS) -c chealpixrender.cu genmap_cuda_render.cpp $(IFLAG)
-	nvcc -o annmap_cuda_nosom main.o flux_ann_nosom.o datareader.o\
-		   	tipsy_io.o parameters.o mapgenerator.o\
-			genmap_cuda_render.o anglefuncs.o chealpixrender.o $(LFLAGS)
+	nvcc -o annmap_cuda_nosom flux_ann_nosom.o $(OBJS_CUDA_RENDER)\
+			genmap_cuda_render.o chealpixrender.o $(LFLAGS)
 
 cuda-ann-adi-render:
 	nvcc $(NVCCARGS) -c chealpixrender.cu genmap_cuda_render.cpp $(IFLAG)
-	nvcc -o annmap_cuda_adi main.o flux_ann_adiabatic.o datareader.o\
-			tipsy_io.o parameters.o mapgenerator.o\
-			genmap_cuda_render.o anglefuncs.o chealpixrender.o $(LFLAGS)
+	nvcc -o annmap_cuda_adi flux_ann_adiabatic.o $(OBJS_CUDA_RENDER)\
+			genmap_cuda_render.o chealpixrender.o $(LFLAGS)
 
 cuda-ann-somv-render:
 	nvcc $(NVCCARGS) -c chealpixrender.cu genmap_cuda_render.cpp $(IFLAG)
-	nvcc -o annmap_cuda_somv main.o flux_ann_somv.o datareader.o\
-		   	tipsy_io.o parameters.o mapgenerator.o\
-			genmap_cuda_render.o anglefuncs.o chealpixrender.o $(LFLAGS)
+	nvcc -o annmap_cuda_somv  flux_ann_somv.o $(OBJS_CUDA_RENDER)\
+			genmap_cuda_render.o chealpixrender.o $(LFLAGS)
 
 cuda-ann-somv2-render:
 	nvcc $(NVCCARGS) -c chealpixrender.cu genmap_cuda_render.cpp $(IFLAG)
-	nvcc -o annmap_cuda_somv2 main.o flux_ann_somv2.o datareader.o\
-		   	tipsy_io.o parameters.o mapgenerator.o\
-			genmap_cuda_render.o anglefuncs.o chealpixrender.o $(LFLAGS)
+	nvcc -o annmap_cuda_somv2 flux_ann_somv2.o $(OBJS_CUDA_RENDER)\
+			genmap_cuda_render.o chealpixrender.o $(LFLAGS)
 
 cuda-ann-pwave-render:
 	nvcc $(NVCCARGS) -c chealpixrender.cu genmap_cuda_render.cpp $(IFLAG)
-	nvcc -o annmap_cuda_pwave main.o flux_ann_pwave.o datareader.o\
-		   	tipsy_io.o parameters.o mapgenerator.o\
-			genmap_cuda_render.o anglefuncs.o chealpixrender.o $(LFLAGS)
+	nvcc -o annmap_cuda_pwave flux_ann_pwave.o $(OBJS_CUDA_RENDER)\
+			genmap_cuda_render.o chealpixrender.o $(LFLAGS)
 
 cuda-decay-render:
 	nvcc $(NVCCARGS) -c chealpixrender.cu genmap_cuda_render.cpp $(IFLAG)
-	nvcc -o decaymap_cuda_nocorr main.o flux_decay.o datareader.o\
-		   	tipsy_io.o parameters.o mapgenerator.o\
-			genmap_cuda_render.o anglefuncs.o chealpixrender.o $(LFLAGS)
+	nvcc -o decaymap_cuda_nocorr flux_decay.o $(OBJS_CUDA_RENDER)\
+			genmap_cuda_render.o chealpixrender.o $(LFLAGS)
 
 
 cuda-debug:
