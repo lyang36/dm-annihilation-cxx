@@ -31,7 +31,7 @@ MAPTYPE getflux(Parameters * par_, DMParticle & current_part, MAPTYPE distances)
         //use units km/s
        v /= 1.0e5;
     if(v < SAT_V){
-        printf("Saturated: %f\n", v);
+        //printf("Saturated: %f\n", v);
         v = SAT_V;
     }
 
