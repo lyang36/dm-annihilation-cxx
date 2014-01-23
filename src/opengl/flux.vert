@@ -32,6 +32,7 @@ uniform int usenormmap;
 
 // the radius of the particle circle and the coordianate
 // this variable will be passed to the fragment shader.
+// vec4(newsize, npvec.x, npvec.y, npvec.z);
 varying vec4 particle;
 
 

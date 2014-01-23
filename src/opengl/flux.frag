@@ -13,26 +13,34 @@ uniform vec3 geofac;
 // The normalization map
 uniform sampler2D normmap;
 
-//whether use the norm map? true: 1 else:0
+// whether use the norm map? true: 1 else:0
 uniform int usenormmap;
 
-//TODO: to be continued.
-
+// The particle parameter passing from flux.vert
+// vec4(newsize, npvec.x, npvec.y, npvec.z);
 varying vec4 particle;
 
 
-
-//This is very important, must be checked 
-float profile(vec3 r1,float dtheta){ 
+// The output profile of a particle
+// This is very important, must be checked
+float profile(vec3 r1,float dtheta){
+    // get the position of the partilce on the sky
     vec3 r0 = vec3(particle.gba);
+    
+    // calcualte the angle between the pixel and the particle
     float costheta = dot(r0, r1)/(length(r0)*length(r1));
-    //use tylor seriers
-    //acos has too much error
+    
+
     costheta = clamp(costheta, -1.0, 1.0);
+    
+    // use Taylor seriers
+    // acos may has too much error
     float t2 = 2.0 * ( 1.0 - costheta) + 1.0/3.0*(costheta - 1.0)*(costheta - 1.0) - 4.0/45.0 * (costheta - 1.0) *(costheta - 1.0)*(costheta - 1.0);
     //costheta = clamp(costheta, -1.0, 1.0);
     //float t2 = acos(costheta);
     //t2 = t2*t2;
+    
+    
     float d2 = clamp(t2 / dtheta / dtheta, 0.0, 1.0);
     //float d2 = (t2 / dtheta / dtheta, 0.0, 1.0);
     
@@ -43,21 +51,18 @@ float profile(vec3 r1,float dtheta){
         t2 = 0.0;
     }
     return exp(- 1.5 * d2);         //here comes the problems
-    //return 1.0 - 1.5 * d2;
-    
 }
 
-//reverse stereoprojection
+// reverse stereoprojection
 vec3 prev(vec2 xy){
     float r2 = xy.x*xy.x + xy.y*xy.y;
     return vec3(2.0 * xy.x/(1.0 + r2), 2.0 * xy.y/(1.0 + r2), (r2 - 1.0)/(r2 + 1.0));
 }
 
+// stereoproject a profile to the plane
 float projprofile(vec2 xy, float fc, float dtheta){
     return fc * profile(prev(xy), dtheta);
 }
-
-
 
 void main(){
     //float dsize = particle.r;
