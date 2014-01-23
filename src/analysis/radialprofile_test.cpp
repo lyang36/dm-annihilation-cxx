@@ -133,7 +133,7 @@ int main(int argc, const char **argv){
                 //    printf("%f\n", corr);
                 //}
                 int ind = r / dr;
-                databins[ind] += part.mass / (4 * PI / 3
+                databins[ind] += 1.0 / (4 * PI / 3
                                               * (pow(r+dr, 3) - pow(r, 3)));//part.dens * corr;
                 countbins[ind] ++;
                 totalmass += part.mass * corr;
@@ -145,7 +145,7 @@ int main(int argc, const char **argv){
     }
     //printf("\n");
     
-    fprintf(stderr, "Sigma V range: [%f %f], total mass: %10e\n", minsigmaav, maxsigmaav, totalmass);
+    fprintf(stderr, "Sigma V range: [%f %e], total mass: %10e\n", minsigmaav, maxsigmaav, totalmass);
     
     reader.close();
     
@@ -156,7 +156,7 @@ int main(int argc, const char **argv){
             databins[i] = 0.0;
         }
         
-        printf("%f %f\n", i * dr, databins[i]);
+        printf("%f %e\n", i * dr, databins[i]);
     }
     
     delete databins;
