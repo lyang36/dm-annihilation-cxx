@@ -1,4 +1,6 @@
 //fits and HEALPIX
+//measure the density field using shell method 
+
 #include <sstream>
 #include <string>
 #include <cmath>
@@ -133,8 +135,8 @@ int main(int argc, const char **argv){
                 //    printf("%f\n", corr);
                 //}
                 int ind = r / dr;
-                databins[ind] += 1.0 / (4 * PI / 3
-                                              * (pow(r+dr, 3) - pow(r, 3)));//part.dens * corr;
+                databins[ind] += part.mass / (4 * PI / 3
+                                              * (pow((ind+1.0) * dr, 3) - pow((ind) * dr, 3)));//part.dens * corr;
                 countbins[ind] ++;
                 totalmass += part.mass * corr;
             }

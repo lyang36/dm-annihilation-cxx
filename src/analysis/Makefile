@@ -27,12 +27,15 @@ all: comp
 	$(CC) -o mapselect mapselect.o ../datareader.o ../tipsy_io.o ../halocore.o  ${LFLAGS}
 	$(CC) -o rprofile radialprofile.o ../datareader.o ../tipsy_io.o ../halocore.o ${LFLAGS}
 	$(CC) -o rprof_adi rprof_adi.o ../datareader.o ../tipsy_io.o ../halocore.o ${LFLAGS}
-	$(CC) -o rpf_test radialprofile_test.o ../datareader.o ../tipsy_io.o ../halocore.o ${LFLAGS}
+	$(CC) -o rpf_shell rpf_shell.o ../datareader.o ../tipsy_io.o ../halocore.o ${LFLAGS}
+	$(CC) -o rpf_shell_adi rpf_shell_adi.o ../datareader.o ../tipsy_io.o ../halocore.o ${LFLAGS}
 
 comp:
-	$(CC) -c  radialprofile_test.cpp angprofile.cpp rprof_adi.cpp radialprofile.cpp mapselect.cpp $(IFLAG)
+	$(CC) -c rpf_shell_adi.cpp rpf_shell.cpp angprofile.cpp rprof_adi.cpp radialprofile.cpp mapselect.cpp $(IFLAG)
 
 clean:
+	rm -f rpf_shell_adi
+	rm -f rpf_shell
 	rm -f rprof_adi
 	rm -f mapselect
 	rm -f rprofile
