@@ -161,8 +161,8 @@ int main(int argc, const char **argv){
         printf("%f %e\n", i * dr, databins[i]);
     }
     
-    delete databins;
-    delete countbins;
+    delete[] databins;
+    delete[] countbins;
     
     return 0;
 }

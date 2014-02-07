@@ -1,5 +1,7 @@
-//fits and HEALPIX
-//log bin size
+// Measure the radial bulk velocity profile
+// Definition:
+// For each shell
+// v = \sum(m_i*(v_i \cdot \hat{r})) / \sum{m_i}
 
 #include <sstream>
 #include <string>
@@ -35,6 +37,7 @@ int main(int argc, const char **argv){
     double * databins;
     //double * angbins;
     double * countbins;
+    double * massbins;
     double dr, x, y, z;
     string filename;
     string maskfile;
@@ -80,11 +83,13 @@ int main(int argc, const char **argv){
     
     
     databins = new double[numbins];
+    massbins = new double[numbins];
     countbins = new double[numbins];
     
     for(int i = 0; i < numbins; i++){
         databins[i] = 0;
         countbins[i] = 0;
+        massbins[i] = 0;
     }
     
     fprintf(stderr, "Filename: %s\n", filename.c_str());
@@ -120,23 +125,29 @@ int main(int argc, const char **argv){
                 minsigmaav = part.sigmav;
             }
             
-            double r = sqrt((part.posx - x) *(part.posx - x) +
-                            (part.posy - y) *(part.posy - y) +
-                            (part.posz - z) *(part.posz - z));
+            double rx = part.posx - x;
+            double ry = part.posy - y;
+            double rz = part.posz - z;
+            double r = sqrt(rx * rx + ry * ry + rz * rz);
+            rx /= r;
+            ry /= r;
+            rz /= r;
+            
             r *= (40000.0);
+            
             if((r < radius) && (part.dens > 0)){
-                //if(r < radius * 18.0 / 400.0)
-                    //printf("%f %f %f %f %f %f\n", r, radius, radius * 18.0 / 400.0, part.posx, part.posy, part.posz);
                 double corr = 1.0;
                 if(isCore){
                     corr = halocore.getCorrection(part.posx, part.posy, part.posz);
                 }
-                //if(corr != 1.0){
-                //    printf("%f\n", corr);
-                //}
+                
                 int ind = r / dr;
-                databins[ind] += part.dens * corr;
+                databins[ind] += part.mass *
+                        (part.velx * rx + part.vely * ry + part.velz * rz);
+                
                 countbins[ind] ++;
+                massbins[ind] += part.mass;
+                
                 totalmass += part.mass * corr;
             }
             cts ++;
@@ -151,8 +162,8 @@ int main(int argc, const char **argv){
     reader.close();
     
     for(int i = 0; i < numbins; i++){
-        if(countbins[i] != 0){
-            databins[i] /= countbins[i];
+        if(massbins[i] != 0){
+            databins[i] /= massbins[i];
         }else{
             databins[i] = 0.0;
         }
@@ -162,6 +173,7 @@ int main(int argc, const char **argv){
     
     delete[] databins;
     delete[] countbins;
+    delete[] massbins;
     
     return 0;
 }
