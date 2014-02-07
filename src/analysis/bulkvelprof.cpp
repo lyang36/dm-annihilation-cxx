@@ -153,7 +153,13 @@ int main(int argc, const char **argv){
                 totalmass += part.mass * corr;
             }
             cts ++;
+            //if(cts > 1000000)
+            //      break;
         }
+
+        //test
+        //break;
+
         reader.loadBuffer();
         //printf("%d\n", cts);
     }
@@ -172,7 +178,7 @@ int main(int argc, const char **argv){
             densbins[i] = 0.0;
         }
         
-        printf("%f %f %f %f %f\n", i * dr, databins[i], densbins[i], massbins[i], countbins[i]);
+        printf("%f %e %e %e %d\n", i * dr, databins[i], densbins[i], massbins[i], countbins[i]);
     }
     
     delete[] databins;
