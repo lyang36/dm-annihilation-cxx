@@ -169,9 +169,10 @@ int main(int argc, const char **argv){
             densbins[i] = massbins[i] / (4 * PI / 3) / (pow(i * dr + dr, 3) - pow(i * dr, 3));
         }else{
             databins[i] = 0.0;
+            densbins[i] = 0;
         }
         
-        printf("%f %f %f %f\n", i * dr, databins[i], densbins[i], countbins[i]);
+        printf("%f %f %f %f\n", i * dr, databins[i], densbins[i], massbins[i], countbins[i]);
     }
     
     delete[] databins;
