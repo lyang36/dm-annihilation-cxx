@@ -86,6 +86,7 @@ int main(int argc, const char **argv){
     databins = new double[numbins];
     massbins = new double[numbins];
     countbins = new double[numbins];
+    densbins = new double[numbins];
     
     for(int i = 0; i < numbins; i++){
         databins[i] = 0;
