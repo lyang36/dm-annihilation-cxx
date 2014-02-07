@@ -38,6 +38,7 @@ int main(int argc, const char **argv){
     //double * angbins;
     double * countbins;
     double * massbins;
+    double * densbins;
     double dr, x, y, z;
     string filename;
     string maskfile;
@@ -164,16 +165,18 @@ int main(int argc, const char **argv){
     for(int i = 0; i < numbins; i++){
         if(massbins[i] != 0){
             databins[i] /= massbins[i];
+            densbins[i] = massbins[i] / (4 * PI / 3) / (pow(i * dr + dr, 3) - pow(i * dr, 3));
         }else{
             databins[i] = 0.0;
         }
         
-        printf("%f %f %f\n", i * dr, databins[i], countbins[i]);
+        printf("%f %f %f %f\n", i * dr, databins[i], densbins[i], countbins[i]);
     }
     
     delete[] databins;
     delete[] countbins;
     delete[] massbins;
+    delete[] densbins;
     
     return 0;
 }
