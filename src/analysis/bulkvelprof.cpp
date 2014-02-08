@@ -149,6 +149,8 @@ int main(int argc, const char **argv){
                 
                 countbins[ind] ++;
                 massbins[ind] += part.mass;
+                densbins[ind] += part.mass / (4 * PI / 3
+                                              * (pow((ind+1.0) * dr, 3) - pow((ind) * dr, 3)));
                 
                 totalmass += part.mass * corr;
             }
@@ -172,10 +174,10 @@ int main(int argc, const char **argv){
     for(int i = 0; i < numbins; i++){
         if(massbins[i] != 0){
             databins[i] /= massbins[i];
-            densbins[i] = massbins[i] / (4 * PI / 3) / (pow(i * dr + dr, 3) - pow(i * dr, 3));
+            //densbins[i] = massbins[i] / (4 * PI / 3) / (pow(i * dr + dr, 3) - pow(i * dr, 3));
         }else{
             databins[i] = 0.0;
-            densbins[i] = 0.0;
+            //densbins[i] = 0.0;
         }
         
         printf("%f %e %e %e %d\n", i * dr, databins[i], densbins[i], massbins[i], (int)countbins[i]);
