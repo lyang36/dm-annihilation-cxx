@@ -35,8 +35,6 @@ void printUsage(const char * s){
 }
 
 
-
-
 int main(int argc, const char **argv){
     int numbins = 100;
     double radius;
