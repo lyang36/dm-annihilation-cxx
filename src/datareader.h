@@ -28,7 +28,8 @@ public:
     
     //to use this reader to read the XDR file
     //it should hase a basedir, and a basename
-    DataReader(string basedir, string basename, bool isMask = false, string maskfile = "");
+    //if set isSingleFile, the only read the original tipsy file, will not read smoothed data
+    DataReader(string basedir, string basename, bool isMask = false, string maskfile = "", bool isSingleFile = false);
     
     void setTest(int tn);                           //set test: not read all the particles
     
@@ -52,6 +53,7 @@ public:
 private:
     bool isNative_;
     bool isMask_;
+    bool isSingleFile_;
     
     //for XDR file
     string basedir_, basename_;

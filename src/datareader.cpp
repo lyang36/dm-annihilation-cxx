@@ -23,12 +23,14 @@ DataReader::DataReader(string path, bool isMask, string maskfile){
     isNative_ = true;
     isMask_ = isMask;
     mask_file_name = maskfile;
-
+    
+    isSingleFile_ = false;
+    
     
 }
 
 //read XDR data
-DataReader::DataReader(string basedir, string basename, bool isMask, string maskfile){
+DataReader::DataReader(string basedir, string basename, bool isMask, string maskfile, bool isSingleFile){
     basedir_ = basedir;
     basename_ = basename;
     
@@ -42,12 +44,13 @@ DataReader::DataReader(string basedir, string basename, bool isMask, string mask
     
     isNative_ = false;
     isMask_ = isMask;
+    isSingleFile_ = isSingleFile;
     mask_file_name = maskfile;
     
     particle_file_name = basedir_ + "/" + basename_;
     density_file_name = particle_file_name + ".den32";
     hsmooth_file_name = particle_file_name + ".hsm32";
-    sigmav_file_name = particle_file_name + ".sigma32";    
+    sigmav_file_name = particle_file_name + ".sigma32";
 }
 
 void DataReader::setTest(int tn){
@@ -65,18 +68,18 @@ bool DataReader::open(){
     memCursor_ = 0;
     memParts_ = 0;
     buffer_ = new DMParticle[memBuffer_];
-
-
+    
+    
     if(isNative_){
         dataInputFile_.open(filePath_.c_str(), ios::binary);
-       
+        
         if(!dataInputFile_.good()){
             printf("Datafile error: %s !\n", filePath_.c_str());
             exit(1);
         }
         dataInputFile_.read((char*)&partNumbers_, sizeof(int));
         cout << "Particles: " << partNumbers_ << endl;
-     }else{
+    }else{
         //open particle file
         char fi[255];
         strcpy(fi, particle_file_name.c_str());
@@ -99,30 +102,32 @@ bool DataReader::open(){
         
         //open density file
         int np;
-        densStream_.open( density_file_name.c_str(), ios::in | ios::binary);
-        densStream_.read( reinterpret_cast<char*>( &np ), sizeof np );
-        if(np != partNumbers_){
-            fprintf(stderr,"Particle numbers in density not match.\n");
-            exit(1);
+        if(!isSingleFile_){
+            densStream_.open( density_file_name.c_str(), ios::in | ios::binary);
+            densStream_.read( reinterpret_cast<char*>( &np ), sizeof np );
+            if(np != partNumbers_){
+                fprintf(stderr,"Particle numbers in density not match.\n");
+                exit(1);
+            }
+            
+            //open hsmooth file
+            hsmoothStream_.open( hsmooth_file_name.c_str(), ios::in | ios::binary);
+            hsmoothStream_.read( reinterpret_cast<char*>( &np ), sizeof np );
+            if(np != partNumbers_){
+                fprintf(stderr,"Particle numbers in hsmooth not match.\n");
+                exit(1);
+            }
+            
+            sigmavStream_.open( sigmav_file_name.c_str(), ios::in | ios::binary);
+            sigmavStream_.read( reinterpret_cast<char*>( &np ), sizeof np);
+            if(np != partNumbers_){
+                fprintf(stderr,"Particle numbers in sigmav not match.\n");
+                exit(1);
+            }
+            
         }
-        
-        //open hsmooth file
-        hsmoothStream_.open( hsmooth_file_name.c_str(), ios::in | ios::binary);
-        hsmoothStream_.read( reinterpret_cast<char*>( &np ), sizeof np );
-        if(np != partNumbers_){
-            fprintf(stderr,"Particle numbers in hsmooth not match.\n");
-            exit(1);
-        }
-       
-        sigmavStream_.open( sigmav_file_name.c_str(), ios::in | ios::binary);
-        sigmavStream_.read( reinterpret_cast<char*>( &np ), sizeof np);
-        if(np != partNumbers_){
-            fprintf(stderr,"Particle numbers in sigmav not match.\n");
-            exit(1);
-        }
-
     }
-
+    
     if(isMask_){
         int np;
         maskStream_.open( mask_file_name.c_str(), ios::in | ios::binary);
@@ -132,17 +137,17 @@ bool DataReader::open(){
             exit(1);
         }
     }
-
+    
     cout << "Load to buffer ... " << endl;
     //loadBuffer();
     if(testnum_ != -1){
         if((int)partNumbers_ > testnum_){
             partNumbers_ = testnum_;
-        }   
+        }
     }
-    loadBuffer();  
-
-
+    loadBuffer();
+    
+    
     if(isNative_){
         return dataInputFile_.is_open();
     }else{
@@ -171,9 +176,9 @@ void DataReader::loadBuffer(){
     }else{
         int i;
         Pdm dp;
-        float dens;
-        float hsmooth;
-        float sigmav;
+        float dens = 0;
+        float hsmooth = 0;
+        float sigmav = 0;
         int status;
         for(i = 0; i < memParts_; i++){
             status = xdr_dark(&xdrs_, &(dp));
@@ -181,9 +186,11 @@ void DataReader::loadBuffer(){
                 fprintf(stderr,"Error reading dark particle from input file.\n");
                 exit(1);
             }
-            densStream_.read((char *) &dens, sizeof(float));
-            hsmoothStream_.read((char *) &hsmooth, sizeof(float));
-            sigmavStream_.read((char *) &sigmav, sizeof(float));
+            if(!isSingleFile_){
+                densStream_.read((char *) &dens, sizeof(float));
+                hsmoothStream_.read((char *) &hsmooth, sizeof(float));
+                sigmavStream_.read((char *) &sigmav, sizeof(float));
+            }
             buffer_[i].setPdm(dp);
             buffer_[i].dens = dens;
             buffer_[i].hsmooth = hsmooth;
@@ -196,7 +203,7 @@ void DataReader::loadBuffer(){
         maskStream_.read(mask, sizeof(char) * memParts_);
         for(int i = 0; i < memParts_; i++){
             if(mask[i] == 0){
-                buffer_[i].dens = -1;    
+                buffer_[i].dens = -1;
             }
         }
     }
@@ -252,16 +259,19 @@ void DataReader::move2bufEnd(){
 
 void DataReader::close(){
     if(buffer_ != NULL)
-        delete(buffer_);
+        delete[](buffer_);
     buffer_ = NULL;
     if(isNative_){
         dataInputFile_.close();
     }else{
         xdr_destroy(&xdrs_);
         fclose(fp_);
-        densStream_.close();
-        hsmoothStream_.close();
-        sigmavStream_.close();
+        
+        if(!isSingleFile_){
+            densStream_.close();
+            hsmoothStream_.close();
+            sigmavStream_.close();
+        }
     }
     if(isMask_){
         maskStream_.close();
