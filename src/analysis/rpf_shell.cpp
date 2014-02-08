@@ -38,7 +38,7 @@ void printUsage(const char * s){
 
 
 int main(int argc, const char **argv){
-    int numbins;
+    int numbins = 100;
     double radius;
     double theta, phi;
     double * databins;
@@ -53,9 +53,11 @@ int main(int argc, const char **argv){
     bool isTipsy = false;
     
     int m=1;
+    //printf("ok!\n");
     while (m<argc)
     {
         string arg = argv[m];
+        //printf("ok!\n");
         stringstream ss, ss1, ss2;
         if (arg == "-b") {
             isTipsy = true;
@@ -96,7 +98,8 @@ int main(int argc, const char **argv){
         }
         m++;
     }
-    
+   
+   
     if(filename == ""){
         printUsage(argv[0]);
         exit(1);
@@ -194,6 +197,7 @@ int main(int argc, const char **argv){
     
     delete[] databins;
     delete[] countbins;
-    
+    delete preader;
+
     return 0;
 }
