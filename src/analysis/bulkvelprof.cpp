@@ -165,7 +165,7 @@ int main(int argc, const char **argv){
             double ry = part.posy - y;
             double rz = part.posz - z;
            
-            //printf("%f %f %f\n", rx, ry, rz);
+            //printf("%f %f %f\n", x, y, z);
            
             double r = sqrt(rx * rx + ry * ry + rz * rz);
             rx /= r;
@@ -176,7 +176,7 @@ int main(int argc, const char **argv){
             //printf("%f %f %f %f\n", rx, ry, rz, r);
 
 
-            if((r < radius) && (part.dens > 0)){
+            if((r < radius)){
                 //printf("%f %f %f\n", rx, ry, rz);
                 double corr = 1.0;
                 if(isCore){
