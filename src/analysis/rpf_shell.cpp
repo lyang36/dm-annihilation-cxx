@@ -126,7 +126,7 @@ int main(int argc, const char **argv){
     if(!isTipsy){
         preader = new DataReader(filename, isMask, maskfile);
     }else{
-        preader = new DataReader(baseName, filename, isMask, maskfile);
+        preader = new DataReader(baseName, filename, isMask, maskfile, true);
     }
     
     DataReader &reader = *preader;
