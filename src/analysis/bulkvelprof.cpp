@@ -38,12 +38,6 @@ void printUsage(const char * s){
 
 
 int main(int argc, const char **argv){
-    //printf("%d\n", argc);
-    if(!(argc == 8 || argc == 7 || argc == 9)){
-        printf("Usage: %s <fitsfilename>, <num of bins>, <radius>, <x>, <y>, <z> [maskfile] [-core]\n", argv[0]);
-        exit(1);
-    }
-
     int numbins;
     double radius;
     double theta, phi;
