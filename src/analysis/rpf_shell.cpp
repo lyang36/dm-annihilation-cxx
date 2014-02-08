@@ -22,13 +22,22 @@
 
 using namespace std;
 
-int main(int argc, const char **argv){
-    //printf("%d\n", argc);
-    if(!(argc == 8 || argc == 7 || argc == 9)){
-        printf("Usage: %s <fitsfilename>, <num of bins>, <radius>, <x>, <y>, <z> [maskfile] [-core]\n", argv[0]);
-        exit(1);
-    }
+void printUsage(const char * s){
+    printf("Usage:\n"
+           "%s\n"
+           "-b <baseName> for tipsyfile only\n"
+           "-f <fitsfilename>\n"
+           "-n <num of bins>\n"
+           "-r <radius>\n"
+           "-c <x>, <y>, <z>\n"
+           "-m <maskfile>\n"
+           "-core\n", s);
+}
 
+
+
+
+int main(int argc, const char **argv){
     int numbins;
     double radius;
     double theta, phi;
@@ -36,47 +45,62 @@ int main(int argc, const char **argv){
     //double * angbins;
     double * countbins;
     double dr, x, y, z;
-    string filename;
-    string maskfile;
-    bool isMask;
-    bool isCore;
+    string baseName = "";
+    string filename = "";
+    string maskfile = "";
+    bool isMask = false;
+    bool isCore = false;
+    bool isTipsy = false;
     
-    isCore = false;
-    if(argc == 7){
-        isMask = false;
-        isCore = false;
-    }else if(argc == 8){
-        //printf("%s\n", argv[7]);
-        if(strstr (argv[7], "-core") != NULL){
-            isMask = false;
+    int m=1;
+    while (m<argc)
+    {
+        string arg = argv[m];
+        stringstream ss, ss1, ss2;
+        if (arg == "-b") {
+            isTipsy = true;
+            baseName = argv[m+1];
+            m+=1;
+        }else if (arg == "-f") {
+            filename = argv[m+1];
+            m+=1;
+        }else if (arg == "-n") {
+            ss << argv[m+1];
+            ss >> numbins;
+            m+=1;
+        }else if (arg == "-r") {
+            ss << argv[m+1];
+            ss >> radius;
+            m+=1;
+        }else if (arg == "-c") {
+            ss << argv[m+1];
+            ss >> x;
+            m++;
+            
+            ss1 << argv[m+1];
+            ss1 >> y;
+            m++;
+            
+            ss2 << argv[m+1];
+            ss2 >> z;
+            m++;
+        }else if (arg == "-m") {
+            isMask = true;
+            maskfile = argv[m+1];
+            m+=1;
+        }else if (arg == "-core") {
             isCore = true;
         }else{
-            isMask = true;
-            isCore = false;
+            printUsage(argv[0]);
+            exit(1);
         }
-    }else if(argc == 9){
-        isMask = true;
-        isCore = true;
+        m++;
     }
     
-    stringstream ss, ss1, ss2, ss3, ss4, ss5, ss6;
-    ss << argv[1];
-    ss >> filename;
-    ss1 << argv[2];
-    ss1 >> numbins;
-    ss2 << argv[3];
-    ss2 >> radius;
-    ss3 << argv[4];
-    ss3 >> x;
-    ss4 << argv[5];
-    ss4 >> y;
-    ss5 << argv[6];
-    ss5 >> z;
-    if(isMask){
-        ss6 << argv[7];
-        ss6 >> maskfile;
+    if(filename == ""){
+        printUsage(argv[0]);
+        exit(1);
     }
-    
     
     
     databins = new double[numbins];
