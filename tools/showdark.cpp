@@ -40,9 +40,12 @@ int main(int argn, char ** argv){
     xdrstdio_create(&xdr,fp,XDR_DECODE);
     int status = xdr_header(&xdr,&header);
     
-    for(int i=startind; (i<header.ndark) && (i < endind); i++) {
+    for(int i=0; (i<header.ndark) && (i < endind); i++) {
         status = xdr_dark(&xdr,&dp);
         
+        if(i < startind){
+                continue;
+        }
         if (status != 1) {
             fprintf(stderr,"Error reading dark particle from input file.\n");
             exit(1);

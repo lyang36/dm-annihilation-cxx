@@ -164,14 +164,20 @@ int main(int argc, const char **argv){
             double rx = part.posx - x;
             double ry = part.posy - y;
             double rz = part.posz - z;
+           
+            //printf("%f %f %f\n", rx, ry, rz);
+           
             double r = sqrt(rx * rx + ry * ry + rz * rz);
             rx /= r;
             ry /= r;
             rz /= r;
             
             r *= (40000.0);
-            
+            //printf("%f %f %f %f\n", rx, ry, rz, r);
+
+
             if((r < radius) && (part.dens > 0)){
+                //printf("%f %f %f\n", rx, ry, rz);
                 double corr = 1.0;
                 if(isCore){
                     corr = halocore.getCorrection(part.posx, part.posy, part.posz);
