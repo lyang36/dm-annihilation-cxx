@@ -156,7 +156,7 @@ int main(int argc, const char **argv){
                             (part.posy - y) *(part.posy - y) +
                             (part.posz - z) *(part.posz - z));
             r *= (40000.0);
-            if((r < radius) && (part.dens > 0)){
+            if((r < radius)){// && (part.dens > 0)){
                 //if(r < radius * 18.0 / 400.0)
                     //printf("%f %f %f %f %f %f\n", r, radius, radius * 18.0 / 400.0, part.posx, part.posy, part.posz);
                 double corr = 1.0;
