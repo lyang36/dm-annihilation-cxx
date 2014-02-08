@@ -178,7 +178,7 @@ int main(int argc, const char **argv){
             densbins[i] = 0.0;
         }
         
-        printf("%f %e %e %e %d\n", i * dr, databins[i], densbins[i], massbins[i], countbins[i]);
+        printf("%f %e %e %e %d\n", i * dr, databins[i], densbins[i], massbins[i], (int)countbins[i]);
     }
     
     delete[] databins;
