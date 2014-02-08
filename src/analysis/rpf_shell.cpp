@@ -122,7 +122,14 @@ int main(int argc, const char **argv){
     
     dr = radius / numbins;
     
-    DataReader reader(filename, isMask, maskfile);
+    DataReader *preader;
+    if(!isTipsy){
+        preader = new DataReader(filename, isMask, maskfile);
+    }else{
+        preader = new DataReader(baseName, filename, isMask, maskfile);
+    }
+    
+    DataReader &reader = *preader;
     reader.open();
 
     static HaloCore halocore;
