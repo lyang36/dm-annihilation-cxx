@@ -37,7 +37,8 @@ void MapGenerator::start(){
 	int Npix = par_->map.Npix;
     MAPTYPE dOmega = par_->map.dOmega;
     MAPTYPE theta0 = acos( 1.0 - dOmega/(2.0*3.141592) );
-    
+    map_ = new double[Npix];
+
     Healpix_Base base(Nside, RING, SET_NSIDE);
 
     int Np = reader_->getPartNum();
@@ -105,6 +106,9 @@ void MapGenerator::start(){
     }
     isFinished_ = true;
     cout << "\nFinished!." << endl;
-    map_ = oglRender.getHealPixMap();
+    double * hmp = oglRender.getHealPixMap();
+    for(int i = 0; i < Npix; i++){
+        map_[i] = hmp[i];
+    }
     free(renderParts);
 }
