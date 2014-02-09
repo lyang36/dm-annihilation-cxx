@@ -27,7 +27,7 @@ void MapGenerator::start(){
     MAPTYPE costheta;
 	MAPTYPE theta;
 	MAPTYPE phi;
-    RenderParticle * renderParts;
+    RenderParticle * renderParts = NULL;
     
     //MAPTYPE unit_factor = pow(pow((par_ -> natconst.c_in_cgs), 2) /
     //                          (par_->units.eV_in_cgs * 1.0e9), 2) / (par_->units.Mpc_in_cgs * 1.0e-3)
