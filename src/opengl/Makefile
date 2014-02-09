@@ -1,10 +1,10 @@
 
 CC=g++
 #must setup these 2 lib to compile
-FITSIOLIB=/Users/lyang/Tools/cfitsio
-HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
-#FITSIOLIB=/home/lyang/Tools/cfitsio
-#HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
+#FITSIOLIB=/Users/lyang/Tools/cfitsio
+#HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
+FITSIOLIB=/home/lyang/Tools/cfitsio
+HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
 #FITSIOLIB=/scratch0/hhpc-hn7/lyang/Tools/cfitsio
 #HEALPIXHOME=/scratch0/hhpc-hn7/lyang/Tools/Healpix_3.00
 
@@ -15,9 +15,9 @@ HEALPIXCXX = $(HEALPIXHOME)/src/cxx/cxxsupport
 HEALPIXC  = $(HEALPIXHOME)/cxx/Healpix_cxx
 
 
-LFLAG= -framework Carbon -framework OpenGL -framework GLUT
+#LFLAG= -framework Carbon -framework OpenGL -framework GLUT
 #LFLAG=-lGL -lglut -lGLEW
-#LFLAGS= -lGL -lglut /home/lyang/Tools/glew/lib/libGLEW.a
+LFLAG= -lGL -lglut /home/lyang/Tools/glew/lib/libGLEW.a
 IFLAG=-I /usr/include/GL/ -I./ -I../ -I$(HEALPIXSRC) -I$(FITSIOLIB)
 #IFLAG= -I /usr/include/GL/ -I./ -I ~/Tools/glew/include/ -I../
 
