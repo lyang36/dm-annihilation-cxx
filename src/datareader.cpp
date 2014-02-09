@@ -180,7 +180,7 @@ void DataReader::loadBuffer(){
         float hsmooth = 0;
         float sigmav = 0;
         int status;
-        for(i = 0; i < memParts_; i++){
+        for(i = 0; i < (memParts_); i++){
             status = xdr_dark(&xdrs_, &(dp));
             if (status != 1) {
                 fprintf(stderr,"Error reading dark particle from input file.\n");
