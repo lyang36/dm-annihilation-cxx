@@ -1,7 +1,13 @@
+/*****************************************************************************/
+// shaderManager.h
+// defines the shader manager
+// manages a shader
+//  Author: Lin F. Yang
+//  01/18/2014
+/*****************************************************************************/
+
 #ifndef __LY_SHADERMANAGER__
 #define __LY_SHADERMANAGER__
-//#include <glew.h>
-//#include <GLUT/glut.h>
 #include <cstdlib>
 #include <cstdio>
 #ifdef __APPLE__
@@ -25,10 +31,11 @@ public:
 class shaderManager{
 private:
     void printLog(GLhandleARB obj);
-    char * textFileRead(const char * fn);
 public:
     shaderObj * loadShaderFile(const char * vfile, const char * ffile);
     shaderObj * loadShader(const char *vf, const char * ff);
+    static char * textFileRead(const char * fn, int * length = NULL);
+    
 };
 
 

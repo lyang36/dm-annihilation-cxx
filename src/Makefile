@@ -1,11 +1,10 @@
 #must setup these 2 lib to compile
-#FITSIOLIB=/Users/lyang/Tools/cfitsio
-#HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
-FITSIOLIB=/home/lyang/Tools/cfitsio
-HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
+FITSIOLIB=/Users/lyang/Tools/cfitsio
+HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
+#FITSIOLIB=/home/lyang/Tools/cfitsio
+#HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
 #FITSIOLIB=/scratch0/hhpc-hn7/lyang/Tools/cfitsio
 #HEALPIXHOME=/scratch0/hhpc-hn7/lyang/Tools/Healpix_3.00
-
 
 HEALPIXSRC = $(HEALPIXHOME)/src/cxx/basic_gcc/include
 HEALPIXLIB = $(HEALPIXHOME)/src/cxx/basic_gcc/lib
@@ -14,6 +13,19 @@ HEALPIXC  = $(HEALPIXHOME)/cxx/Healpix_cxx
 
 FLUXDIR = ./flux
 COREDIR = ./halocore
+
+LFLAGS=$(HEALPIXLIB)/libhealpix_cxx.a\
+	   $(HEALPIXLIB)/libcxxsupport.a\
+	   $(FITSIOLIB)/libcfitsio.a
+
+IFLAG=-I $(HEALPIXSRC) -I$(FITSIOLIB)
+
+
+OGLLFLAG= -framework Carbon -framework OpenGL -framework GLUT /usr/lib/libGLEW.a
+#OGLLFLAG=-lGL -lglut -lGLEW
+#OGLLFLAG= -lGL -lglut /home/lyang/Tools/glew/lib/libGLEW.a
+OGLIFLAG=-I /usr/include/GL/ -I./ -I../ -I$(HEALPIXSRC) -I$(FITSIOLIB)
+#OGLIFLAG= -I /usr/include/GL/ -I./ -I ~/Tools/glew/include/ -I../
 
 NVCCARGS=-arch=sm_20
 
@@ -28,12 +40,9 @@ OBJS_CUDA=main.o datareader.o tipsy_io.o parameters.o mapgenerator.o\
 OBJS_CUDA_RENDER=main.o datareader.o tipsy_io.o parameters.o mapgenerator.o\
 	  anglefuncs.o datatypes.o
 
-
-LFLAGS=$(HEALPIXLIB)/libhealpix_cxx.a\
-	   $(HEALPIXLIB)/libcxxsupport.a\
-	   $(FITSIOLIB)/libcfitsio.a
-
-IFLAG=-I $(HEALPIXSRC) -I$(FITSIOLIB)
+OBJS_OGL_RENDER=main.o datareader.o tipsy_io.o parameters.o mapgenerator.o\
+	 genmap_ogl.o anglefuncs.o datatypes.o opengl/buffers.o opengl/render.o\
+	 opengl/shaderManager.o opengl/shaders.o opengl/shadersrc.o
 
 
 
@@ -119,6 +128,7 @@ cuda-decay:
 
 
 cuda-render: cuda-ann-adi-render cuda-ann-nosom-render cuda-ann-somv-render cuda-ann-somv2-render cuda-ann-pwave-render cuda-decay-render
+
 cuda-ann-nosom-render:
 	nvcc $(NVCCARGS) -c chealpixrender.cu genmap_cuda_render.cpp $(IFLAG)
 	nvcc -o annmap_cuda_nosom flux_ann_nosom.o $(OBJS_CUDA_RENDER)\
@@ -149,6 +159,45 @@ cuda-decay-render:
 	nvcc -o decaymap_cuda_nocorr flux_decay.o $(OBJS_CUDA_RENDER)\
 			genmap_cuda_render.o chealpixrender.o $(LFLAGS)
 
+
+
+
+ogl-comp:
+	@cd opengl; make
+	g++ -c genmap_ogl.cpp $(IFLAG) $(OGLIFLAG)
+
+ogl-render: ogl-ann-nosom ogl-ann-adi ogl-ann-core-nosom ogl-ann-somv ogl-ann-somv2\
+	ogl-ann-pwave ogl-decay
+
+ogl-ann-nosom: ogl-comp
+	$(CC) -c $(FLUXDIR)/flux_ann_nosom.cpp
+	$(CC) -o annmap_ogl_nosom flux_ann_nosom.o $(OBJS_OGL_RENDER) $(LFLAGS) $(OGLLFLAG)
+
+ogl-ann-adi: ogl-comp
+	$(CC) -c $(FLUXDIR)/flux_ann_adiabatic.cpp
+	$(CC) -o annmap_ogl_adi flux_ann_adiabatic.o $(OBJS_OGL_RENDER) $(LFLAGS) $(OGLLFLAG)
+
+ogl-ann-core-nosom: ogl-comp
+	$(CC) -c $(FLUXDIR)/flux_ann_core_nosom.cpp $(COREDIR)/halocore.cpp
+	$(CC) -o annmap_ogl_core_nosom flux_ann_core_nosom.o halocore.o $(OBJS_OGL_RENDER) $(LFLAGS) $(OGLLFLAG)
+
+ogl-ann-somv: ogl-comp
+	$(CC) -c $(FLUXDIR)/flux_ann_somv.cpp
+	$(CC) -o annmap_ogl_somv flux_ann_somv.o $(OBJS_OGL_RENDER) $(LFLAGS) $(OGLLFLAG)
+	
+ogl-ann-somv2: ogl-comp
+	$(CC) -c $(FLUXDIR)/flux_ann_somv2.cpp
+	$(CC) -o annmap_ogl_somv2 flux_ann_somv2.o $(OBJS_OGL_RENDER) $(LFLAGS) $(OGLLFLAG)
+
+ogl-ann-pwave: ogl-comp
+	$(CC) -c $(FLUXDIR)/flux_ann_pwave.cpp
+	$(CC) -o annmap_ogl_pwave flux_ann_pwave.o $(OBJS_OGL_RENDER) $(LFLAGS) $(OGLLFLAG)
+	
+ogl-decay: ogl-comp
+	$(CC) -c $(FLUXDIR)/flux_decay.cpp
+	$(CC) -o decaymap_ogl_nocorr flux_decay.o $(OBJS_OGL_RENDER) $(LFLAGS) $(OGLLFLAG)
+
+	
 
 cuda-debug:
 	nvcc -c -arch=sm_13 -g -G kernel.cu genmap_cuda.cpp $(IFLAG)

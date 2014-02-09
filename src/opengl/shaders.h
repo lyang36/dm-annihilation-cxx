@@ -1,3 +1,11 @@
+/*****************************************************************************/
+// shaders.h
+// defines the actual shader
+// manages a shader
+//  Author: Lin F. Yang
+//  01/18/2014
+/*****************************************************************************/
+
 #ifndef __LY_PARTICLESHADER__
 #define __LY_PARTICLESHADER__
 #include <string>
@@ -40,8 +48,9 @@ public:
 };
 
 
-class fluxShader:public Shader{
 
+// the flux shader, used to render the DM gamma flux
+class fluxShader:public Shader{
 public:
     static const string VERTEX_SHADER_SRC;
     static const string FRAGMENT_SHADER_SRC;
@@ -67,27 +76,7 @@ public:
     
     
     //load shader from file
-    fluxShader(){
-        setIsUseRotm(false);
-        shaderManager SM;
-        shader = SM.loadShader(VERTEX_SHADER_SRC.c_str(), FRAGMENT_SHADER_SRC.c_str());
-        if(shader == 0){
-            printf("Shader error!\n");
-            exit(1);
-        }
-        if(shader->progmObj == 0){
-            printf("Shader error!\n");
-            exit(1);
-        }else{
-            good = true;
-        }
-        
-        if(good){
-            loadUniform();
-        }
-        
-        isRotm = true;
-    };
+    fluxShader();
     
 private:
     //GLint xaxisloc, yaxisloc, zaxisloc;

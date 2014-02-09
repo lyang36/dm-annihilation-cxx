@@ -39,12 +39,6 @@ static unsigned int WSIZE, POINTSIZE;
 string picfile;
 bool isonscreen = false;
 
-
-
-
-
-
-
 void render::openGLInit(){
     int argc = 1;
     char *argv[1] = {(char*)"Particle Render"};

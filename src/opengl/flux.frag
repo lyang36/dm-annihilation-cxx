@@ -65,39 +65,67 @@ float projprofile(vec2 xy, float fc, float dtheta){
 }
 
 void main(){
-    //float dsize = particle.r;
+    
+    // the new size of the halo
     float newsize = particle.r;
+    
+    // the center coordinates of the point sprite
     vec2 xyc = gl_Color.rg;
+    
+    // convert the coordinate to actuall screen coordinates
     vec2 coor = xyc *geofac.y / 2.0;
+    
+    // initialize
     float flux = 0.0;
+    
+    // flux fac is the normalization calculated in vert
     float fluxfac = gl_Color.b;
-	if(newsize != 1.0){
-		if(fluxfac != 0.0){
+    
+    // rasterizing the point sprite
+	if(newsize > 1.0){
+		if(fluxfac > 0.0){
+            // the angular radius
 			float dtheta = gl_Color.a;
+            
+            // get current relative coordinates of the pixel inside the pointsprite
 			vec2 p = floor(newsize * vec2(gl_TexCoord[0].s,gl_TexCoord[0].t));
 			
+            // because of each coordinates of the pixels
+            // is the lower left corner, must be converted to be the
+            // center of the pixel, then convert to the coordinates
+            // to be in a circle of radias 1
 			p = (p+0.5) / newsize;
 			p = 2.0*(p-0.5);
+            
+            // if the pixel is outside the unit circle, discard it
+            // this is because of each point sprite is actually
+            // a ractangle.
 			float u = dot(p, p);
 			if (u > 1.0) discard;
 			
+            // calculate the actuall coordinates of a pixel on the screen
 			vec2 xyp = p * (newsize / 2.0) + coor;
 			vec2 xyr = xyp / (geofac.y / 2.0);
+            
+            // calculate the r-coordinates
 			float pr2 = dot(xyr, xyr);
-            //use the actual norm
+            
+            // use the actual norm
 			flux = fluxfac  * profile(prev(xyr), dtheta) * 4.0/(1.0+pr2)/(1.0+pr2);
+            
             //use analytical norm
             //flux = fluxfac  * profile(prev(xyr), dtheta) * 4.0/(1.0+pr2)/(1.0+pr2);
 			//flux = fluxfac;
-			if(usenormmap == 1){
+			
+            // use a normalization map, stored in the texture
+            if(usenormmap == 1){
 				float r0 = sqrt(pr2);
 				float r = newsize / geofac.z;
 				float norm = (texture2D(normmap, vec2(r0, r))).r;
-				//if(norm < 0.0) norm = 1.0;
 				flux = flux / norm;
 			}
 			
-
+            // output the flux into the red component of color
 			gl_FragColor = vec4(flux, 0, 0, 1.0);
 		}else{
 			discard;

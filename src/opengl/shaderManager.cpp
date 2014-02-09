@@ -44,7 +44,7 @@ void shaderObj::end(){
 
 }
 
-char * shaderManager::textFileRead(const char * fn){
+char * shaderManager::textFileRead(const char * fn, int * length){
     
     
     FILE *fp;
@@ -74,6 +74,10 @@ char * shaderManager::textFileRead(const char * fn){
             printf("no shader file: %s\n", fn);
             exit(1);
         }
+    }
+    
+    if(length != NULL){
+        *length = count;
     }
     return content;
 }

@@ -21,6 +21,9 @@
 
 using namespace std;
 
+
+
+
 void buffer::checkbuffer(){
     // check FBO status
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -178,6 +181,52 @@ float projprofile(float * xy, float * r0, float fc, float dtheta){
     }*/
     return fc * profile(r, r0, dtheta);
 }
+
+fluxBuffer::fluxBuffer(unsigned int w, unsigned int h):buffer(w,h){
+    normtex = 100;
+    normMapRes = 1024;
+    normPointSize = 256;
+    normfile = "norm.dat";
+    normtextbuf = NULL;
+    //isUseMap = false;
+};
+
+fluxBuffer::~fluxBuffer(){
+    if(normtextbuf != NULL){
+        delete[] normtextbuf;
+        normtextbuf = NULL;
+    }
+};
+
+void fluxBuffer::setMapRes(int m, int n){
+    normMapRes = m;
+    normPointSize = n;
+};
+
+void fluxBuffer::setNormTex(){
+    normtextbuf = new float[normMapRes * normMapRes];
+    loadnorm();
+    glEnable(GL_TEXTURE_2D);
+    glGenTextures(1, &normtex);
+    glBindTexture(GL_TEXTURE_2D, normtex);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F_ARB, normMapRes, normMapRes, 0, GL_RED, GL_FLOAT, normtextbuf);
+    //for(int i = 0; i < normMapRes*normMapRes; i++){
+    //    printf("%f  ", normtextbuf[i]);
+    //}
+    // set its parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    
+    // setup some generic opengl options
+    glClampColorARB(GL_CLAMP_VERTEX_COLOR_ARB, GL_FALSE);
+    glClampColorARB(GL_CLAMP_FRAGMENT_COLOR_ARB, GL_FALSE);
+    glClampColorARB(GL_CLAMP_READ_COLOR_ARB, GL_FALSE);
+    
+};
 
 
 void fluxBuffer::loadnorm(){

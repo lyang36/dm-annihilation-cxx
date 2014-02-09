@@ -27,7 +27,7 @@ void MapGenerator::start(){
     MAPTYPE costheta;
 	MAPTYPE theta;
 	MAPTYPE phi;
-    MAPTYPE * weight;
+    RenderParticle * renderParts;
     
     //MAPTYPE unit_factor = pow(pow((par_ -> natconst.c_in_cgs), 2) /
     //                          (par_->units.eV_in_cgs * 1.0e9), 2) / (par_->units.Mpc_in_cgs * 1.0e-3)
@@ -40,8 +40,6 @@ void MapGenerator::start(){
     
     Healpix_Base base(Nside, RING, SET_NSIDE);
 
-    map_ = (MAPTYPE *) calloc(Npix, sizeof(MAPTYPE));
-    weight = (MAPTYPE *) calloc(Npix, sizeof(MAPTYPE));
     int Np = reader_->getPartNum();
     
     int rec = Np / 50;
@@ -65,22 +63,23 @@ void MapGenerator::start(){
     MAPTYPE oposy = par_->params.opos[1];
     MAPTYPE oposz = par_->params.opos[2];
     
+    
+    render oglRender(*par_, Nside, 256, Nside);
+    
     int count = 0;
     while(reader_->hasNext()){
     	parts = reader_->getBuf();
     	
+        renderParts = (RenderParticle *) realloc(renderParts, sizeof(RenderParticle) * reader_->getMemparts());
 		for( int i = 0; i< reader_->getMemparts(); i++){
 			if(count % rec == 0){
 				cout << "#";
 				cout.flush();
 			}
 			count ++;
-			//reader_->readParticle(& current_part);
 			DMParticle &current_part = parts[i];
 			
 			//ignore the low resolution mass
-            //use density < 0 to set the mask
-			//printf("current mas: %f %f\n", current_part.mass, hires_particle_mass );
 			if(current_part.mass >= hires_particle_mass * 1.1 
              ||current_part.dens < 0){
 				continue;
@@ -92,67 +91,20 @@ void MapGenerator::start(){
 			
 			//fluxes = unit_factor * current_part.dens * current_part.mass / (4.0 * PI * distances * distances);
 			fluxes = getflux(par_, current_part, distances);
+            
+            renderParts[i].x = current_part.posx;
+            renderParts[i].y = current_part.posy;
+            renderParts[i].z = current_part.posz;
+            renderParts[i].densityfac1 = fluxes;
+            renderParts[i].densityfac2 = 1.0;
+            renderParts[i].hsmooth = current_part.hsmooth;
 			
-			calc_angles(current_part.posx-oposx, current_part.posy-oposy,
-						current_part.posz-oposz, distances, par_,
-						costheta, phi);
-			
-			theta = acos(costheta);
-			angular_radius = current_part.hsmooth / distances;
-			
-			
-			pointing p(theta,phi);
-			vec3 vec;
-			ang2vec(theta,phi,&vec);
-			
-			int pix = base.ang2pix(p);
-			if( 2.0*angular_radius < theta0 ) {
-				map_[pix] += fluxes;
-				continue;
-			}
-			
-			vector<int> pix_list;
-			base.query_disc(p, 2.0*angular_radius, pix_list);
-			
-			int npix_disc = pix_list.size();
-			
-			if(npix_disc < 2) {
-				map_[pix] += fluxes;
-				continue;
-			}
-			
-			// get here only if the particle covers more than one pixel
-			
-			MAPTYPE weight_norm = 0.0;
-			for(int j=0; j<npix_disc; j++) {
-				int this_pix = pix_list[j];
-				vec3 this_vec = base.pix2vec(this_pix);
-				
-				MAPTYPE d2 = acos( dotprod(this_vec,vec) ) / angular_radius;
-				d2 = d2*d2;
-				weight[j] = exp(-0.5 * d2 / 0.333);
-				weight_norm += weight[j];		    
-			}
-			
-			// apply weighted flux to map
-			for(int j=0;j<npix_disc;j++) {
-				// first normalize weight array
-				weight[j] = weight[j] / weight_norm;
-				map_[pix_list[j]] += weight[j] * fluxes;
-				
-			}  // loop over pixels covered by this particle
 		}
+        oglRender.rend(renderParts, reader_->getMemparts());
 		reader_->loadBuffer();
     }
     isFinished_ = true;
     cout << "\nFinished!." << endl;
-    
-    for(int i = 0; i < Npix; i++){
-        map_[i] /= par_->map.dOmega;
-    }
-    
-    //printf("%e\n%e\n%e", map_[0], map_[100], map_[10000]);
-
-
-    free(weight);
+    map_ = oglRender.getHealPixMap();
+    free(renderParts);
 }

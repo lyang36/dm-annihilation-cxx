@@ -1,8 +1,14 @@
+/*****************************************************************************/
+// buffers.h
+// defines the pixel buffer for
+// buffer rendering or texture
+//  Author: Lin F. Yang
+//  01/18/2014
+/*****************************************************************************/
+
 #ifndef __LY_BUFFERS__
 #define __LY_BUFFERS__
 #include <string>
-//#include <glew.h>
-//#include <GLUT/glut.h>
 #ifdef __APPLE__
 #include <glew.h>
 #include <GLUT/glut.h> // darwin uses glut.h rather than GL/glut.h
@@ -14,11 +20,11 @@
 
 using namespace std;
 
-class buffer{              //buffers
+class buffer{               //buffers
 protected:
     GLuint textureId;       //texture binding
-    bool fboUsed;          //fbo ok?
-    GLuint fboId, rboId;   //framebuffer and renderbuffer ID
+    bool fboUsed;           //fbo ok?
+    GLuint fboId, rboId;    //framebuffer and renderbuffer ID
     unsigned int twidth, theight; //the width and height of the buffer
     void checkbuffer();     //check whether buffer is ok
     bool  issetup;
@@ -26,7 +32,7 @@ protected:
 public:     
     buffer(unsigned int w, unsigned int h);
     ~buffer();
-    GLuint getTex();     //get texture ID
+    GLuint getTex();         //get texture ID
     void bindTex();          //bind the texture
     void unbindTex();        //unbind texture
     void setTex(GLuint tex);       //set a texture, bind it to the buffer
@@ -49,60 +55,21 @@ private:
     int normMapRes;          //map resolution, in pixels.
     int normPointSize;       //max point size of the point sprite, in pixels
     void loadnorm();         //calculate normalization text or from file
-    string normfile;// = "norm.dat";
+    string normfile;         // = "norm.dat";
     float * normtextbuf;
-    //bool isUseMap;
+                             //bool isUseMap;
 public:
-    //load norm and bind texture
-    void setNormTex(){
-        normtextbuf = new float[normMapRes * normMapRes];
-        loadnorm();
-        glEnable(GL_TEXTURE_2D);
-        glGenTextures(1, &normtex);
-        glBindTexture(GL_TEXTURE_2D, normtex);
-        
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F_ARB, normMapRes, normMapRes, 0, GL_RED, GL_FLOAT, normtextbuf);
-        //for(int i = 0; i < normMapRes*normMapRes; i++){
-        //    printf("%f  ", normtextbuf[i]);
-        //}
-        // set its parameters
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-        
-        // setup some generic opengl options
-        glClampColorARB(GL_CLAMP_VERTEX_COLOR_ARB, GL_FALSE);
-        glClampColorARB(GL_CLAMP_FRAGMENT_COLOR_ARB, GL_FALSE);
-        glClampColorARB(GL_CLAMP_READ_COLOR_ARB, GL_FALSE);
-        
-    };
     
-    void setMapRes(int m, int n){
-        normMapRes = m;
-        normPointSize = n;
-    };
+    void setNormTex();       //load norm and bind texture
+                             //(using the normalization map)
     
-    fluxBuffer(unsigned int w, unsigned int h):buffer(w,h){
-        normtex = 100;
-        normMapRes = 1024;
-        normPointSize = 256;
-        normfile = "norm.dat";
-        normtextbuf = NULL;
-        //isUseMap = false;
-    };//:buffer(w,h);
+                             //set the normalization map resolution
+    void setMapRes(int m, int n);
     
-    //bool isBufferLoaded(){
-    //    return isUseMap;
-    //}
+                             //initialization
+    fluxBuffer(unsigned int w, unsigned int h);
     
-    ~fluxBuffer(){
-        if(normtextbuf != NULL){
-            delete normtextbuf;
-            normtextbuf = NULL;
-        }
-    }
+    ~fluxBuffer();
     
 };                 
 
