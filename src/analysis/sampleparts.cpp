@@ -29,7 +29,7 @@ void printUsage(const char * s){
            "%s\n"
            "-b <baseName> for tipsyfile only\n"
            "-f <fitsFilename>\n"
-           "-n <numberOfParts>"
+           "-n <numberOfParts>\n"
            "-m <maskFile>\n"
            "-o <outputFilename>\n"
            "Output the sampleling particles, with dens=-1 if masked out\n"
@@ -104,7 +104,7 @@ int main(int argc, const char **argv){
     reader.open();
 
     int totalNumParts = reader.getPartNum();
-    double rejectingprob = (double) numParts / (double) totalNumParts;
+    double rejectingprob = ((double) numParts) / ((double) totalNumParts);
     
     reader.close();
     delete preader;
@@ -139,9 +139,10 @@ int main(int argc, const char **argv){
         while(reader.hasNext()){
             DMParticle * ps = reader.getBuf();
             for(int i = 0; i < reader.getMemparts(); i++){
-                double prob = (double) rand() / (double) RAND_MAX;
-                if(prob > rejectingprob){
+                double prob = ((double) rand()) / ((double) RAND_MAX);
+                if(prob < rejectingprob){
                     outputStream.write((char *) &(ps[i]), sizeof(DMParticle));
+                    //printf("Parts: %f, %f, %d\n", prob, rejectingprob, i);
                     partCounts ++;
                     if(partCounts >= numParts){
                         goto SAMPLINGOVER;

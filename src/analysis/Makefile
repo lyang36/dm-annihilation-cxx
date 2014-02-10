@@ -1,7 +1,7 @@
 FITSIOLIB=/Users/lyang/Tools/cfitsio
 HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
-#FITSIOLIB=/home/lyang/Tools/cfitsio
-#HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
+FITSIOLIB=/home/lyang/Tools/cfitsio
+HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
 
 
 HEALPIXSRC = $(HEALPIXHOME)/src/cxx/basic_gcc/include
@@ -37,6 +37,7 @@ comp:
 		   sampleparts.cpp rprof_adi.cpp radialprofile.cpp mapselect.cpp $(IFLAG)
 
 clean:
+	rm -f *.o
 	rm -f sampleparts
 	rm -f rpf_shell_adi
 	rm -f rpf_shell
