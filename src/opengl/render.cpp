@@ -49,10 +49,10 @@ void render::openGLInit(){
     glutInitWindowSize(WSIZE, WSIZE);
     glutCreateWindow("Dark Matter GammaRay rendering!");
     
-#ifndef __APPLE__
+//#ifndef __APPLE__
     glewExperimental = GL_TRUE;
     glewInit();
-#endif
+//#endif
     
     glutHideWindow();
     
@@ -161,7 +161,6 @@ render::render(Parameters &par, int imsize, int pointSize, int nside){
         //begin shader
         fshaderU->begin();
         fshaderU->setIsUseRotm(IS_USE_NORM);
-        
         
         //setup shader parameters
         fshaderU->setgeofac3f(orthsize, windowSize, pointSize);

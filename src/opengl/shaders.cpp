@@ -43,6 +43,7 @@ fluxShader::fluxShader(){
 };
 
 void fluxShader::setopos(Parameters &pars){
+    //printf("%f %f %f\n", pars.params.opos[0], pars.params.opos[1], pars.params.opos[2]);
     setopos3f(pars.params.opos[0], pars.params.opos[1], pars.params.opos[2]);
 }
 
@@ -51,7 +52,6 @@ void fluxShader::setrotm(Parameters &pars, bool updown){
     for (int i = 0; i<3; i++){
         for (int j =0; j<3; j++){
             rotmatrix[i * 3 + j] = pars.rotmatrix[i][j];
-            //printf("%d\n", i*3+j);
         }
     }
     
@@ -64,9 +64,6 @@ void fluxShader::setrotm(Parameters &pars, bool updown){
 
 //void fluxShader::setrotmatrix(REAL * alignvec, REAL * obsvec, REAL * centvec, bool updown){
 void fluxShader::setrotmatrix(Parameters &pars, bool updown){
-    //this->align_vec = alignvec;
-    //this->opos = obsvec;
-    //this->cpos = centvec;
     setrotm(pars, updown);
     glUniformMatrix3fv(rotmloc, 1, GL_FALSE, this->rotmatrix);
     

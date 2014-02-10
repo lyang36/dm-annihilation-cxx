@@ -1,8 +1,8 @@
 #must setup these 2 lib to compile
-#FITSIOLIB=/Users/lyang/Tools/cfitsio
-#HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
-FITSIOLIB=/home/lyang/Tools/cfitsio
-HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
+FITSIOLIB=/Users/lyang/Tools/cfitsio
+HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
+#FITSIOLIB=/home/lyang/Tools/cfitsio
+#HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
 #FITSIOLIB=/scratch0/hhpc-hn7/lyang/Tools/cfitsio
 #HEALPIXHOME=/scratch0/hhpc-hn7/lyang/Tools/Healpix_3.00
 
@@ -21,9 +21,9 @@ LFLAGS=$(HEALPIXLIB)/libhealpix_cxx.a\
 IFLAG=-I $(HEALPIXSRC) -I$(FITSIOLIB)
 
 
-#OGLLFLAG= -framework Carbon -framework OpenGL -framework GLUT /usr/lib/libGLEW.a
+OGLLFLAG= -framework Carbon -framework OpenGL -framework GLUT /usr/lib/libGLEW.a
 #OGLLFLAG=-lGL -lglut -lGLEW
-OGLLFLAG= -lGL -lglut /home/lyang/Tools/glew/lib/libGLEW.a
+#OGLLFLAG= -lGL -lglut /home/lyang/Tools/glew/lib/libGLEW.a
 OGLIFLAG=-I /usr/include/GL/ -I./ -I../ -I$(HEALPIXSRC) -I$(FITSIOLIB)
 #OGLIFLAG= -I /usr/include/GL/ -I./ -I ~/Tools/glew/include/ -I../
 

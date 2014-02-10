@@ -45,8 +45,7 @@ void MapGenerator::start(){
     
     int rec = Np / 50;
     int ll = 0;
-    cout << "Creating map!!!" << endl;
-	cout << "---10---20---30---40---50---60---70---80---90--100%\n";
+
     
 
     //remove low resolution particles
@@ -68,6 +67,9 @@ void MapGenerator::start(){
     render oglRender(*par_, Nside, 256, Nside);
     
     int count = 0;
+    
+    cout << "Creating map!!!" << endl;
+	cout << "---10---20---30---40---50---60---70---80---90--100%\n";
     while(reader_->hasNext()){
     	parts = reader_->getBuf();
     	
