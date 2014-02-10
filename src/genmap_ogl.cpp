@@ -101,6 +101,7 @@ void MapGenerator::start(){
             renderParts[i].hsmooth = current_part.hsmooth;
 			
 		}
+        //printf("ok\n");
         oglRender.rend(renderParts, reader_->getMemparts());
 		reader_->loadBuffer();
     }
