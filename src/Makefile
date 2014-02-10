@@ -229,5 +229,8 @@ clean:
 	rm -fr annmap_adi
 	rm -fr annmap_cuda_debug
 	rm -fr annmap_cuda_core_nosom_debug
+	rm -fr annmap_ogl_adi annmap_ogl_nosom annmap_ogl_somv\
+		annmap_ogl_core_nosom  annmap_ogl_pwave  annmap_ogl_somv2\
+		decaymap_ogl_nocorr
 	@cd dataconverter; make clean
 	@cd test; make clean
