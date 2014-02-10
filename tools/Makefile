@@ -28,12 +28,13 @@ all: comp
 	$(CC) -o ascii2bin ascii2bin.o
 	$(CC) -o bin2ascii bin2ascii.o
 	$(CC) -o showdark tipsy_io.o showdark.o
+	#$(CC) -o sampleparts sampleparts.o ../src/datareader.o
 
 comp:
 	$(CC) -c selectdm.cpp showdark.cpp \
 			id2mark.cpp ../src/tipsy_io.c \
 			ascii2bin.cpp bin2ascii.cpp	\
-			$(IFLAG)
+			 $(IFLAG) -I ../src/
 
 clean:
 	rm -fr *.o

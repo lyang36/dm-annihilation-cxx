@@ -1,7 +1,7 @@
 FITSIOLIB=/Users/lyang/Tools/cfitsio
 HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00
-FITSIOLIB=/home/lyang/Tools/cfitsio
-HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
+#FITSIOLIB=/home/lyang/Tools/cfitsio
+#HEALPIXHOME=/home/lyang/Tools/Healpix_3.00
 
 
 HEALPIXSRC = $(HEALPIXHOME)/src/cxx/basic_gcc/include
@@ -30,11 +30,14 @@ all: comp
 	$(CC) -o rpf_shell rpf_shell.o ../datareader.o ../tipsy_io.o ../halocore.o ${LFLAGS}
 	$(CC) -o rpf_shell_adi rpf_shell_adi.o ../datareader.o ../tipsy_io.o ../halocore.o ${LFLAGS}
 	$(CC) -o bulkvelprof bulkvelprof.o ../datareader.o ../tipsy_io.o ../halocore.o ${LFLAGS}
+	$(CC) -o sampleparts sampleparts.o ../datareader.o ../tipsy_io.o ../halocore.o ${LFLAGS}
 
 comp:
-	$(CC) -c rpf_shell_adi.cpp bulkvelprof.cpp rpf_shell.cpp angprofile.cpp rprof_adi.cpp radialprofile.cpp mapselect.cpp $(IFLAG)
+	$(CC) -c rpf_shell_adi.cpp bulkvelprof.cpp rpf_shell.cpp angprofile.cpp\
+		   sampleparts.cpp rprof_adi.cpp radialprofile.cpp mapselect.cpp $(IFLAG)
 
 clean:
+	rm -f sampleparts
 	rm -f rpf_shell_adi
 	rm -f rpf_shell
 	rm -f rprof_adi

@@ -94,13 +94,7 @@ bool DataReader::open(){
         partNumbers_ = tips_.ndark;
         
         cout << "Particles: " << partNumbers_ << endl;
-        // if(testnum_ != -1){
-        //     if((int)partNumbers_ > testnum_){
-        //         partNumbers_ = testnum_;
-        //    }
-        //}
         
-        //open density file
         int np;
         if(!isSingleFile_){
             densStream_.open( density_file_name.c_str(), ios::in | ios::binary);
