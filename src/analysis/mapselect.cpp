@@ -91,7 +91,7 @@ int main(int argc, const char **argv){
     yvec.y = cos(phi);
     yvec.z = 0;
     
-    /*for(int i = 0; i < inputmap.Npix(); i++){
+    for(int i = 0; i < inputmap.Npix(); i++){
         vec3 cvec = inputmap.pix2vec(i);
         
         double angle = acos(cvec.x * centvec.x + cvec.y * centvec.y + cvec.z * centvec.z);
@@ -117,7 +117,7 @@ int main(int argc, const char **argv){
             databins[ind] += inputmap[i];
             countbins[ind] += 1;
         }
-    }*/
+    }
     
     
     
@@ -136,7 +136,7 @@ int main(int argc, const char **argv){
     outfile.write((char *) databins, sizeof(double) * res * res);
     outfile.close();
     
-    delete databins;
-    delete countbins;
+    delete[] databins;
+    delete[] countbins;
     
 }

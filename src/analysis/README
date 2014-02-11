@@ -1,0 +1,15 @@
+Tools:
+    1. angprofile.cpp > angprofile
+        	measure the angular density of HEALPix Map fits file
+    2. bulkvelprof.cpp > bulkvelprof
+		measure the bulk velocity profile as well as the velocity distribution
+    3. mapselect.cpp > mapselect
+		select a region from a fits file (not finished)
+    4. radialprofile.cpp > rprofile
+       rprof_adi.cpp > rprof_adi (adiabatic contraction)
+       rpf_shell.cpp > rpf_shell (shell method)
+       rpf_shell_adi.cpp > rpf_shell_adi
+		measure the radial profile    
+    5. sampleparts.cpp
+		sample particles from the tipsy file randomly
+	
