@@ -214,7 +214,7 @@ int main(int argc, const char **argv){
                     velZBinCounts[velInd] ++;
                 }
                 
-                double vel = sqrt(part.velx * part.velx + part.vely * part.vely + part.velz);
+                double vel = sqrt(part.velx * part.velx + part.vely * part.vely + part.velz * part.velz);
                 
                 if((vel < maxVelMag) && (vel >= 0)){
                     int velInd = (vel) / velBin;
