@@ -74,11 +74,11 @@ bool DataReader::open(){
         dataInputFile_.open(filePath_.c_str(), ios::binary);
         
         if(!dataInputFile_.good()){
-            printf("Datafile error: %s !\n", filePath_.c_str());
+            fprintf(stderr, "Datafile error: %s !\n", filePath_.c_str());
             exit(1);
         }
         dataInputFile_.read((char*)&partNumbers_, sizeof(int));
-        cout << "Particles: " << partNumbers_ << endl;
+        cerr << "Particles: " << partNumbers_ << endl;
     }else{
         //open particle file
         char fi[255];
@@ -93,7 +93,7 @@ bool DataReader::open(){
         int status = xdr_header(&xdrs_, &tips_);
         partNumbers_ = tips_.ndark;
         
-        cout << "Particles: " << partNumbers_ << endl;
+        cerr << "Particles: " << partNumbers_ << endl;
         
         int np;
         if(!isSingleFile_){
@@ -132,7 +132,7 @@ bool DataReader::open(){
         }
     }
     
-    cout << "Load to buffer ... " << endl;
+    cerr << "Load to buffer ... " << endl;
     //loadBuffer();
     if(testnum_ != -1){
         if((int)partNumbers_ > testnum_){

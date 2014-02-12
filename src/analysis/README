@@ -12,4 +12,5 @@ Tools:
 		measure the radial profile    
     5. sampleparts.cpp
 		sample particles from the tipsy file randomly
-	
+    6. distribution.cpp > distribution
+		measure the distribution (velocity/density) given a box
