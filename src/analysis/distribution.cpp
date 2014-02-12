@@ -186,6 +186,8 @@ int main(int argc, const char **argv){
         velMBinCounts[i] = 0;
     }
     
+    double mvx=0.0, mvy=0.0, mvz=0.0;
+    
     int cts = 0;
     while(reader.hasNext()){
         DMParticle * ps = reader.getBuf();
@@ -205,16 +207,19 @@ int main(int argc, const char **argv){
                     int velInd = (part.velx - minvel) / velBin;
                     velXBinCounts[velInd] ++;
                 }
+                mvx += part.velx;
                 
                 if((part.vely < maxvel) && (part.vely >= minvel)){
                     int velInd = (part.vely - minvel) / velBin;
                     velYBinCounts[velInd] ++;
                 }
+                mvy += part.vely;
                 
                 if((part.velz < maxvel) && (part.velz >= minvel)){
                     int velInd = (part.velz - minvel) / velBin;
                     velZBinCounts[velInd] ++;
                 }
+                mvz += part.velz;
                 
                 double vel = sqrt(part.velx * part.velx + part.vely * part.vely + part.velz * part.velz);
                 
@@ -229,6 +234,8 @@ int main(int argc, const char **argv){
         //printf("%d\n", cts);
     }
     reader.close();
+    
+    printf("Mean Vel: %f %f %f\n", mvx/cts, mvy/cts, mvz/cts);
     
     //output the results:
     fprintf(stdout, "Density, Counts\n");
