@@ -178,7 +178,9 @@ int main(int argc, const char **argv){
         densBinCounts[i] = 0;
     }
     for(int i = 0; i < numVelXYZBin; i++){
-        velXBinCounts[i] = velYBinCounts[i] = velZBinCounts[i] = 0;
+        velXBinCounts[i] = 0;
+        velYBinCounts[i] = 0;
+        velZBinCounts[i] = 0;
     }
     for(int i = 0; i < numVelMBin; i++){
         velMBinCounts[i] = 0;
