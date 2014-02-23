@@ -89,11 +89,10 @@ std::vector<float> & VL2Reader::getVelocityZ(){
 
 
 //test
-/*
+
 int main(){
-    VL2Reader reader("/Users/lyang/data/data_samp_1e6.bin", 3.612030e-01, 2.106580e-01, 6.877260e-03, 10);
+    VL2Reader reader("/data1/data/data_float_all.bin", 3.612030e-01, 2.106580e-01, 6.877260e-03, 0.00001);
     for(int i = 0; i < reader.getDensity().size(); i++){
         printf("%f\n", reader.getDensity()[i]);
     }
 }
-*/
