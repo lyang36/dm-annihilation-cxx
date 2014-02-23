@@ -5,6 +5,7 @@
 #include <rpc/xdr.h>
 #include <vector>
 #include <string>
+#include "../tipsydefs.h"
 #include "../datareader.h"
 #include "vl2read.h"
 

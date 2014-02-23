@@ -9,4 +9,4 @@ clean:
 	rm -fr *.o *.so
 	rm -fr build
 	rm -fr _vl2readwrapper_module.cc
-	rm -fr VL2read.py	
+	rm -fr vl2read.py	

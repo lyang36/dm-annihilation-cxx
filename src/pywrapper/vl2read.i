@@ -1,4 +1,4 @@
-%module VL2read
+%module vl2read
 
 %{
 #include <string>
@@ -7,7 +7,7 @@
 #include <rpc/types.h>
 #include <rpc/xdr.h>
 #include <vector>
-#include <string>
+#include "../tipsydefs.h"
 #include "../datareader.h"
 #include "vl2read.h"
 %}
