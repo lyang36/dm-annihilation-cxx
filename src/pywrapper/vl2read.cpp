@@ -11,7 +11,7 @@
 
 using namespace std;
 
-const int VL2Reader::INITMEMSIZE = 8 * 1024 * 1024;
+const int VL2Reader::INITMEMSIZE = 128 * 1024;
 
 VL2Reader::VL2Reader(std::string filename, double xc,
                      double yc, double zc, double boxsize,
@@ -33,12 +33,13 @@ void VL2Reader::loadParts(std::string basename, std::string filename, double xc,
     velX_.reserve(INITMEMSIZE);
     velY_.reserve(INITMEMSIZE);
     velZ_.reserve(INITMEMSIZE);
-    
+    //return;
+
     bool isMask = false;
     if(maskfile != ""){
         isMask = true;
     }
-    
+    //return;    
     DataReader *preader;
     if(!isTipsy){
         preader = new DataReader(filename, isMask, maskfile);
@@ -89,10 +90,10 @@ std::vector<float> & VL2Reader::getVelocityZ(){
 
 
 //test
-
+/*
 int main(){
     VL2Reader reader("/data1/data/data_float_all.bin", 3.612030e-01, 2.106580e-01, 6.877260e-03, 0.00001);
     for(int i = 0; i < reader.getDensity().size(); i++){
         printf("%f\n", reader.getDensity()[i]);
     }
-}
+}*/
