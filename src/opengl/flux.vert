@@ -27,7 +27,7 @@ uniform vec3 opos;
 uniform vec3 geofac;
 
 // whether use the norm map? true: 1 else:0
-uniform int usenormmap;
+// uniform int usenormmap;
 /*****************************************************************************/
 
 // the radius of the particle circle and the coordianate
@@ -233,7 +233,8 @@ void main(){
         
         // calculate normfac
         {
-            if(usenormmap == 0 && newsize != 1.0){
+            //if(usenormmap == 0 && newsize != 1.0){
+            if(newsize != 1.0){
 #ifndef USEANALYTICALNORM
                 //use actual norm
                 normfac = calc_norm(vec2(xc, yc), newsize, dtheta);

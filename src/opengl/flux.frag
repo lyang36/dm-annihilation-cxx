@@ -14,7 +14,7 @@ uniform vec3 geofac;
 uniform sampler2D normmap;
 
 // whether use the norm map? true: 1 else:0
-uniform int usenormmap;
+// uniform int usenormmap;
 
 // The particle parameter passing from flux.vert
 // vec4(newsize, npvec.x, npvec.y, npvec.z);
@@ -118,12 +118,12 @@ void main(){
 			//flux = fluxfac;
 			
             // use a normalization map, stored in the texture
-            if(usenormmap == 1){
+            /*if(usenormmap == 1){
 				float r0 = sqrt(pr2);
 				float r = newsize / geofac.z;
 				float norm = (texture2D(normmap, vec2(r0, r))).r;
 				flux = flux / norm;
-			}
+			}*/
 			
             // output the flux into the red component of color
 			gl_FragColor = vec4(flux, 0, 0, 1.0);

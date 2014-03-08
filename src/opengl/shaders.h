@@ -55,21 +55,18 @@ public:
     static const string VERTEX_SHADER_SRC;
     static const string FRAGMENT_SHADER_SRC;
     
-    
-    void setopos3f(REAL x, REAL y, REAL z); //set opos
+    //set opos
+    void setopos3f(REAL x, REAL y, REAL z);
     void setopos3fv(REAL * opos);
     void setopos(Parameters &pars);
     
-    void setgeofac3f(REAL x, REAL y, REAL z); //set opos
+    //set geometric factor
+    void setgeofac3f(REAL x, REAL y, REAL z);
     void setgeofac3fv(REAL * geo);
-    //void setrotmatrix(REAL * alignvec, REAL * obsvec, REAL * centervec, bool updown);     //setup rotation matrix
     
     void setrotmatrix(Parameters &pars, bool updown);
-                                            //alignvec has 3 vars
     
-
     
-    void setusenormmap(bool isnm);          //whether use the norm map
     void setIsUseRotm(bool isrotm){
         isRotm = isrotm;
     };
@@ -83,16 +80,19 @@ private:
     GLint rotmloc;
     GLint oposloc;
     GLint geofacloc;
-    GLint isnormmaploc;
-    void setrotm(Parameters &pars, bool updown);  //setup rotation matrix, 9 variables
+    
+    //setup rotation matrix, 9 variables
     //updown: true/up; false/down
+    void setrotm(Parameters &pars, bool updown);
+    
     void loadUniform();
-    //REAL * align_vec;
+
     REAL * opos;
-    //REAL * cpos;
+
     REAL rotmatrix[9];
     
-    bool isRotm;                //set whether use the rotation matrix
+    //set whether use the rotation matrix
+    bool isRotm;
 };
 
 

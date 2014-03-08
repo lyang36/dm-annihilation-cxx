@@ -70,15 +70,11 @@ void render::openGLInit(){
     if(!initialized){
         
         fshaderL = new fluxShader();
-        //cshaderL = new colorShader(params->colorvertexshader, params->colorfragmentshader);
         fbufferL = new fluxBuffer(windowSize, windowSize);
-        //cbufferL = new colorBuffer(windowSize, windowSize);
         fbufferL->setBuffer();
         
         fshaderU = new fluxShader();
-        //cshaderU = new colorShader(params->colorvertexshader, params->colorfragmentshader);
         fbufferU = new fluxBuffer(windowSize, windowSize);
-        //cbufferU = new colorBuffer(windowSize, windowSize);
         fbufferU->setBuffer();
         
         initialized = true;

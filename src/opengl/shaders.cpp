@@ -16,8 +16,6 @@ void fluxShader::loadUniform(){
     geofacloc = glGetUniformLocation(shader->progmObj,"geofac");
     //printf("gloc, %d\n", geofacloc);
 
-    isnormmaploc = glGetUniformLocation(shader->progmObj,"usenormmap");
-    //printf("isnormmaploc, %d\n", isnormmaploc);
     
 }
 
@@ -89,12 +87,5 @@ void fluxShader::setgeofac3f(REAL x, REAL y, REAL z){
     glUniform3f(geofacloc, x, y, z);
 }
 
-void fluxShader::setusenormmap(bool isnm){
-    if(isnm){
-        glUniform1i(isnormmaploc, 1);
-    }else{
-        glUniform1i(isnormmaploc, 0);
-    }
-}
 
 
