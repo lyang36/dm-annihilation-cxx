@@ -144,6 +144,9 @@ void main(){
     // rotation and normalize the position vector
     vec3 npvec = normalize(rotmatrix * pvec);
     
+    // rotate 180 degree to match the c++ rotation
+    // npvec.x = - npvec.x;
+    
     // caltucle the angle of the observed particle
     float costheta = clamp(npvec.z, -1.0, 1.0);//dot(npvec, nzaxis);
     

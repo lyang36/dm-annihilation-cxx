@@ -401,6 +401,8 @@ void render::convertToHealpixMap(){
         //converte (theta, phi, dtheta) to the projectio plane, we have
         //phi = 2*PI - phi + PI;
 
+        //make a rotation on y to match the data stored in memory
+        this_vec.x = - this_vec.x;
         
         bool isupshere = false;
         if(this_vec.z > 0){//theta < PI/2){

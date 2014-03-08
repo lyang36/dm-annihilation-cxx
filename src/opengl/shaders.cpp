@@ -53,9 +53,7 @@ void fluxShader::setrotm(Parameters &pars, bool updown){
     for (int i = 0; i<3; i++){
         for (int j =0; j<3; j++){
             rotmatrix[i * 3 + j] = pars.rotmatrix[i][j];
-            //printf("%f ",  rotmatrix[i * 3 + j]);
         }
-        //printf("\n");
     }
     
     if(updown){
