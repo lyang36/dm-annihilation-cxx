@@ -271,10 +271,11 @@ void render::drawFlux(RenderParticle * fluxdata, int numParts){
         GLfloat * vetexarray = (GLfloat *) fluxdata;
         glEnableClientState (GL_VERTEX_ARRAY);
         glEnableClientState (GL_COLOR_ARRAY);
-        glColorPointer (3, GL_FLOAT, 6*sizeof(GLfloat), &(vetexarray[0]));
-        glVertexPointer (3, GL_FLOAT, 6*sizeof(GLfloat), &(vetexarray[3]));
+        glColorPointer (3, GL_FLOAT, 6*sizeof(GLfloat), &(vetexarray[3]));
+        glVertexPointer (3, GL_FLOAT, 6*sizeof(GLfloat), &(vetexarray[0]));
 
         //test
+        //for(int i = 0; i < numParts)
         //printf("%e %e %e %e %e %e\n", vetexarray[0], vetexarray[1], vetexarray[2],
         //                vetexarray[3], vetexarray[4], vetexarray[5]);
     

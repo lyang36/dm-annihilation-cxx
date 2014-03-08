@@ -8,6 +8,7 @@ using namespace std;
 void fluxShader::loadUniform(){
 
     rotmloc = glGetUniformLocation(shader->progmObj,"rotmatrix");
+    //printf("rotmloc, %d\n", rotmloc);
     
     oposloc = glGetUniformLocation(shader->progmObj,"opos");
     //printf("oloc, %d\n", oposloc);
@@ -16,7 +17,7 @@ void fluxShader::loadUniform(){
     //printf("gloc, %d\n", geofacloc);
 
     isnormmaploc = glGetUniformLocation(shader->progmObj,"usenormmap");
-
+    //printf("isnormmaploc, %d\n", isnormmaploc);
     
 }
 
@@ -52,7 +53,9 @@ void fluxShader::setrotm(Parameters &pars, bool updown){
     for (int i = 0; i<3; i++){
         for (int j =0; j<3; j++){
             rotmatrix[i * 3 + j] = pars.rotmatrix[i][j];
+            //printf("%f ",  rotmatrix[i * 3 + j]);
         }
+        //printf("\n");
     }
     
     if(updown){
@@ -76,6 +79,7 @@ void fluxShader::setopos3fv(REAL * ya){
 
 
 void fluxShader::setopos3f(REAL x, REAL y, REAL z){
+    //printf("Opos: %f %f %f\n", x, y, z);
     glUniform3f(oposloc, x, y, z);
 }
 

@@ -122,7 +122,7 @@ void main(){
     // the position vector of the target particle in the frame of the observer
     // input x, y z of the particle
     // transform it to the stereoprojection plane
-    vec3 pvec = vec3(gl_Vertex) - opos;
+    vec3 pvec = vec3(gl_Vertex.x, gl_Vertex.y, gl_Vertex.z) - opos;
 
     
     // the parameters of a partilce is stored in its color
