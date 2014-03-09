@@ -21,28 +21,30 @@ uniform sampler2D normmap;
 varying vec4 particle;
 
 
-// The output profile of a particle
-// This is very important, must be checked
+/*****************************************************************************/
+// calculate the profile of a particle
+// using the position vector r1, and angular size dtheta
+// the position vector is a point on the unit sphere
 float profile(vec3 r1,float dtheta){
-    // get the position of the partilce on the sky
+    // get the particle position on the sphere
     vec3 r0 = vec3(particle.gba);
     
-    // calcualte the angle between the pixel and the particle
+    // calculate the costheta between the queried position and particle position
     float costheta = dot(r0, r1)/(length(r0)*length(r1));
     
-
+    // clamp the costherta to be between -1 and 1
     costheta = clamp(costheta, -1.0, 1.0);
     
-    // use Taylor seriers
-    // acos may has too much error
-    float t2 = 2.0 * ( 1.0 - costheta) + 1.0/3.0*(costheta - 1.0)*(costheta - 1.0) - 4.0/45.0 * (costheta - 1.0) *(costheta - 1.0)*(costheta - 1.0);
-    //costheta = clamp(costheta, -1.0, 1.0);
-    //float t2 = acos(costheta);
-    //t2 = t2*t2;
+    // use tayler seriers to calculate the angle^2
+    // acos may too much error
+    //float t2 = 2.0 * ( 1.0 - costheta) + 1.0/3.0*(costheta - 1.0)*(costheta - 1.0) - 4.0/45.0 * (costheta - 1.0) *(costheta - 1.0)*(costheta - 1.0);
     
+    // alternative method
+    float t2 = acos(costheta);
+    t2 = t2*t2;
     
+    // calculate the final value
     float d2 = clamp(t2 / dtheta / dtheta, 0.0, 1.0);
-    //float d2 = (t2 / dtheta / dtheta, 0.0, 1.0);
     
     if(t2 > 1.0){
         return 0.0;
@@ -50,23 +52,25 @@ float profile(vec3 r1,float dtheta){
     if(t2 < 0.0){
         t2 = 0.0;
     }
-    return exp(- 1.5 * d2);         //here comes the problems
+    return exp(- 1.5 * d2);
 }
 
-// reverse stereoprojection
+// reverse stereoprojection, given a point on the tangential plane, output the point on the sphere
 vec3 prev(vec2 xy){
     float r2 = xy.x*xy.x + xy.y*xy.y;
     return vec3(2.0 * xy.x/(1.0 + r2), 2.0 * xy.y/(1.0 + r2), (r2 - 1.0)/(r2 + 1.0));
 }
 
-// stereoproject a profile to the plane
-float projprofile(vec2 xy, float fc, float dtheta){
-    return fc * profile(prev(xy), dtheta);
+
+//projected profile
+float profPRJ(vec3 r1, float dtheta){
+    return (1.0 - r1.z) * (1.0 - r1.z) * profile(r1, dtheta);
 }
+
 
 void main(){
     
-    // the new size of the halo
+    // the new size of the pointsprite
     float newsize = particle.r;
     
     // the center coordinates of the point sprite
@@ -111,19 +115,14 @@ void main(){
 			float pr2 = dot(xyr, xyr);
             
             // use the actual norm
-			flux = fluxfac  * profile(prev(xyr), dtheta) * 4.0/(1.0+pr2)/(1.0+pr2);
+			flux = fluxfac  * profPRJ(prev(xyr), dtheta);
+            
+            //profile(prev(xyr), dtheta) * 4.0/(1.0+pr2)/(1.0+pr2);
             
             //use analytical norm
             //flux = fluxfac  * profile(prev(xyr), dtheta) * 4.0/(1.0+pr2)/(1.0+pr2);
 			//flux = fluxfac;
 			
-            // use a normalization map, stored in the texture
-            /*if(usenormmap == 1){
-				float r0 = sqrt(pr2);
-				float r = newsize / geofac.z;
-				float norm = (texture2D(normmap, vec2(r0, r))).r;
-				flux = flux / norm;
-			}*/
 			
             // output the flux into the red component of color
 			gl_FragColor = vec4(flux, 0, 0, 1.0);

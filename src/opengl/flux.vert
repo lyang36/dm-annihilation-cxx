@@ -11,7 +11,7 @@
 #define PI 3.1415926535897932
 #define e32 4.4816890703380648226           //e^(3/2)
 
-#define USEANALYTICALNORM
+//#define USEANALYTICALNORM
 
 /******************************Parameters*************************************/
 // rotation matrix
@@ -21,7 +21,7 @@ uniform mat3 rotmatrix;
 uniform vec3 opos;
 
 // the geometric factor defined as:
-// geometry factor {size(square), viewportsize, maxpointsize }
+// geometry factor {size(projected size of the equater), viewportsize, maxpointsize }
 // controlling the point sprite stuctures, determined by the
 // pointsprite features, supported by hardware
 uniform vec3 geofac;
@@ -52,11 +52,11 @@ float profile(vec3 r1,float dtheta){
     
     // use tayler seriers to calculate the angle^2
     // acos may too much error
-    float t2 = 2.0 * ( 1.0 - costheta) + 1.0/3.0*(costheta - 1.0)*(costheta - 1.0) - 4.0/45.0 * (costheta - 1.0) *(costheta - 1.0)*(costheta - 1.0);
+    //float t2 = 2.0 * ( 1.0 - costheta) + 1.0/3.0*(costheta - 1.0)*(costheta - 1.0) - 4.0/45.0 * (costheta - 1.0) *(costheta - 1.0)*(costheta - 1.0);
     
     // alternative method
-    //float t2 = acos(costheta);
-    //t2 = t2*t2;
+    float t2 = acos(costheta);
+    t2 = t2*t2;
    
     // calculate the final value
     float d2 = clamp(t2 / dtheta / dtheta, 0.0, 1.0);
@@ -77,6 +77,12 @@ vec3 prev(vec2 xy){
 }
 
 
+//projected profile
+float profPRJ(vec3 r1, float dtheta){
+    return (1.0 - r1.z) * (1.0 - r1.z) * profile(r1, dtheta);
+}
+
+
 // calculate the normalization of a particle by counting all the pixels
 // this is very accurate, but very slow to get the result
 float calc_norm(vec2 svec, float newsize, float dtheta){
@@ -89,19 +95,26 @@ float calc_norm(vec2 svec, float newsize, float dtheta){
     float y=0.0;
     for(x = 0.0; x < newsize; x++){
         for(y = 0.0; y < newsize; y++){
+            // the pixel coordinates is at the center of the pixel
             float px = (x+0.5)/newsize;
             float py = (y+0.5)/newsize;
             px = 2.0*(px-0.5); // -1...1
             py = 2.0*(py-0.5);
             vec2 xy = vec2(px, py);
             float u = dot(xy, xy);
+            
+            // reject the points that are outside the circle
             if (u > 1.0)
                 continue;
             
+            // calculate the actual coordinates on the projected plane
             vec2 xyp = xy * (newsize / 2.0) + coor;
             vec2 xyr = xyp / (geofac.y / 2.0);
-            float pr2 = dot(xyr, xyr);
-            norm += 4.0/(1.0+pr2)/(1.0+pr2) * profile(prev(xyr), dtheta);
+            //float pr2 = dot(xyr, xyr);
+            
+            // calculate the flux
+            norm += profPRJ(prev(xyr), dtheta);
+            //4.0/(1.0+pr2)/(1.0+pr2) * profile(prev(xyr), dtheta);
         }
     }
     return 1.0/norm;
@@ -197,7 +210,7 @@ void main(){
         yc = prho * sinphi;
         
         // calculate the point size
-        float newsize = floor(r *geofac.y); ///!!!!!!!!!!!!!!!!
+        //float newsize = floor(r *geofac.y); ///!!!!!!!!!!!!!!!!
 
         // calculate the actuall point position on the screen
         newpos = vec4(xc * geofac.x, yc * geofac.x, 0.0, 1.0);
