@@ -211,6 +211,7 @@ void main(){
         
         // calculate the point size
         //float newsize = floor(r *geofac.y); ///!!!!!!!!!!!!!!!!
+        float newsize = ceil(r *geofac.y);
 
         // calculate the actuall point position on the screen
         newpos = vec4(xc * geofac.x, yc * geofac.x, 0.0, 1.0);
