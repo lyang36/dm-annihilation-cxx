@@ -160,9 +160,6 @@ void main(){
     // rotation and normalize the position vector
     vec3 npvec = normalize(rotmatrix * pvec);
     
-    // rotate 180 degree to match the c++ rotation
-    // npvec.x = - npvec.x;
-    
     // caltucle the angle of the observed particle
     float costheta = clamp(npvec.z, -1.0, 1.0);//dot(npvec, nzaxis);
     
@@ -173,7 +170,7 @@ void main(){
     
     // restrict the point is inside the circle
     if((theta > (PI / 2.0 - 0.1) || (theta + angdsize) > (PI / 2.0 - 0.1))
-       && (angdsize < PI / 2.0))
+       && (angdsize < PI / 2.0+0.2))
     {   // if the particle is in the lower sphere, do the following
         // also ignore those particles that are too large
         

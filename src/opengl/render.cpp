@@ -313,56 +313,6 @@ void render::rend(RenderParticle * fluxdata, int numParts){
 }
 
 
-
-double render::_getpixflux(int x1, int y1, bool isupshere){
-    //inside the circle
-    double f11 = 0;
-    int d = floor(WSIZE / 2.0);
-    double _r = sqrt((double)(x1 * x1 + y1 * y1)/(double)(d * d));
-    if(x1 * x1 + y1 * y1 <= d * d){
-        if(x1 < -(d)) x1 = -(d);
-        if(x1 > d-1) x1 = d-1;
-        if(y1 < -(d-1)) y1 = -(d-1);
-        if(y1 > d) y1 = d;
-        if(isupshere){
-            f11 = fluxmapU[(d - y1) * WSIZE + x1 + d];
-        }else{
-            f11 = fluxmapL[(d - y1) * WSIZE + x1 + d];
-        }
-        f11 =  f11;// / (4.0 / (1 + _r*_r)/(1 + _r*_r));
-    }else{
-        //converted it to theta phi and add it to another sphere
-        double _y = (double) y1 / (double)d;
-        double _x = (double) x1 / (double)d;
-        double _sinphi = _y / _r;
-        double _cosphi = _x / _r;
-        double _theta;
-        _theta = (_r == 0.0) ? PI : 2.0 * atan(1.0 / _r);
-        _theta = PI - _theta;
-        double r1 = sin(_theta)/(1-cos(_theta));
-        double _px = r1 * _cosphi;
-        double _py = r1 * _sinphi;
-        int kx = floor((_px + 1.0) * WSIZE / 2);
-        int ky = floor((_py + 1.0) * WSIZE / 2);
-        
-        double _flux = 0;
-        if(ky < 1) kx = 1;
-        if(ky > (int)WSIZE) ky = WSIZE;
-        if(kx < 0) kx = 0;
-        if(kx > (int)WSIZE - 1) kx = WSIZE - 1;
-        if(!isupshere){
-            _flux = fluxmapU[(WSIZE - ky) * WSIZE + kx];
-        }
-        else{
-            _flux = fluxmapL[(WSIZE - ky) * WSIZE + kx];
-        }
-        f11 = _flux;// / (4.0 / (1 + r1*r1)/(1 + r1*r1));
-    }
-    return f11;
-
-}
-
-
 //get the pixel value
 double render::_getPixel(double x, double y, bool isUp){
     isUp = _getTexCoord(x, y, (double) WSIZE / 2,  isUp);
@@ -444,11 +394,6 @@ void render::convertToHealpixMap(){
     //int pixss = WSIZE * WSIZE;
     int npix = nside * nside * 12;
     healmap = healpixmap_;
-
-    //double domega = 4.0 * PI / (double) npix;
-    //double detheta = sqrt(domega);
-    //double theta;
-    //double phi;
     
     double _rffmin = 1.0e36;
     double _rffmax = 0.0;
@@ -459,12 +404,7 @@ void render::convertToHealpixMap(){
     
     for(int i = 0; i < npix; i++){
         //double x, y,r, factor;
-        //int j;
-        //pix2ang_ring(nside, i, &theta, &phi);
         vec3 this_vec = base.pix2vec(i);
-        //now we have theta and phi and dtheta
-        //converte (theta, phi, dtheta) to the projectio plane, we have
-        //phi = 2*PI - phi + PI;
 
         //make a rotation on y to match the data stored in memory
         this_vec.x = - this_vec.x;
@@ -477,64 +417,7 @@ void render::convertToHealpixMap(){
         healmap[i] = flux / (4.0 / (1 + pr*pr)/(1 + pr*pr))
             * WSIZE * WSIZE / 4.0 *  par_->map.dOmega;;
         
-        /*
-        bool isupshere = false;
-        if(this_vec.z > 0){//theta < PI/2){
-            //theta = PI - theta;
-            this_vec.z = - this_vec.z;
-            isupshere = true;
-        }
-        
-        int d = floor(WSIZE / 2.0);
-        //bilinear interpolation
-        //double pr = sin(theta)/(1-cos(theta));
-        double pr = sqrt(1 - this_vec.z * this_vec.z)/(1-this_vec.z);
-        //double pxc = pr * cos(phi);
-        //double pyc = pr * sin(phi);
-        double pxc = this_vec.x/(1-this_vec.z);
-        double pyc = this_vec.y/(1-this_vec.z);
-        
-        double xc = (pxc) * (double)d;
-        double yc = (pyc) * (double)d;
-        
-        double x1 = floor(xc);
-        double x2 = x1 + 1;
-        double y1 = floor(yc);
-        double y2 = y1 + 1;
-        
-        double f11 = _getpixflux((int)floor(x1), (int)floor(y1), isupshere);
-        double f12 = _getpixflux((int)floor(x1), (int)floor(y2), isupshere);
-        double f21 = _getpixflux((int)floor(x2), (int)floor(y1), isupshere);
-        double f22 = _getpixflux((int)floor(x2), (int)floor(y2), isupshere);
-        
-        f11 = _getPixel(x1, y1, isupshere);
-        f12 = _getPixel(x1, y2, isupshere);
-        f21 = _getPixel(x2, y1, isupshere);
-        f22 = _getPixel(x2, y2, isupshere);
-        
-        double flux = 0;
-        double fr1 = (x2 - xc) / (x2 - x1) * f11 + (xc - x1) / (x2 - x1) * f21;
-        double fr2 = (x2 - xc) / (x2 - x1) * f12 + (xc - x1) / (x2 - x1) * f22;
-        flux = (y2 - yc) / (y2 - y1) * fr1 + (yc - y1) / (y2 - y1) * fr2;
-        
-        healmap[i] = flux / (4.0 / (1 + pr*pr)/(1 + pr*pr)) * WSIZE * WSIZE / 4.0;
-        
-        total_f += healmap[i];
-        // * 
-        //4 * PI * (WSIZE * WSIZE) / npix;// / (4.0 / (1 + pr*pr)/(1 + pr*pr));;
-        // * params->FLUXFACTOR / 
-        if(flux > _rffmax) _rffmax = flux;
-        if(flux < _rffmin) _rffmin = flux;
-        
-        */
-        
-        
     }
-    //float _ft = 0;
-    //for(int i = 0; i < npix; i++){
-    //    healmap[i] = healmap[i] *  par_->map.dOmega;
-        //_ft += healmap[i];
-    //}
 }
 
 void render::clear(){
