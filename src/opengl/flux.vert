@@ -82,8 +82,8 @@ vec3 prev(in vec2 xy){
 
 //projected profile
 float profPRJ(in vec3 r1, in float dtheta){
-    
-    return (1.0 - r1.z) * (1.0 - r1.z) * 1.0;//profile(r1, dtheta);
+    return 1.0;
+    //return (1.0 - r1.z) * (1.0 - r1.z) * 1.0;//profile(r1, dtheta);
 }
 
 
@@ -121,12 +121,9 @@ float calc_norm(in vec2 svec, in float newsize, in float dtheta){
             
             // calculate the flux
             norm += profPRJ(prev(xyr), dtheta);
-            //4.0/(1.0+pr2)/(1.0+pr2) * profile(prev(xyr), dtheta);
         }
     }
-    if(norm == 0.0){
-        norm = 1.0;
-    }
+
     return norm;
 }
 
@@ -234,7 +231,7 @@ void main(){
         
         // the output parameters of a point sprite
         float xc, yc, r, newsize;
-                
+        
         geoTrans(cosphi, sinphi, theta,
                  angdsize, xc, yc, r, newsize);
 
@@ -268,8 +265,24 @@ void main(){
             //if(usenormmap == 0 && newsize != 1.0){
             if(newsize != 1.0){
 #ifdef USEACTURALNORM
+                float norm0 = calc_norm(vec2(xc, yc), newsize, dtheta);
+                float norm1 = 0.0;
+                if((theta < (PI / 2.0) || (theta - angdsize) < (PI / 2.0))){
+                    float xc1, yc1, r1, newsize1;
+                    geoTrans(cosphi, sinphi, PI - theta,
+                             angdsize, xc1, yc1, r1, newsize1);
+                    particle.a = - particle.a;
+                    norm1 = calc_norm(vec2(xc1, yc1), newsize1, dtheta);
+                    particle.a = - particle.a;
+                }
+                
+                float normf = (norm0 + norm1);
+                if(normf == 0.0){
+                    normf = 1.0;
+                }
+                
                 //use actual norm
-                normfac = 1.0 / calc_norm(vec2(xc, yc), newsize, dtheta);
+                normfac = 1.0;// / normf;
 #else
                 //use analytical norm
 				normfac = 1.0 / (ViewSize * ViewSize) / calc_norm1(dtheta) * 4.0;

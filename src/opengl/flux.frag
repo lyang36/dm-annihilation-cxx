@@ -26,7 +26,6 @@ uniform sampler2D normmap;
 // vec4(newsize, npvec.x, npvec.y, npvec.z);
 varying vec4 particle;
 
-
 float ViewSize = geofac.y - CANVASMARGIN * 2.0;
 
 /*****************************************************************************/
@@ -121,8 +120,17 @@ void main(){
 			vec2 xyp = p * (newsize / 2.0) + coor;
 			vec2 xyr = xyp / (ViewSize / 2.0);
             
+            // get the actual coordinates
+            //vec2 xyrtr = (vec2(gl_FragCoord.x, gl_FragCoord.y) / (geofac.y / 2.0) - 1.0);
+            
+            //gl_FragCoord.x;
+            
             // calculate the r-coordinates
 			float pr2 = dot(xyr, xyr);
+            
+            // test
+            if (pr2 > 0.5)
+                discard;
             
             // use the actual norm
 			flux = fluxfac  * profPRJ(prev(xyr), dtheta);

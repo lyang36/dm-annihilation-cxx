@@ -377,9 +377,9 @@ double render::_getpixflux(double x, double y, double z){
     
     double y2 = y1 + 1;
     
-    return _getPixel(x1, y1, isupshere);
+    //return _getPixel(x1, y1, isupshere);
     
-    /*double f11, f12, f21, f22;
+    double f11, f12, f21, f22;
     f11 = _getPixel(x1, y1, isupshere);
     f12 = _getPixel(x1, y2, isupshere);
     f21 = _getPixel(x2, y1, isupshere);
@@ -389,7 +389,7 @@ double render::_getpixflux(double x, double y, double z){
     double fr1 = (x2 - xc) / (x2 - x1) * f11 + (xc - x1) / (x2 - x1) * f21;
     double fr2 = (x2 - xc) / (x2 - x1) * f12 + (xc - x1) / (x2 - x1) * f22;
     flux = (y2 - yc) / (y2 - y1) * fr1 + (yc - y1) / (y2 - y1) * fr2;
-    return flux;*/
+    return flux;
 }
 
 void render::convertToHealpixMap(){
