@@ -29,8 +29,10 @@
 #endif
 
 
-#define IS_USE_NORM false
+//#define IS_USE_NORM false
 
+// set to the edge of the OGL convas, to avoid edge problem
+#define CANVAS_MARGINE
 
 
 using namespace std;
@@ -130,21 +132,14 @@ render::render(Parameters &par, int imsize, int pointSize, int nside){
     
     
     //bind texture
-    if(IS_USE_NORM){
-        printf("Generating normalization buffer...\n");
-        fbufferL -> setMapRes(windowSize, POINTSIZE);
-        fbufferL -> setNormTex();
-        printf("Norm map generated.\n");
-    }else{
-        glBindTexture(GL_TEXTURE_2D, textureIni);
-    }
+    glBindTexture(GL_TEXTURE_2D, textureIni);
     
     
     {//setup shaders L and U
         
         //begin shader
         fshaderL->begin();
-        fshaderL->setIsUseRotm(IS_USE_NORM);
+        //fshaderL->setIsUseRotm(IS_USE_NORM);
         
         //setup shader parameters
         fshaderL->setgeofac3f(orthsize, windowSize, pointSize);
@@ -156,7 +151,7 @@ render::render(Parameters &par, int imsize, int pointSize, int nside){
         
         //begin shader
         fshaderU->begin();
-        fshaderU->setIsUseRotm(IS_USE_NORM);
+        //fshaderU->setIsUseRotm(IS_USE_NORM);
         
         //setup shader parameters
         fshaderU->setgeofac3f(orthsize, windowSize, pointSize);

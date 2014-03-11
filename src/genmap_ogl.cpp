@@ -94,6 +94,7 @@ void MapGenerator::start(){
 			
 			//fluxes = unit_factor * current_part.dens * current_part.mass / (4.0 * PI * distances * distances);
 			fluxes = getflux(par_, current_part, distances);
+            //printf("%e\n", fluxes);
             
             renderParts[i].x = current_part.posx;
             renderParts[i].y = current_part.posy;
@@ -113,8 +114,19 @@ void MapGenerator::start(){
     isFinished_ = true;
     cout << "\nFinished!." << endl;
     double * hmp = oglRender.getHealPixMap();
+    
+    //test
+    double totalC = 0;
+    
     for(int i = 0; i < Npix; i++){
-        map_[i] = hmp[i];
+        totalC += hmp[i];
+        
+        map_[i] = hmp[i] / par_->map.dOmega;;
     }
+    
+    //test
+    printf("Total Conts: %f\n", totalC);
+    
+    
     free(renderParts);
 }

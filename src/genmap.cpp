@@ -110,8 +110,16 @@ void MapGenerator::start(){
 			}
 			
 			vector<int> pix_list;
-			base.query_disc(p, 2.0*angular_radius, pix_list);
 			
+            
+            // query the disk
+            // where 2*angular_radius?
+            // the SPH kernel (from SMOOTH code) given that h is
+            // the half of the radius of the kernel
+            base.query_disc(p, 2.0*angular_radius, pix_list);
+			
+            
+            
 			int npix_disc = pix_list.size();
 			
 			if(npix_disc < 2) {
@@ -128,6 +136,10 @@ void MapGenerator::start(){
 				
 				MAPTYPE d2 = acos( dotprod(this_vec,vec) ) / angular_radius;
 				d2 = d2*d2;
+                
+                // why 3/2? well, it's given by Kulen
+                // What I have (see the notebook) is something around 1.45
+                // It does not differ much, so I'd beleive this one is correct
 				weight[j] = exp(-0.5 * d2 / 0.333);
 				weight_norm += weight[j];		    
 			}
@@ -145,12 +157,18 @@ void MapGenerator::start(){
     isFinished_ = true;
     cout << "\nFinished!." << endl;
     
+    //test
+    double totalC = 0;
+    
+    
     for(int i = 0; i < Npix; i++){
+        totalC += map_[i];
+        
         map_[i] /= par_->map.dOmega;
     }
     
     //printf("%e\n%e\n%e", map_[0], map_[100], map_[10000]);
-
+    printf("Total Conts: %f\n", totalC);
 
     free(weight);
 }

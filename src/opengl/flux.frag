@@ -37,21 +37,18 @@ float profile(vec3 r1,float dtheta){
     
     // use tayler seriers to calculate the angle^2
     // acos may too much error
-    //float t2 = 2.0 * ( 1.0 - costheta) + 1.0/3.0*(costheta - 1.0)*(costheta - 1.0) - 4.0/45.0 * (costheta - 1.0) *(costheta - 1.0)*(costheta - 1.0);
+    float t2 = 2.0 * ( 1.0 - costheta) + 1.0/3.0*(costheta - 1.0)*(costheta - 1.0) - 4.0/45.0 * (costheta - 1.0) *(costheta - 1.0)*(costheta - 1.0);
     
     // alternative method
-    float t2 = acos(costheta);
-    t2 = t2*t2;
+    //float t2 = acos(costheta);
+    //t2 = t2*t2;
     
     // calculate the final value
-    float d2 = clamp(t2 / dtheta / dtheta, 0.0, 1.0);
+    float d2 = (t2 / dtheta / dtheta);
     
-    if(t2 > 1.0){
+    /*if(d2 > 1.0){
         return 0.0;
-    }
-    if(t2 < 0.0){
-        t2 = 0.0;
-    }
+    }*/
     return exp(- 1.5 * d2);
 }
 
@@ -64,6 +61,9 @@ vec3 prev(vec2 xy){
 
 //projected profile
 float profPRJ(vec3 r1, float dtheta){
+    //test
+    //return 1.0;
+    
     return (1.0 - r1.z) * (1.0 - r1.z) * profile(r1, dtheta);
 }
 
@@ -105,7 +105,8 @@ void main(){
             // this is because of each point sprite is actually
             // a ractangle.
 			float u = dot(p, p);
-			if (u > 1.0) discard;
+			if (u > 1.0)
+                discard;
 			
             // calculate the actuall coordinates of a pixel on the screen
 			vec2 xyp = p * (newsize / 2.0) + coor;

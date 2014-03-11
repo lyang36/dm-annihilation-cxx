@@ -11,7 +11,7 @@
 #define PI 3.1415926535897932
 #define e32 4.4816890703380648226           //e^(3/2)
 
-//#define USEANALYTICALNORM
+#define USEACTURALNORM
 
 /******************************Parameters*************************************/
 // rotation matrix
@@ -52,21 +52,18 @@ float profile(vec3 r1,float dtheta){
     
     // use tayler seriers to calculate the angle^2
     // acos may too much error
-    //float t2 = 2.0 * ( 1.0 - costheta) + 1.0/3.0*(costheta - 1.0)*(costheta - 1.0) - 4.0/45.0 * (costheta - 1.0) *(costheta - 1.0)*(costheta - 1.0);
+    float t2 = 2.0 * ( 1.0 - costheta) + 1.0/3.0*(costheta - 1.0)*(costheta - 1.0) - 4.0/45.0 * (costheta - 1.0) *(costheta - 1.0)*(costheta - 1.0);
     
     // alternative method
-    float t2 = acos(costheta);
-    t2 = t2*t2;
+    //float t2 = acos(costheta);
+    //t2 = t2*t2;
    
     // calculate the final value
-    float d2 = clamp(t2 / dtheta / dtheta, 0.0, 1.0);
+    float d2 = (t2 / dtheta / dtheta);
     
-    if(t2 > 1.0){
-        return 0.0;
-    }
-    if(t2 < 0.0){
-        t2 = 0.0;
-    }
+    //if(d2 > 1.0){
+    //    return 0.0;
+    //}
     return exp(- 1.5 * d2);
 }
 
@@ -79,6 +76,9 @@ vec3 prev(vec2 xy){
 
 //projected profile
 float profPRJ(vec3 r1, float dtheta){
+    //test
+    //return 1.0;
+    
     return (1.0 - r1.z) * (1.0 - r1.z) * profile(r1, dtheta);
 }
 
@@ -151,8 +151,10 @@ void main(){
     // the distance from the observer to the particle
     float distance = length(pvec);
     
-    // parameter.b is hsmooth, so this is the angular size
+    // parameter.b is hsmooth, so this is the half angular size
+    // used in the gaussian parameters
     dtheta = parameter.b / distance;    //2.186
+    float angdsize = 2.0 * dtheta;
     
     // rotation and normalize the position vector
     vec3 npvec = normalize(rotmatrix * pvec);
@@ -169,11 +171,10 @@ void main(){
     
     
     
-    if((theta > (PI / 2.0) || (theta + dtheta) >= PI / 2.0) && dtheta < PI / 2.0)
+    if((theta > (PI / 2.0) || (theta + angdsize) >= PI / 2.0)
+       && (angdsize < PI / 2.0))
     {   // if the particle is in the lower sphere, do the following
         // also ignore those particles that are too large
-        
-        
         
         // calculate sintheta
         float sintheta = sin(theta);
@@ -191,17 +192,17 @@ void main(){
         }
         
         // calculate the flux, encoded by parameter.g*parameter.r
-        float flux = parameter.g * parameter.r / (4.0 * PI * distance * distance);
+        float flux = parameter.r;// / (4.0 * PI * distance * distance);
         
         // the output parameters of a point sprite
         float xc, yc, r;
     
         // transform the vertex:
         // stereoproject a circle from a sphere to the plane
-        float sintpr = sin(theta + dtheta);
-        float costpr = cos(theta + dtheta);
-        float sintmr = sin(theta - dtheta);
-        float costmr = cos(theta - dtheta);
+        float sintpr = sin(theta + angdsize);
+        float costpr = cos(theta + angdsize);
+        float sintmr = sin(theta - angdsize);
+        float costmr = cos(theta - angdsize);
         float a = sintpr/(1.0-costpr);
         float b = sintmr/(1.0-costmr);
         r = -(a - b)/2.0;
@@ -249,7 +250,7 @@ void main(){
         {
             //if(usenormmap == 0 && newsize != 1.0){
             if(newsize != 1.0){
-#ifndef USEANALYTICALNORM
+#ifdef USEACTURALNORM
                 //use actual norm
                 normfac = calc_norm(vec2(xc, yc), newsize, dtheta);
 #else
