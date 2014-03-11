@@ -6,6 +6,7 @@
 //Author Lin F. Yang
 //01/18/2014
 /*****************************************************************************/
+#version 120
 
 //Constants
 #define PI 3.1415926535897932
@@ -269,14 +270,14 @@ void main(){
         gl_FrontColor = vec4(xc, yc, flux * normfac , dtheta);
 
         // textura
-        gl_TexCoord[0] = gl_MultiTexCoord0;
+        // gl_TexCoord[0] = gl_MultiTexCoord0;
     }else{
         // if the particles are in the upper sphere, remove this particle
         
         gl_PointSize = 1.0;  //point size
         newpos = vec4(0.0, 0.0, 0.0, 1.0);
         gl_FrontColor = vec4(0, 0, 0, 0);
-        gl_TexCoord[0] = gl_MultiTexCoord0;
+        // gl_TexCoord[0] = gl_MultiTexCoord0;
     }
     
     // calculate the final position of the particle on the screen

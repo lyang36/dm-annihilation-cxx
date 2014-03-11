@@ -32,8 +32,6 @@
 //#define IS_USE_NORM false
 
 // set to the edge of the OGL convas, to avoid edge problem
-#define CANVAS_MARGINE
-
 
 using namespace std;
 
@@ -72,19 +70,18 @@ void render::openGLInit(){
     if(!initialized){
         
         fshaderL = new fluxShader();
-        fbufferL = new fluxBuffer(windowSize, windowSize);
+        fbufferL = new buffer(WSIZE, WSIZE);
         fbufferL->setBuffer();
         
         fshaderU = new fluxShader();
-        fbufferU = new fluxBuffer(windowSize, windowSize);
+        fbufferU = new buffer(WSIZE, WSIZE);
         fbufferU->setBuffer();
         
         initialized = true;
     }
     
     //set the global pointers
-    WSIZE = windowSize;
-    POINTSIZE = pointSize;
+
     //CBL = cbufferL;
     //CBU = cbufferU;
     //CB = CBL;
@@ -118,8 +115,8 @@ render::render(Parameters &par, int imsize, int pointSize, int nside){
     
     nside_ = nside;
     
-    fluxmapL = new float[windowSize*windowSize];
-    fluxmapU = new float[windowSize*windowSize];
+    fluxmapL = new float[WSIZE*WSIZE];
+    fluxmapU = new float[WSIZE*WSIZE];
     healpixmap_ = new double[12 * nside * nside];
     
 
@@ -221,7 +218,7 @@ void render::init(){
     glGenTextures(1, &textureIni);
     glBindTexture(GL_TEXTURE_2D, textureIni);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F_ARB, windowSize, windowSize, 0,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F_ARB, WSIZE, WSIZE, 0,
              GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
     // set its parameters
@@ -315,10 +312,14 @@ void render::rend(RenderParticle * fluxdata, int numParts){
     drawFlux(fluxdata, numParts);
 }
 
+/*double render::_getpixflux(float theta, float phi){
+    
+}*/
+
 double render::_getpixflux(int x1, int y1, bool isupshere){
     //inside the circle
     double f11 = 0;
-    int d = round(windowSize / 2.0);
+    int d = floor(WSIZE / 2.0);
     double _r = sqrt((double)(x1 * x1 + y1 * y1)/(double)(d * d));
     if(x1 * x1 + y1 * y1 <= d * d){
         if(x1 < -(d)) x1 = -(d);
@@ -326,9 +327,9 @@ double render::_getpixflux(int x1, int y1, bool isupshere){
         if(y1 < -(d-1)) y1 = -(d-1);
         if(y1 > d) y1 = d;
         if(isupshere){
-            f11 = fluxmapU[(d - y1) * windowSize + x1 + d];
+            f11 = fluxmapU[(d - y1) * WSIZE + x1 + d];
         }else{
-            f11 = fluxmapL[(d - y1) * windowSize + x1 + d];
+            f11 = fluxmapL[(d - y1) * WSIZE + x1 + d];
         }
         f11 =  f11;// / (4.0 / (1 + _r*_r)/(1 + _r*_r));
     }else{
@@ -343,19 +344,19 @@ double render::_getpixflux(int x1, int y1, bool isupshere){
         double r1 = sin(_theta)/(1-cos(_theta));
         double _px = r1 * _cosphi;
         double _py = r1 * _sinphi;
-        int kx = floor((_px + 1.0) * windowSize / 2);
-        int ky = floor((_py + 1.0) * windowSize / 2);
+        int kx = floor((_px + 1.0) * WSIZE / 2);
+        int ky = floor((_py + 1.0) * WSIZE / 2);
         
         double _flux = 0;
         if(ky < 1) kx = 1;
-        if(ky > (int)windowSize) ky = windowSize;
+        if(ky > (int)WSIZE) ky = WSIZE;
         if(kx < 0) kx = 0;
-        if(kx > (int)windowSize - 1) kx = windowSize - 1;
+        if(kx > (int)WSIZE - 1) kx = WSIZE - 1;
         if(!isupshere){
-            _flux = fluxmapU[(windowSize - ky) * windowSize + kx];
+            _flux = fluxmapU[(WSIZE - ky) * WSIZE + kx];
         }
         else{
-            _flux = fluxmapL[(windowSize - ky) * windowSize + kx];
+            _flux = fluxmapL[(WSIZE - ky) * WSIZE + kx];
         }
         f11 = _flux;// / (4.0 / (1 + r1*r1)/(1 + r1*r1));
     }
@@ -367,7 +368,7 @@ double render::_getpixflux(int x1, int y1, bool isupshere){
 void render::convertToHealpixMap(){
     double * healmap;
     int nside = nside_;
-    //int pixss = windowSize * windowSize;
+    //int pixss = WSIZE * WSIZE;
     int npix = nside * nside * 12;
     healmap = healpixmap_;
 
@@ -402,7 +403,7 @@ void render::convertToHealpixMap(){
             isupshere = true;
         }
         
-        int d = round(windowSize / 2.0);
+        int d = floor(WSIZE / 2.0);
         //bilinear interpolation
         //double pr = sin(theta)/(1-cos(theta));
         double pr = sqrt(1 - this_vec.z * this_vec.z)/(1-this_vec.z);
@@ -419,21 +420,21 @@ void render::convertToHealpixMap(){
         double y1 = floor(yc);
         double y2 = y1 + 1;
         
-        double f11 = _getpixflux(round(x1), round(y1), isupshere);
-        double f12 = _getpixflux(round(x1), round(y2), isupshere);
-        double f21 = _getpixflux(round(x2), round(y1), isupshere);
-        double f22 = _getpixflux(round(x2), round(y2), isupshere);
+        double f11 = _getpixflux(floor(x1), floor(y1), isupshere);
+        double f12 = _getpixflux(floor(x1), floor(y2), isupshere);
+        double f21 = _getpixflux(floor(x2), floor(y1), isupshere);
+        double f22 = _getpixflux(floor(x2), floor(y2), isupshere);
         
         double flux = 0;
         double fr1 = (x2 - xc) / (x2 - x1) * f11 + (xc - x1) / (x2 - x1) * f21;
         double fr2 = (x2 - xc) / (x2 - x1) * f12 + (xc - x1) / (x2 - x1) * f22;
         flux = (y2 - yc) / (y2 - y1) * fr1 + (yc - y1) / (y2 - y1) * fr2;
         
-        healmap[i] = flux / (4.0 / (1 + pr*pr)/(1 + pr*pr)) * windowSize * windowSize / 4.0;
+        healmap[i] = flux / (4.0 / (1 + pr*pr)/(1 + pr*pr)) * WSIZE * WSIZE / 4.0;
         
         total_f += healmap[i];
         // * 
-        //4 * PI * (windowSize * windowSize) / npix;// / (4.0 / (1 + pr*pr)/(1 + pr*pr));;
+        //4 * PI * (WSIZE * WSIZE) / npix;// / (4.0 / (1 + pr*pr)/(1 + pr*pr));;
         // * params->FLUXFACTOR / 
         if(flux > _rffmax) _rffmax = flux;
         if(flux < _rffmin) _rffmin = flux;
@@ -447,8 +448,8 @@ void render::convertToHealpixMap(){
 }
 
 void render::clear(){
-    memset(fluxmapL, 0, windowSize * windowSize * sizeof(float));
-    memset(fluxmapU, 0, windowSize * windowSize * sizeof(float));
+    memset(fluxmapL, 0, WSIZE * WSIZE * sizeof(float));
+    memset(fluxmapU, 0, WSIZE * WSIZE * sizeof(float));
     
     fbufferL->bindBuf();
     {

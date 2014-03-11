@@ -40,12 +40,12 @@ private:
     //U for the upper sphere
     fluxShader * fshaderL;
 //    colorShader * cshaderL;
-    fluxBuffer * fbufferL;
+    buffer * fbufferL;
 //    colorBuffer * cbufferL;
     
     fluxShader * fshaderU;
 //    colorShader * cshaderU;
-    fluxBuffer * fbufferU;
+    buffer * fbufferU;
 //    colorBuffer * cbufferU;
     
     int nside_;
@@ -71,6 +71,9 @@ private:
     void readFluxMap();           //read map from the GPU
     
     double _getpixflux(int x1, int y1, bool isupshere);
+    
+    //get the flux at (x, y, z) on the sphere using linear interpolation
+    //double _getpixflux(double x, double y, double z);
     void convertToHealpixMap();
     
     double totalFlux;

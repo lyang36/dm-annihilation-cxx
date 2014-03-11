@@ -48,30 +48,4 @@ public:
     void readTex(void * tex);//read the data from the GPU
     void saveImg(string filename);  //save the picture to file
 };
-
-class fluxBuffer:public buffer{       //buffer for additing flux
-private:
-    GLuint normtex;          //map used to calculate map flux
-    int normMapRes;          //map resolution, in pixels.
-    int normPointSize;       //max point size of the point sprite, in pixels
-    void loadnorm();         //calculate normalization text or from file
-    string normfile;         // = "norm.dat";
-    float * normtextbuf;
-                             //bool isUseMap;
-public:
-    
-    void setNormTex();       //load norm and bind texture
-                             //(using the normalization map)
-    
-                             //set the normalization map resolution
-    void setMapRes(int m, int n);
-    
-                             //initialization
-    fluxBuffer(unsigned int w, unsigned int h);
-    
-    ~fluxBuffer();
-    
-};                 
-
-
 #endif

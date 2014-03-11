@@ -3,6 +3,8 @@
 // Author: Lin F. Yang
 // Date: 01/18/2014
 /*****************************************************************************/
+#version 120
+
 //Constants
 #define PI 3.1415926535897932
 
@@ -92,7 +94,7 @@ void main(){
 			float dtheta = gl_Color.a;
             
             // get current relative coordinates of the pixel inside the pointsprite
-			vec2 p = floor(newsize * vec2(gl_TexCoord[0].s,gl_TexCoord[0].t));
+			vec2 p = floor(newsize * vec2(gl_PointCoord.s, gl_PointCoord.t));
 			
             // because of each coordinates of the pixels
             // is the lower left corner, must be converted to be the
