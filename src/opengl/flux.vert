@@ -12,6 +12,9 @@
 #define PI 3.1415926535897932
 #define e32 4.4816890703380648226           //e^(3/2)
 
+// the margin to handle the boundary problem
+#define CANVASMARGIN 0.0
+
 #define USEACTURALNORM
 
 /******************************Parameters*************************************/
@@ -22,7 +25,7 @@ uniform mat3 rotmatrix;
 uniform vec3 opos;
 
 // the geometric factor defined as:
-// geometry factor {size(projected size of the equater), viewportsize, maxpointsize }
+// geometry factor {size(projected size of the equater), viewportsize, maxpointsize}
 // controlling the point sprite stuctures, determined by the
 // pointsprite features, supported by hardware
 uniform vec3 geofac;
@@ -36,6 +39,8 @@ uniform vec3 geofac;
 // vec4(newsize, npvec.x, npvec.y, npvec.z);
 varying vec4 particle;
 
+
+float ViewSize = geofac.y - CANVASMARGIN * 2.0;
 
 /*****************************************************************************/
 // calculate the profile of a particle
@@ -77,10 +82,8 @@ vec3 prev(in vec2 xy){
 
 //projected profile
 float profPRJ(in vec3 r1, in float dtheta){
-    //test
-    //return 1.0;
     
-    return (1.0 - r1.z) * (1.0 - r1.z) * profile(r1, dtheta);
+    return (1.0 - r1.z) * (1.0 - r1.z) * 1.0;//profile(r1, dtheta);
 }
 
 
@@ -89,7 +92,7 @@ float profPRJ(in vec3 r1, in float dtheta){
 float calc_norm(in vec2 svec, in float newsize, in float dtheta){
     float norm = 0.0;
     
-    vec2 coor = svec * geofac.y / 2.0;
+    vec2 coor = svec * ViewSize / 2.0;
     
     
     float x=0.0;
@@ -110,9 +113,11 @@ float calc_norm(in vec2 svec, in float newsize, in float dtheta){
             
             // calculate the actual coordinates on the projected plane
             vec2 xyp = xy * (newsize / 2.0) + coor;
-            vec2 xyr = xyp / (geofac.y / 2.0);
+            vec2 xyr = xyp / (ViewSize / 2.0);
             //float pr2 = dot(xyr, xyr);
             
+            if (u > 1.0)
+                continue;
             // calculate the flux
             norm += profPRJ(prev(xyr), dtheta);
             //4.0/(1.0+pr2)/(1.0+pr2) * profile(prev(xyr), dtheta);
@@ -209,11 +214,13 @@ void main(){
         yc = prho * sinphi;
         
         // calculate the point size
-        //float newsize = floor(r *geofac.y); ///!!!!!!!!!!!!!!!!
-        float newsize = ceil(r * geofac.y);
+        //float newsize = floor(r *ViewSize); ///!!!!!!!!!!!!!!!!
+        float newsize = ceil(r * ViewSize);
 
         // calculate the actuall point position on the screen
-        newpos = vec4(xc * geofac.x, yc * geofac.x, 0.0, 1.0);
+        newpos = vec4(xc * geofac.x * (ViewSize / geofac.y),
+                      yc * geofac.x * (ViewSize / geofac.y),
+                      0.0, 1.0);
         
         // if the point size been calculated is too large than the largest allowed,
         // clamp it to the limited value
@@ -253,7 +260,7 @@ void main(){
                 normfac = calc_norm(vec2(xc, yc), newsize, dtheta);
 #else
                 //use analytical norm
-				normfac = 1.0 / (geofac.y * geofac.y) / calc_norm1(dtheta) * 4.0;
+				normfac = 1.0 / (ViewSize * ViewSize) / calc_norm1(dtheta) * 4.0;
 #endif
             }else{
                 normfac = 1.0;

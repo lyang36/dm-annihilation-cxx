@@ -29,7 +29,8 @@
 #endif
 
 
-//#define IS_USE_NORM false
+// the margin to handle the boundary problem
+#define CANVASMARGIN 0.0
 
 // set to the edge of the OGL convas, to avoid edge problem
 
@@ -315,7 +316,8 @@ void render::rend(RenderParticle * fluxdata, int numParts){
 
 //get the pixel value
 double render::_getPixel(double x, double y, bool isUp){
-    isUp = _getTexCoord(x, y, (double) WSIZE / 2,  isUp);
+    double d = (double) WSIZE / 2 - CANVASMARGIN;
+    isUp = _getTexCoord(x, y, d, isUp);
     int ind = (int)floor((WSIZE / 2 - y - 1) * WSIZE + x + WSIZE / 2);
     
     if(isUp){
@@ -358,7 +360,7 @@ double render::_getpixflux(double x, double y, double z){
         z = - z;
     }
     
-    double d = WSIZE / 2.0;
+    double d = WSIZE / 2.0 - CANVASMARGIN;
     
     //bilinear interpolation
     double pxc = x/(1-z);
@@ -375,7 +377,9 @@ double render::_getpixflux(double x, double y, double z){
     
     double y2 = y1 + 1;
     
-    double f11, f12, f21, f22;
+    return _getPixel(x1, y1, isupshere);
+    
+    /*double f11, f12, f21, f22;
     f11 = _getPixel(x1, y1, isupshere);
     f12 = _getPixel(x1, y2, isupshere);
     f21 = _getPixel(x2, y1, isupshere);
@@ -385,7 +389,7 @@ double render::_getpixflux(double x, double y, double z){
     double fr1 = (x2 - xc) / (x2 - x1) * f11 + (xc - x1) / (x2 - x1) * f21;
     double fr2 = (x2 - xc) / (x2 - x1) * f12 + (xc - x1) / (x2 - x1) * f22;
     flux = (y2 - yc) / (y2 - y1) * fr1 + (yc - y1) / (y2 - y1) * fr2;
-    return flux;
+    return flux;*/
 }
 
 void render::convertToHealpixMap(){

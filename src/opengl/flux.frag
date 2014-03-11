@@ -5,6 +5,10 @@
 /*****************************************************************************/
 #version 120
 
+
+// the margin to handle the boundary problem
+#define CANVASMARGIN 0.0
+
 //Constants
 #define PI 3.1415926535897932
 
@@ -22,6 +26,8 @@ uniform sampler2D normmap;
 // vec4(newsize, npvec.x, npvec.y, npvec.z);
 varying vec4 particle;
 
+
+float ViewSize = geofac.y - CANVASMARGIN * 2.0;
 
 /*****************************************************************************/
 // calculate the profile of a particle
@@ -66,7 +72,7 @@ float profPRJ(in vec3 r1, in float dtheta){
     //test
     //return 1.0;
     
-    return (1.0 - r1.z) * (1.0 - r1.z) * profile(r1, dtheta);
+    return (1.0 - r1.z) * (1.0 - r1.z) * 1.0;//profile(r1, dtheta);
 }
 
 
@@ -80,7 +86,7 @@ void main(){
     vec2 xyc = gl_Color.rg;
     
     // convert the coordinate to actuall screen coordinates
-    vec2 coor = xyc *geofac.y / 2.0;
+    vec2 coor = xyc * ViewSize / 2.0;
     
     // initialize
     float flux = 0.0;
@@ -113,7 +119,7 @@ void main(){
 			
             // calculate the actuall coordinates of a pixel on the screen
 			vec2 xyp = p * (newsize / 2.0) + coor;
-			vec2 xyr = xyp / (geofac.y / 2.0);
+			vec2 xyr = xyp / (ViewSize / 2.0);
             
             // calculate the r-coordinates
 			float pr2 = dot(xyr, xyr);
