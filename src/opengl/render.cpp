@@ -312,9 +312,7 @@ void render::rend(RenderParticle * fluxdata, int numParts){
     drawFlux(fluxdata, numParts);
 }
 
-/*double render::_getpixflux(float theta, float phi){
-    
-}*/
+
 
 double render::_getpixflux(int x1, int y1, bool isupshere){
     //inside the circle
@@ -365,6 +363,83 @@ double render::_getpixflux(int x1, int y1, bool isupshere){
 }
 
 
+//get the pixel value
+double render::_getPixel(double x, double y, bool isUp){
+    isUp = _getTexCoord(x, y, (double) WSIZE / 2,  isUp);
+    if(!isUp){
+        return fluxmapU[(WSIZE / 2 - y - 1) * WSIZE + x + WSIZE / 2];
+    }
+    else{
+        return fluxmapL[(WSIZE / 2 - y - 1) * WSIZE + x + WSIZE / 2];
+    }
+}
+
+
+// return is up down
+bool render::_getTexCoord(double &x, double &y, double d, double isupdown){
+    double cx = (x + 0.5) / d;
+    double cy = (y + 0.5) / d;
+    if(cx*cx + cy*cy <= 1.0){
+        return isupdown;
+    }else{
+        double dnom = 1.0 + cx * cx + cy * cy;
+        double vx = (2 * cx) / dnom;
+        double vy = (2 * cy) / dnom;
+        double vz = (dnom - 2) / dnom;
+        vz = - vz;
+        cx = vx / (1 - vz);
+        cy = vy / (1 - vz);
+        
+        x = floor(cx * d);
+        y = floor(cy * d);
+        return !isupdown;
+    }
+};
+
+double render::_getpixflux(double x, double y, double z){
+    // calculate is upper or lower sphere
+    bool isupshere = false;
+    if(z > 0.0){
+        isupshere = true;
+        
+        // reverse the z-direction
+        z = - z;
+    }
+    
+    double d = floor(WSIZE / 2.0);
+    
+    //bilinear interpolation
+    double pxc = x/(1-z);
+    double pyc = y/(1-z);
+    
+    double xc = (pxc) * d;
+    double yc = (pyc) * d;
+    
+    double x1 = floor(xc);
+    double cx1 = (x1 + 0.5) / d;
+    
+    double x2 = x1 + 1;
+    double cx2 = (x2 + 0.5) / d;
+    
+    double y1 = floor(yc);
+    double cy1 = (y1 + 0.5) / d;
+    
+    double y2 = y1 + 1;
+    double cy2 = (y2 + 0.5) / d;
+    
+    double f11, f12, f21, f22;
+    f11 = _getPixel(x1, y1);
+    f12 = _getPixel(x1, y2);
+    f21 = _getPixel(x2, y1);
+    f22 = _getPixel(x2, y2);
+    
+    double flux;
+    double fr1 = (cx2 - pxc) / (cx2 - cx1) * f11 + (pxc - cx1) / (cx2 - cx1) * f21;
+    double fr2 = (cx2 - pxc) / (cx2 - cx1) * f12 + (pxc - cx1) / (cx2 - cx1) * f22;
+    flux = (cy2 - pyc) / (cy2 - cy1) * fr1 + (pyc - cy1) / (cy2 - cy1) * fr2;
+    return flux;
+}
+
 void render::convertToHealpixMap(){
     double * healmap;
     int nside = nside_;
@@ -396,7 +471,11 @@ void render::convertToHealpixMap(){
         //make a rotation on y to match the data stored in memory
         this_vec.x = - this_vec.x;
         
-        bool isupshere = false;
+        double pr = sqrt(1 - this_vec.z * this_vec.z)/(1-this_vec.z);
+        double flux = _getpixflux(this_vec.x, this_vec.y, this_vec.z);
+        healmap[i] = flux / (4.0 / (1 + pr*pr)/(1 + pr*pr)) * WSIZE * WSIZE / 4.0;
+        
+        /*bool isupshere = false;
         if(this_vec.z > 0){//theta < PI/2){
             //theta = PI - theta;
             this_vec.z = - this_vec.z;
@@ -420,10 +499,10 @@ void render::convertToHealpixMap(){
         double y1 = floor(yc);
         double y2 = y1 + 1;
         
-        double f11 = _getpixflux(floor(x1), floor(y1), isupshere);
-        double f12 = _getpixflux(floor(x1), floor(y2), isupshere);
-        double f21 = _getpixflux(floor(x2), floor(y1), isupshere);
-        double f22 = _getpixflux(floor(x2), floor(y2), isupshere);
+        double f11 = _getpixflux((int)floor(x1), (int)floor(y1), isupshere);
+        double f12 = _getpixflux((int)floor(x1), (int)floor(y2), isupshere);
+        double f21 = _getpixflux((int)floor(x2), (int)floor(y1), isupshere);
+        double f22 = _getpixflux((int)floor(x2), (int)floor(y2), isupshere);
         
         double flux = 0;
         double fr1 = (x2 - xc) / (x2 - x1) * f11 + (xc - x1) / (x2 - x1) * f21;
@@ -437,13 +516,16 @@ void render::convertToHealpixMap(){
         //4 * PI * (WSIZE * WSIZE) / npix;// / (4.0 / (1 + pr*pr)/(1 + pr*pr));;
         // * params->FLUXFACTOR / 
         if(flux > _rffmax) _rffmax = flux;
-        if(flux < _rffmin) _rffmin = flux;
+        if(flux < _rffmin) _rffmin = flux;*/
+        
+        
+        
         
     }
-    float _ft = 0;
+    //float _ft = 0;
     for(int i = 0; i < npix; i++){
-        healmap[i] = healmap[i] *  par_->map.dOmega;//params->FLUXFACTOR;// / total_f * totalFlux * params->FLUXFACTOR /domega;
-        _ft += healmap[i];// / total_f * totalFlux * params->FLUXFACTOR /domega;;
+        healmap[i] = healmap[i] *  par_->map.dOmega;
+        //_ft += healmap[i];
     }
 }
 

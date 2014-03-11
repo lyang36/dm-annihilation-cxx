@@ -27,7 +27,7 @@ varying vec4 particle;
 // calculate the profile of a particle
 // using the position vector r1, and angular size dtheta
 // the position vector is a point on the unit sphere
-float profile(vec3 r1,float dtheta){
+float profile(in vec3 r1, in float dtheta){
     // get the particle position on the sphere
     vec3 r0 = vec3(particle.gba);
     
@@ -48,26 +48,27 @@ float profile(vec3 r1,float dtheta){
     // calculate the final value
     float d2 = (t2 / dtheta / dtheta);
     
-    /*if(d2 > 1.0){
-        return 0.0;
-    }*/
+    //if(d2 > 1.0){
+    //    return 0.0;
+    //}
     return exp(- 1.5 * d2);
 }
 
 // reverse stereoprojection, given a point on the tangential plane, output the point on the sphere
-vec3 prev(vec2 xy){
+vec3 prev(in vec2 xy){
     float r2 = xy.x*xy.x + xy.y*xy.y;
     return vec3(2.0 * xy.x/(1.0 + r2), 2.0 * xy.y/(1.0 + r2), (r2 - 1.0)/(r2 + 1.0));
 }
 
 
 //projected profile
-float profPRJ(vec3 r1, float dtheta){
+float profPRJ(in vec3 r1, in float dtheta){
     //test
     //return 1.0;
     
     return (1.0 - r1.z) * (1.0 - r1.z) * profile(r1, dtheta);
 }
+
 
 
 void main(){

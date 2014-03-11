@@ -73,7 +73,10 @@ private:
     double _getpixflux(int x1, int y1, bool isupshere);
     
     //get the flux at (x, y, z) on the sphere using linear interpolation
-    //double _getpixflux(double x, double y, double z);
+    double _getpixflux(double x, double y, double z);
+    double _getPixel(double x, double y, bool isUp);
+    bool _getTexCoord(double &x, double &y, double d, double isupdown);
+    
     void convertToHealpixMap();
     
     double totalFlux;

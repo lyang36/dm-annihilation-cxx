@@ -41,7 +41,7 @@ varying vec4 particle;
 // calculate the profile of a particle
 // using the position vector r1, and angular size dtheta
 // the position vector is a point on the unit sphere
-float profile(vec3 r1,float dtheta){
+float profile(in vec3 r1, in float dtheta){
     // get the particle position on the sphere
     vec3 r0 = vec3(particle.gba);
     
@@ -69,14 +69,14 @@ float profile(vec3 r1,float dtheta){
 }
 
 // reverse stereoprojection, given a point on the tangential plane, output the point on the sphere
-vec3 prev(vec2 xy){
+vec3 prev(in vec2 xy){
     float r2 = xy.x*xy.x + xy.y*xy.y;
     return vec3(2.0 * xy.x/(1.0 + r2), 2.0 * xy.y/(1.0 + r2), (r2 - 1.0)/(r2 + 1.0));
 }
 
 
 //projected profile
-float profPRJ(vec3 r1, float dtheta){
+float profPRJ(in vec3 r1, in float dtheta){
     //test
     //return 1.0;
     
@@ -86,7 +86,7 @@ float profPRJ(vec3 r1, float dtheta){
 
 // calculate the normalization of a particle by counting all the pixels
 // this is very accurate, but very slow to get the result
-float calc_norm(vec2 svec, float newsize, float dtheta){
+float calc_norm(in vec2 svec, in float newsize, in float dtheta){
     float norm = 0.0;
     
     vec2 coor = svec * geofac.y / 2.0;
@@ -122,7 +122,7 @@ float calc_norm(vec2 svec, float newsize, float dtheta){
 }
 
 // use an analytical method to calculate the normalization, fast, but not very accurate
-float calc_norm1(float theta0){
+float calc_norm1(in float theta0){
     return 2.0*(-1.0 + e32) * PI * theta0 * theta0 / (3.0 * e32) -
         (PI * (-5.0 + 2.0 * e32) * theta0 * theta0 * theta0 * theta0) / (27.0 * e32)
         +(PI * (-29.0 + 8.0 * e32) * PI * theta0 * theta0 * theta0 * theta0 * theta0 * theta0) / ( 1620.0 * e32);
@@ -171,8 +171,8 @@ void main(){
     float theta = acos(costheta);      //0.955
     
     
-    
-    if((theta > (PI / 2.0) || (theta + angdsize) >= PI / 2.0)
+    // restrict the point is inside the circle
+    if((theta > (PI / 2.0 - 0.1) || (theta + angdsize) > (PI / 2.0 - 0.1))
        && (angdsize < PI / 2.0))
     {   // if the particle is in the lower sphere, do the following
         // also ignore those particles that are too large
@@ -213,7 +213,7 @@ void main(){
         
         // calculate the point size
         //float newsize = floor(r *geofac.y); ///!!!!!!!!!!!!!!!!
-        float newsize = ceil(r *geofac.y);
+        float newsize = ceil(r * geofac.y);
 
         // calculate the actuall point position on the screen
         newpos = vec4(xc * geofac.x, yc * geofac.x, 0.0, 1.0);
@@ -269,15 +269,12 @@ void main(){
         // the color is used to transfor the value of the center and norm
         gl_FrontColor = vec4(xc, yc, flux * normfac , dtheta);
 
-        // textura
-        // gl_TexCoord[0] = gl_MultiTexCoord0;
     }else{
         // if the particles are in the upper sphere, remove this particle
         
         gl_PointSize = 1.0;  //point size
         newpos = vec4(0.0, 0.0, 0.0, 1.0);
         gl_FrontColor = vec4(0, 0, 0, 0);
-        // gl_TexCoord[0] = gl_MultiTexCoord0;
     }
     
     // calculate the final position of the particle on the screen
