@@ -366,11 +366,13 @@ double render::_getpixflux(int x1, int y1, bool isupshere){
 //get the pixel value
 double render::_getPixel(double x, double y, bool isUp){
     isUp = _getTexCoord(x, y, (double) WSIZE / 2,  isUp);
-    if(!isUp){
-        return fluxmapU[(WSIZE / 2 - y - 1) * WSIZE + x + WSIZE / 2];
+    int ind = (int)floor((WSIZE / 2 - y - 1) * WSIZE + x + WSIZE / 2);
+    
+    if(isUp){
+        return fluxmapU[ind];
     }
     else{
-        return fluxmapL[(WSIZE / 2 - y - 1) * WSIZE + x + WSIZE / 2];
+        return fluxmapL[ind];
     }
 }
 
@@ -406,7 +408,7 @@ double render::_getpixflux(double x, double y, double z){
         z = - z;
     }
     
-    double d = floor(WSIZE / 2.0);
+    double d = WSIZE / 2.0;
     
     //bilinear interpolation
     double pxc = x/(1-z);
@@ -416,27 +418,23 @@ double render::_getpixflux(double x, double y, double z){
     double yc = (pyc) * d;
     
     double x1 = floor(xc);
-    double cx1 = (x1 + 0.5) / d;
     
     double x2 = x1 + 1;
-    double cx2 = (x2 + 0.5) / d;
     
     double y1 = floor(yc);
-    double cy1 = (y1 + 0.5) / d;
     
     double y2 = y1 + 1;
-    double cy2 = (y2 + 0.5) / d;
     
     double f11, f12, f21, f22;
-    f11 = _getPixel(x1, y1);
-    f12 = _getPixel(x1, y2);
-    f21 = _getPixel(x2, y1);
-    f22 = _getPixel(x2, y2);
+    f11 = _getPixel(x1, y1, isupshere);
+    f12 = _getPixel(x1, y2, isupshere);
+    f21 = _getPixel(x2, y1, isupshere);
+    f22 = _getPixel(x2, y2, isupshere);
     
-    double flux;
-    double fr1 = (cx2 - pxc) / (cx2 - cx1) * f11 + (pxc - cx1) / (cx2 - cx1) * f21;
-    double fr2 = (cx2 - pxc) / (cx2 - cx1) * f12 + (pxc - cx1) / (cx2 - cx1) * f22;
-    flux = (cy2 - pyc) / (cy2 - cy1) * fr1 + (pyc - cy1) / (cy2 - cy1) * fr2;
+    double flux = 0;
+    double fr1 = (x2 - xc) / (x2 - x1) * f11 + (xc - x1) / (x2 - x1) * f21;
+    double fr2 = (x2 - xc) / (x2 - x1) * f12 + (xc - x1) / (x2 - x1) * f22;
+    flux = (y2 - yc) / (y2 - y1) * fr1 + (yc - y1) / (y2 - y1) * fr2;
     return flux;
 }
 
@@ -470,12 +468,17 @@ void render::convertToHealpixMap(){
 
         //make a rotation on y to match the data stored in memory
         this_vec.x = - this_vec.x;
-        
-        double pr = sqrt(1 - this_vec.z * this_vec.z)/(1-this_vec.z);
         double flux = _getpixflux(this_vec.x, this_vec.y, this_vec.z);
-        healmap[i] = flux / (4.0 / (1 + pr*pr)/(1 + pr*pr)) * WSIZE * WSIZE / 4.0;
         
-        /*bool isupshere = false;
+        if(this_vec.z > 0){
+            this_vec.z = - this_vec.z;
+        }
+        double pr = sqrt(1 - this_vec.z * this_vec.z)/(1-this_vec.z);
+        healmap[i] = flux / (4.0 / (1 + pr*pr)/(1 + pr*pr))
+            * WSIZE * WSIZE / 4.0 *  par_->map.dOmega;;
+        
+        /*
+        bool isupshere = false;
         if(this_vec.z > 0){//theta < PI/2){
             //theta = PI - theta;
             this_vec.z = - this_vec.z;
@@ -504,6 +507,11 @@ void render::convertToHealpixMap(){
         double f21 = _getpixflux((int)floor(x2), (int)floor(y1), isupshere);
         double f22 = _getpixflux((int)floor(x2), (int)floor(y2), isupshere);
         
+        f11 = _getPixel(x1, y1, isupshere);
+        f12 = _getPixel(x1, y2, isupshere);
+        f21 = _getPixel(x2, y1, isupshere);
+        f22 = _getPixel(x2, y2, isupshere);
+        
         double flux = 0;
         double fr1 = (x2 - xc) / (x2 - x1) * f11 + (xc - x1) / (x2 - x1) * f21;
         double fr2 = (x2 - xc) / (x2 - x1) * f12 + (xc - x1) / (x2 - x1) * f22;
@@ -516,17 +524,17 @@ void render::convertToHealpixMap(){
         //4 * PI * (WSIZE * WSIZE) / npix;// / (4.0 / (1 + pr*pr)/(1 + pr*pr));;
         // * params->FLUXFACTOR / 
         if(flux > _rffmax) _rffmax = flux;
-        if(flux < _rffmin) _rffmin = flux;*/
+        if(flux < _rffmin) _rffmin = flux;
         
-        
+        */
         
         
     }
     //float _ft = 0;
-    for(int i = 0; i < npix; i++){
-        healmap[i] = healmap[i] *  par_->map.dOmega;
+    //for(int i = 0; i < npix; i++){
+    //    healmap[i] = healmap[i] *  par_->map.dOmega;
         //_ft += healmap[i];
-    }
+    //}
 }
 
 void render::clear(){
