@@ -114,16 +114,20 @@ float calc_norm(in vec2 svec, in float newsize, in float dtheta){
             // calculate the actual coordinates on the projected plane
             vec2 xyp = xy * (newsize / 2.0) + coor;
             vec2 xyr = xyp / (ViewSize / 2.0);
-            //float pr2 = dot(xyr, xyr);
+            float pr2 = dot(xyr, xyr);
             
-            if (u > 1.0)
+            if (pr2 > 1.0)
                 continue;
+            
             // calculate the flux
             norm += profPRJ(prev(xyr), dtheta);
             //4.0/(1.0+pr2)/(1.0+pr2) * profile(prev(xyr), dtheta);
         }
     }
-    return 1.0/norm;
+    if(norm == 0.0){
+        norm = 1.0;
+    }
+    return norm;
 }
 
 // use an analytical method to calculate the normalization, fast, but not very accurate
@@ -131,6 +135,37 @@ float calc_norm1(in float theta0){
     return 2.0*(-1.0 + e32) * PI * theta0 * theta0 / (3.0 * e32) -
         (PI * (-5.0 + 2.0 * e32) * theta0 * theta0 * theta0 * theta0) / (27.0 * e32)
         +(PI * (-29.0 + 8.0 * e32) * PI * theta0 * theta0 * theta0 * theta0 * theta0 * theta0) / ( 1620.0 * e32);
+}
+
+
+// geometry transformation of a circle
+void geoTrans(in float cosphi, in float sinphi,
+              in float theta, in float angdsize,
+              inout float xc, inout float yc, inout float r,
+              inout float newsize){
+    // transform the vertex:
+    // stereoproject a circle from a sphere to the plane
+    float sintpr = sin(theta + angdsize);
+    float costpr = cos(theta + angdsize);
+    float sintmr = sin(theta - angdsize);
+    float costmr = cos(theta - angdsize);
+    float a = sintpr/(1.0-costpr);
+    float b = sintmr/(1.0-costmr);
+    r = -(a - b)/2.0;
+    float prho = (a + b)/2.0;
+    
+    xc = prho * cosphi;
+    yc = prho * sinphi;
+    
+    // calculate the point size
+    newsize = ceil(r * ViewSize);
+    
+    // if the point size been calculated is too large than the largest allowed,
+    // clamp it to the limited value
+    if(newsize > geofac.z){
+        newsize = geofac.z;
+    }
+    
 }
 
 void main(){
@@ -198,38 +233,15 @@ void main(){
         float flux = parameter.r;// / (4.0 * PI * distance * distance);
         
         // the output parameters of a point sprite
-        float xc, yc, r;
-    
-        // transform the vertex:
-        // stereoproject a circle from a sphere to the plane
-        float sintpr = sin(theta + angdsize);
-        float costpr = cos(theta + angdsize);
-        float sintmr = sin(theta - angdsize);
-        float costmr = cos(theta - angdsize);
-        float a = sintpr/(1.0-costpr);
-        float b = sintmr/(1.0-costmr);
-        r = -(a - b)/2.0;
-        float prho = (a + b)/2.0;
-        xc = prho * cosphi;
-        yc = prho * sinphi;
-        
-        // calculate the point size
-        //float newsize = floor(r *ViewSize); ///!!!!!!!!!!!!!!!!
-        float newsize = ceil(r * ViewSize);
+        float xc, yc, r, newsize;
+                
+        geoTrans(cosphi, sinphi, theta,
+                 angdsize, xc, yc, r, newsize);
 
         // calculate the actuall point position on the screen
         newpos = vec4(xc * geofac.x * (ViewSize / geofac.y),
                       yc * geofac.x * (ViewSize / geofac.y),
                       0.0, 1.0);
-        
-        // if the point size been calculated is too large than the largest allowed,
-        // clamp it to the limited value
-        if(newsize > geofac.z){
-            dsize = geofac.z / newsize * r;
-            newsize = geofac.z;
-        }else{
-            dsize = r;
-        }
         
         // if the point size is less than 1, asign it to be 1
         if(newsize < 1.0){
@@ -257,7 +269,7 @@ void main(){
             if(newsize != 1.0){
 #ifdef USEACTURALNORM
                 //use actual norm
-                normfac = calc_norm(vec2(xc, yc), newsize, dtheta);
+                normfac = 1.0 / calc_norm(vec2(xc, yc), newsize, dtheta);
 #else
                 //use analytical norm
 				normfac = 1.0 / (ViewSize * ViewSize) / calc_norm1(dtheta) * 4.0;
