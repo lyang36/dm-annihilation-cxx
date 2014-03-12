@@ -15,7 +15,7 @@
 // the margin to handle the boundary problem
 #define CANVASMARGIN 0.0
 
-#define USEACTURALNORM
+//#define USE_ANALYTICAL_NORM
 
 /******************************Parameters*************************************/
 // rotation matrix
@@ -128,10 +128,10 @@ float calc_norm(in vec2 svec, in float newsize, in float dtheta){
 }
 
 // use an analytical method to calculate the normalization, fast, but not very accurate
-float calc_norm1(in float theta0){
-    return 2.0*(-1.0 + e32) * PI * theta0 * theta0 / (3.0 * e32) -
-        (PI * (-5.0 + 2.0 * e32) * theta0 * theta0 * theta0 * theta0) / (27.0 * e32)
-        +(PI * (-29.0 + 8.0 * e32) * PI * theta0 * theta0 * theta0 * theta0 * theta0 * theta0) / ( 1620.0 * e32);
+float calc_norm_approx(in float theta0){
+    float a = -21829.1;
+    float b = 153297.0;
+    return (a * theta0 + b) * theta0 * theta0;
 }
 
 
@@ -264,29 +264,18 @@ void main(){
         {
             //if(usenormmap == 0 && newsize != 1.0){
             if(newsize != 1.0){
-#ifdef USEACTURALNORM
-                float norm0 = calc_norm(vec2(xc, yc), newsize, dtheta);
-                float norm1 = 0.0;
-                /*if((theta < (PI / 2.0) || (theta - angdsize) < (PI / 2.0))){
-                    float xc1, yc1, r1, newsize1;
-                    geoTrans(cosphi, sinphi, PI - theta,
-                             angdsize, xc1, yc1, r1, newsize1);
-                    particle.a = - particle.a;
-                    norm1 = calc_norm(vec2(xc1, yc1), newsize1, dtheta);
-                    particle.a = - particle.a;
-                }*/
+#ifndef USE_ANALYTICAL_NORM
+                //use actual norm
+                float normf = calc_norm(vec2(xc, yc), newsize, dtheta);
+#else
+                //use analytical norm
+                float normf = calc_norm_approx(dtheta);
+#endif
                 
-                float normf = (norm0 + norm1);
                 if(normf == 0.0){
                     normf = 1.0;
                 }
-                
-                //use actual norm
                 normfac = 1.0 / normf;
-#else
-                //use analytical norm
-				normfac = 1.0 / (ViewSize * ViewSize) / calc_norm1(dtheta) * 4.0;
-#endif
             }else{
                 normfac = 1.0;
             }
