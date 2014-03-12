@@ -250,7 +250,7 @@ void render::init(){
     //printf("min and max point size %f, %f\n", sizes[0], sizes[1]);
 
     //must be this
-    glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_UPPER_LEFT);
+    glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT);
 
     glPointSize(pointSize);
 }

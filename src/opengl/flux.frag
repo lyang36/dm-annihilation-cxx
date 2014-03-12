@@ -71,7 +71,7 @@ float profPRJ(in vec3 r1, in float dtheta){
     //test
     //return 1.0;
     
-    return (1.0 - r1.z) * (1.0 - r1.z) * 1.0;//profile(r1, dtheta);
+    return (1.0 - r1.z) * (1.0 - r1.z) * profile(r1, dtheta);
 }
 
 
@@ -121,16 +121,14 @@ void main(){
 			vec2 xyr = xyp / (ViewSize / 2.0);
             
             // get the actual coordinates
-            //vec2 xyrtr = (vec2(gl_FragCoord.x, gl_FragCoord.y) / (geofac.y / 2.0) - 1.0);
-            
-            //gl_FragCoord.x;
+            //xyr = (gl_FragCoord.xy / (geofac.y / 2.0) - 1.0);
             
             // calculate the r-coordinates
 			float pr2 = dot(xyr, xyr);
             
             // test
-            if (pr2 > 0.5)
-                discard;
+            //if (pr2 > 0.5)
+            //    discard;
             
             // use the actual norm
 			flux = fluxfac  * profPRJ(prev(xyr), dtheta);

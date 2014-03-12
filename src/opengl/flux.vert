@@ -82,8 +82,8 @@ vec3 prev(in vec2 xy){
 
 //projected profile
 float profPRJ(in vec3 r1, in float dtheta){
-    return 1.0;
-    //return (1.0 - r1.z) * (1.0 - r1.z) * 1.0;//profile(r1, dtheta);
+    //return 1.0;
+    return (1.0 - r1.z) * (1.0 - r1.z) * profile(r1, dtheta);
 }
 
 
@@ -116,8 +116,8 @@ float calc_norm(in vec2 svec, in float newsize, in float dtheta){
             vec2 xyr = xyp / (ViewSize / 2.0);
             float pr2 = dot(xyr, xyr);
             
-            if (pr2 > 1.0)
-                continue;
+            //if (pr2 > 1.0)
+            //    continue;
             
             // calculate the flux
             norm += profPRJ(prev(xyr), dtheta);
@@ -267,14 +267,14 @@ void main(){
 #ifdef USEACTURALNORM
                 float norm0 = calc_norm(vec2(xc, yc), newsize, dtheta);
                 float norm1 = 0.0;
-                if((theta < (PI / 2.0) || (theta - angdsize) < (PI / 2.0))){
+                /*if((theta < (PI / 2.0) || (theta - angdsize) < (PI / 2.0))){
                     float xc1, yc1, r1, newsize1;
                     geoTrans(cosphi, sinphi, PI - theta,
                              angdsize, xc1, yc1, r1, newsize1);
                     particle.a = - particle.a;
                     norm1 = calc_norm(vec2(xc1, yc1), newsize1, dtheta);
                     particle.a = - particle.a;
-                }
+                }*/
                 
                 float normf = (norm0 + norm1);
                 if(normf == 0.0){
@@ -282,7 +282,7 @@ void main(){
                 }
                 
                 //use actual norm
-                normfac = 1.0;// / normf;
+                normfac = 1.0 / normf;
 #else
                 //use analytical norm
 				normfac = 1.0 / (ViewSize * ViewSize) / calc_norm1(dtheta) * 4.0;

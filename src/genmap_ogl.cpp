@@ -96,7 +96,7 @@ void MapGenerator::start(){
 			fluxes = getflux(par_, current_part, distances);
             
             //test
-            fluxes /= (distances * distances);
+            //fluxes /= (distances * distances * 4.0 * PI);
             //printf("%e\n", fluxes);
             
             renderParts[i].x = current_part.posx;
