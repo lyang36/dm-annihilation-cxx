@@ -8,9 +8,11 @@
 struct RenderParticle{
     float x, y, z;
     
-    //final flux is calculated  as densityfac1 * densityfac2 / 4*pi*r^2
-    float densityfac1;
-    float densityfac2;      //angular radius
+    //final flux is calculated  as fluxfac1 * fluxfac2 / 4*pi*r^2
+    float fluxfac1;
+    float fluxfac2;
+    
+     //smooth radius
     float hsmooth;
 };
 

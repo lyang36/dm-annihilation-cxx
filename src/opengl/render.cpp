@@ -30,6 +30,7 @@
 
 
 // the margin to handle the boundary problem
+// current of no use
 #define CANVASMARGIN 0.0
 
 // set to the edge of the OGL convas, to avoid edge problem
@@ -51,19 +52,19 @@ void render::openGLInit(){
     glutInitWindowSize(WSIZE, WSIZE);
     glutCreateWindow("Dark Matter GammaRay rendering!");
     
-    // initialize glut
+    // initialize glew
     glewExperimental = GL_TRUE;
     glewInit();
     
     // hide the window
     glutHideWindow();
     
-    
     // check whether GLSL is supported
-    if (GLEW_ARB_vertex_shader && GLEW_ARB_fragment_shader)
-		printf("Ready for GLSL\n");
+    if (GLEW_ARB_vertex_shader && GLEW_ARB_fragment_shader){
+		//fprintf(stderr, "Ready for GLSL\n");
+    }
     else {
-		printf("No GLSL support\n");
+		fprintf(stderr, "No GLSL support\n");
 		exit(1);
     }
     
@@ -89,9 +90,6 @@ void render::openGLInit(){
     glBlendFunc (GL_ONE,GL_ONE);    //blending
     
 }
-
-
-
 
 render::render(Parameters &par, int imsize, int pointSize, int nside){
     par_ = & par;
@@ -223,48 +221,40 @@ void render::init(){
 }
 
 void render::drawFlux(RenderParticle * fluxdata, int numParts){
-
-        GLfloat * vetexarray = (GLfloat *) fluxdata;
-        glEnableClientState (GL_VERTEX_ARRAY);
-        glEnableClientState (GL_COLOR_ARRAY);
-        glColorPointer (3, GL_FLOAT, 6*sizeof(GLfloat), &(vetexarray[3]));
-        glVertexPointer (3, GL_FLOAT, 6*sizeof(GLfloat), &(vetexarray[0]));
-
-        //test
-        //for(int i = 0; i < numParts)
-        //printf("%e %e %e %e %e %e\n", vetexarray[0], vetexarray[1], vetexarray[2],
-        //                vetexarray[3], vetexarray[4], vetexarray[5]);
     
-        //lower sphere
-        fbufferL->bindBuf();
-        fshaderL->begin();
-        {
-            glDrawArrays(GL_POINTS, 0, numParts);
-        }
-        fshaderL->end();
-        fbufferL->unbindBuf();
-        
-        //upper sphere
-        fbufferU->bindBuf();
-        fshaderU->begin();
-        {
-            glDrawArrays(GL_POINTS, 0, numParts);
-        }
-        fshaderU->end();
-        fbufferU->unbindBuf();
-        
-        glDisableClientState (GL_VERTEX_ARRAY);
-        glDisableClientState (GL_COLOR_ARRAY);
+    // set up the data
+    GLfloat * vetexarray = (GLfloat *) fluxdata;
+    glEnableClientState (GL_VERTEX_ARRAY);
+    glEnableClientState (GL_COLOR_ARRAY);
+    glColorPointer (3, GL_FLOAT, 6*sizeof(GLfloat), &(vetexarray[3]));
+    glVertexPointer (3, GL_FLOAT, 6*sizeof(GLfloat), &(vetexarray[0]));
     
-
-
-    glBindTexture(GL_TEXTURE_2D, 0);
+    // lower sphere
+    fbufferL->bindBuf();
+    fshaderL->begin();
+    {
+        glDrawArrays(GL_POINTS, 0, numParts);
+    }
+    fshaderL->end();
+    fbufferL->unbindBuf();
+    
+    //upper sphere
+    fbufferU->bindBuf();
+    fshaderU->begin();
+    {
+        glDrawArrays(GL_POINTS, 0, numParts);
+    }
+    fshaderU->end();
+    fbufferU->unbindBuf();
+    
+    glDisableClientState (GL_VERTEX_ARRAY);
+    glDisableClientState (GL_COLOR_ARRAY);
 
     glPopAttrib();
 }
- 
+
 void render::readFluxMap(){
-    glPixelStorei(GL_PACK_ALIGNMENT, 4);  
+    glPixelStorei(GL_PACK_ALIGNMENT, 4);
 
 
     fbufferL -> bindTex();
@@ -296,7 +286,7 @@ double render::_getPixel(double x, double y, bool isUp){
 }
 
 
-// return is up down
+// return is updown, get the texture coordinate
 bool render::_getTexCoord(double &x, double &y, double d, double isupdown){
     double cx = (x + 0.5) / d;
     double cy = (y + 0.5) / d;
@@ -317,6 +307,7 @@ bool render::_getTexCoord(double &x, double &y, double d, double isupdown){
     }
 };
 
+// return the flux of a vector direction
 double render::_getpixflux(double x, double y, double z){
     // calculate is upper or lower sphere
     bool isupshere = false;
@@ -359,6 +350,7 @@ double render::_getpixflux(double x, double y, double z){
     return flux;
 }
 
+// convert to a Healpix Map
 void render::convertToHealpixMap(){
     double * healmap;
     int nside = nside_;
@@ -391,6 +383,8 @@ void render::convertToHealpixMap(){
     }
 }
 
+
+// clear the buffer
 void render::clear(){
     memset(fluxmapL, 0, WSIZE * WSIZE * sizeof(float));
     memset(fluxmapU, 0, WSIZE * WSIZE * sizeof(float));
@@ -423,5 +417,6 @@ float* render::getUpSphere(){
     return fluxmapU;
 }
 float* render::getLowerSphere(){
+    readFluxMap();
     return fluxmapL;
 }

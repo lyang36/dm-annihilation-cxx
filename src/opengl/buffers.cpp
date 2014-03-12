@@ -30,7 +30,7 @@ void buffer::checkbuffer(){
     
     if(status != GL_FRAMEBUFFER_COMPLETE){
         fboUsed = false;
-        printf("No frame buffer!\n");
+        fprintf(stderr, "No frame buffer!\n");
         exit(-1);
     }
 }
@@ -114,7 +114,7 @@ void buffer::genBuffer(){
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
                               GL_RENDERBUFFER, rboId);
     //unbindBuf();
-    printf("Buffer generated!\n");
+    //printf("Buffer generated!\n");
     //printf("frame: %d, render: %d \n", fboId, rboId);
 }
 
@@ -135,12 +135,9 @@ void buffer::unbindBuf(){
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-// TODO
-void buffer::readTex(void* tex){
-    
+void buffer::readTex(void* tex, GLint intFormat){
+    this -> bindTex();
+    glGetTexImage(GL_TEXTURE_2D,0,intFormat,GL_FLOAT,tex);
+    this -> unbindTex();
 }
 
-// TODO
-void buffer::saveImg(string filename){
-    
-}

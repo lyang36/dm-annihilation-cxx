@@ -105,8 +105,8 @@ void MapGenerator::start(){
             
             //printf("First: %f %f %f\n", renderParts[i].x, renderParts[i].y, renderParts[i].z);
             
-            renderParts[i].densityfac1 = fluxes;
-            renderParts[i].densityfac2 = 1.0;
+            renderParts[i].fluxfac1 = fluxes;
+            renderParts[i].fluxfac2 = 1.0;
             renderParts[i].hsmooth = current_part.hsmooth;
 			
 		}

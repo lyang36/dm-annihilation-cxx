@@ -31,19 +31,20 @@ public:
         return good;
     };
     
+    //start shader
     void begin(){
         shader->begin();
-    };           //start shader
+    };
     
+    //end shader
     void end(){
         shader->end();
-    };//end shader
+    };
     
     void setfile(string v, string f){
         vfile =v;
         ffile =f;
     };
-    
     
 };
 
@@ -66,11 +67,9 @@ public:
     
     void setrotmatrix(Parameters &pars, bool updown);
     
-    
     void setIsUseRotm(bool isrotm){
         isRotm = isrotm;
     };
-    
     
     //load shader from file
     fluxShader();

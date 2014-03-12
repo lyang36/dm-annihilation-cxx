@@ -1,6 +1,6 @@
 /*****************************************************************************/
 // buffers.h
-// defines the pixel buffer for
+// defines the frame buffer for
 // buffer rendering or texture
 //  Author: Lin F. Yang
 //  01/18/2014
@@ -27,16 +27,18 @@ protected:
     GLuint fboId, rboId;    //framebuffer and renderbuffer ID
     unsigned int twidth, theight; //the width and height of the buffer
     void checkbuffer();     //check whether buffer is ok
-    bool  issetup;
+    bool  issetup;          //check whether setup
     
 public:     
     buffer(unsigned int w, unsigned int h);
     ~buffer();
+    
     GLuint getTex();         //get texture ID
     void bindTex();          //bind the texture
     void unbindTex();        //unbind texture
-    void setTex(GLuint tex);       //set a texture, bind it to the buffer
+    void setTex(GLuint tex); //set a texture, bind it to the buffer
     void genTex();           //generate a new texture
+    
     void attachTex();        //attach the texture
     void genBuffer();        //generate the frame buffer and render buffer
                              //and attach them together and bind buffer
@@ -45,7 +47,9 @@ public:
     void bindBuf();          //bind buffer to render
     void unbindBuf();        //unbind buffer from render
     
-    void readTex(void * tex);//read the data from the GPU
-    void saveImg(string filename);  //save the picture to file
+                             //read the data from the GPU
+                             //intFormat is the internal format
+    void readTex(void* tex, GLint intFormat);
+    //void saveImg(string filename);//save the picture to file
 };
 #endif
