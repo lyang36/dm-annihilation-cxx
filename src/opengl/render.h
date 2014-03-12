@@ -51,7 +51,7 @@ private:
     int nside_;
     
     
-    GLuint textureIni;  //initial empty texture
+    //GLuint textureIni;  //initial empty texture
 
     unsigned int windowSize;      //2^m
     unsigned int pointSize;

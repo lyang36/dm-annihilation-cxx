@@ -45,27 +45,27 @@ void render::openGLInit(){
     int argc = 1;
     char *argv[1] = {(char*)"Particle Render"};
     
+    // initialize glut
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_SINGLE);
     glutInitWindowSize(WSIZE, WSIZE);
     glutCreateWindow("Dark Matter GammaRay rendering!");
     
-//#ifndef __APPLE__
+    // initialize glut
     glewExperimental = GL_TRUE;
     glewInit();
-//#endif
     
+    // hide the window
     glutHideWindow();
     
     
+    // check whether GLSL is supported
     if (GLEW_ARB_vertex_shader && GLEW_ARB_fragment_shader)
 		printf("Ready for GLSL\n");
     else {
 		printf("No GLSL support\n");
 		exit(1);
     }
-    
-    
     
     //set up shaders and buffers
     if(!initialized){
@@ -81,14 +81,9 @@ void render::openGLInit(){
         initialized = true;
     }
     
-    //set the global pointers
-
-    //CBL = cbufferL;
-    //CBU = cbufferU;
-    //CB = CBL;
-    
     //initialize enviroment
     init();
+    
     //setup blending
     glEnable (GL_BLEND);
     glBlendFunc (GL_ONE,GL_ONE);    //blending
@@ -99,9 +94,6 @@ void render::openGLInit(){
 
 
 render::render(Parameters &par, int imsize, int pointSize, int nside){
-    //fluxmapL = NULL;
-    //fluxmapU = NULL;
-    
     par_ = & par;
     
     windowSize = imsize;
@@ -120,21 +112,13 @@ render::render(Parameters &par, int imsize, int pointSize, int nside){
     fluxmapU = new float[WSIZE*WSIZE];
     healpixmap_ = new double[12 * nside * nside];
     
-
-    
     openGLInit();
     
     init();
     
     
-    
-    
-    //bind texture
-    glBindTexture(GL_TEXTURE_2D, textureIni);
-    
-    
-    {//setup shaders L and U
-        
+    //setup shaders L and U
+    {
         //begin shader
         fshaderL->begin();
         //fshaderL->setIsUseRotm(IS_USE_NORM);
@@ -158,41 +142,22 @@ render::render(Parameters &par, int imsize, int pointSize, int nside){
         fshaderL->setopos(*par_);
         fshaderL->setrotmatrix(*par_, true);
         fshaderU->end();
-        
     }
+    
+
+    
     
     fbufferL->bindBuf();
     {
-        //start drawing
-        glPushAttrib(GL_VIEWPORT_BIT | GL_COLOR_BUFFER_BIT);
-        glViewport(0,0,WSIZE, WSIZE);
-        
-        //setup matrix
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        glOrtho(-orthsize, orthsize, -orthsize, orthsize, -100, 100);
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-        
         //clear color
         glClearColor (0.0, 0.0, 0.0, 0.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
     fbufferL->unbindBuf();
     
+    
     fbufferU->bindBuf();
     {
-        //start drawing
-        glPushAttrib(GL_VIEWPORT_BIT | GL_COLOR_BUFFER_BIT);
-        glViewport(0,0,WSIZE, WSIZE);
-        
-        //setup matrix
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        glOrtho(-orthsize, orthsize, -orthsize, orthsize, -100, 100);
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-        
         //clear color
         glClearColor (0.0, 0.0, 0.0, 0.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -212,47 +177,49 @@ render::~render(){
 }
 
 void render::init(){
+    
+    // enable texture
     glEnable(GL_TEXTURE_2D);
     glDisable(GL_DEPTH_TEST);
-    //glPixelStorei(GL_UNPACK_ALIGNMENT, 4);  
-
-    glGenTextures(1, &textureIni);
-    glBindTexture(GL_TEXTURE_2D, textureIni);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F_ARB, WSIZE, WSIZE, 0,
-             GL_RGBA, GL_UNSIGNED_BYTE, 0);
-
-    // set its parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-
-    glBindTexture(GL_TEXTURE_2D, 0);
 
     // setup some generic opengl options
+    // disable clamp
     glClampColorARB(GL_CLAMP_VERTEX_COLOR_ARB, GL_FALSE);
     glClampColorARB(GL_CLAMP_FRAGMENT_COLOR_ARB, GL_FALSE);
     glClampColorARB(GL_CLAMP_READ_COLOR_ARB, GL_FALSE);
 
-
+    // enable point sprite
     glEnable(GL_POINT_SPRITE);
     glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+    // enable gl_PointSize in vertex shader
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
    
     
+    // set Point Size
     GLfloat sizes[2];
     glGetFloatv(GL_ALIASED_POINT_SIZE_RANGE, sizes);
 	glPointParameterfARB( GL_POINT_FADE_THRESHOLD_SIZE_ARB, 1000.0 );
 	glPointParameterfARB( GL_POINT_SIZE_MIN_ARB, sizes[0]);
 	glPointParameterfARB( GL_POINT_SIZE_MAX_ARB, sizes[1]);
-    //printf("min and max point size %f, %f\n", sizes[0], sizes[1]);
 
-    //must be this
+    // set the coordinates to be lower left to avoid distortion
     glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT);
 
     glPointSize(pointSize);
+    
+    
+    //set viewport
+    glViewport(0,0,WSIZE, WSIZE);
+    
+    //setup matrix
+    // setup orthgonal matrix to projection
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(-orthsize, orthsize, -orthsize, orthsize, -100, 100);
+    
+    // setup identity to the modelview
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 }
 
 void render::drawFlux(RenderParticle * fluxdata, int numParts){
