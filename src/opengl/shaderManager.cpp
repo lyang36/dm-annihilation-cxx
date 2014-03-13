@@ -112,18 +112,18 @@ shaderObj * shaderManager::loadShaderFile(const char * vfile, const char * ffile
 
 shaderObj * shaderManager::loadShader(const char *vf, const char * ff){
     
-    GLhandleARB v,f,p; 
+    GLhandleARB v,f,p;
     shaderObj * sobj = new shaderObj();
-    v = glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
-	f = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+    v = glCreateShaderObjectARB(GL_VERTEX_SHADER);
+	f = glCreateShaderObjectARB(GL_FRAGMENT_SHADER);
     
-    glShaderSourceARB(v, 1, &vf, NULL);
-	glShaderSourceARB(f, 1, &ff, NULL);
+    glShaderSource(v, 1, &vf, NULL);
+	glShaderSource(f, 1, &ff, NULL);
     
 
     
-	glCompileShaderARB(v);
-	glCompileShaderARB(f);
+	glCompileShader(v);
+	glCompileShader(f);
     
 	printLog(v);
 	printLog(f);
@@ -133,7 +133,7 @@ shaderObj * shaderManager::loadShader(const char *vf, const char * ff){
 	glAttachObjectARB(p,f);
 	glAttachObjectARB(p,v);
     
-	glLinkProgramARB(p);
+	glLinkProgram(p);
     
     sobj->vertexShader = v;
     sobj->fragmentShader = f;
