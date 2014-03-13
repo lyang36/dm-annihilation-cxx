@@ -36,11 +36,11 @@ shadersrc.cpp: flux.vert flux.frag
 	@echo "#include <string>" >> shadersrc.cpp
 	@echo "#include \"shaders.h\"" >> shadersrc.cpp
 	@echo "const std::string fluxShader::VERTEX_SHADER_SRC = " >> shadersrc.cpp
-	@cat flux.vert | sed "s/^/\"/" | sed 's/.$$/\\\n\"/' >> shadersrc.cpp
+	@cat flux.vert | sed "s/^/\"/" | sed 's/.$$/\\n\"/' >> shadersrc.cpp
 	@echo ";" >> shadersrc.cpp
 	@echo  >> shadersrc.cpp
 	@echo "const std::string fluxShader::FRAGMENT_SHADER_SRC = " >> shadersrc.cpp
-	@cat flux.frag | sed "s/^/\"/" | sed 's/.$$/\\\n\"/' >> shadersrc.cpp
+	@cat flux.frag | sed "s/^/\"/" | sed 's/.$$/\\n\"/' >> shadersrc.cpp
 	@echo ";" >> shadersrc.cpp
 
 clean:
