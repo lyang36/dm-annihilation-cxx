@@ -7,13 +7,13 @@
 using namespace std;
 void fluxShader::loadUniform(){
 
-    rotmloc = glGetUniformLocation(shader->progmObj,"rotmatrix");
+    rotmloc = glGetUniformLocationARB(shader->progmObj,"rotmatrix");
     //printf("rotmloc, %d\n", rotmloc);
     
-    oposloc = glGetUniformLocation(shader->progmObj,"opos");
+    oposloc = glGetUniformLocationARB(shader->progmObj,"opos");
     //printf("oloc, %d\n", oposloc);
 
-    geofacloc = glGetUniformLocation(shader->progmObj,"geofac");
+    geofacloc = glGetUniformLocationARB(shader->progmObj,"geofac");
     //printf("gloc, %d\n", geofacloc);
 
     
@@ -64,27 +64,27 @@ void fluxShader::setrotm(Parameters &pars, bool updown){
 //void fluxShader::setrotmatrix(REAL * alignvec, REAL * obsvec, REAL * centvec, bool updown){
 void fluxShader::setrotmatrix(Parameters &pars, bool updown){
     setrotm(pars, updown);
-    glUniformMatrix3fv(rotmloc, 1, GL_FALSE, this->rotmatrix);
+    glUniformMatrix3fvARB(rotmloc, 1, GL_FALSE, this->rotmatrix);
     
 }
 
 void fluxShader::setopos3fv(REAL * ya){
-    glUniform3f(oposloc, ya[0], ya[1], ya[2]);
+    glUniform3fARB(oposloc, ya[0], ya[1], ya[2]);
 }
 
 
 
 void fluxShader::setopos3f(REAL x, REAL y, REAL z){
     //printf("Opos: %f %f %f\n", x, y, z);
-    glUniform3f(oposloc, x, y, z);
+    glUniform3fARB(oposloc, x, y, z);
 }
 
 void fluxShader::setgeofac3fv(REAL * ya){
-    glUniform3f(geofacloc, ya[0], ya[1], ya[2]);
+    glUniform3fARB(geofacloc, ya[0], ya[1], ya[2]);
 }
 
 void fluxShader::setgeofac3f(REAL x, REAL y, REAL z){
-    glUniform3f(geofacloc, x, y, z);
+    glUniform3fARB(geofacloc, x, y, z);
 }
 
 
