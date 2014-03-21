@@ -32,11 +32,12 @@ all: comp
 	$(CC) -o bulkvelprof bulkvelprof.o ../datareader.o ../tipsy_io.o ../halocore.o ${LFLAGS}
 	$(CC) -o sampleparts sampleparts.o ../datareader.o ../tipsy_io.o ../halocore.o ${LFLAGS}
 	$(CC) -o distribution distribution.o ../datareader.o ../tipsy_io.o ../halocore.o ${LFLAGS}
+	$(CC) -o measure_radial_clumpiness measure_radial_clumpiness.o ../datareader.o ../tipsy_io.o ../halocore.o ${LFLAGS}
 
 comp:
 	$(CC) -c rpf_shell_adi.cpp bulkvelprof.cpp rpf_shell.cpp angprofile.cpp\
 		   sampleparts.cpp rprof_adi.cpp radialprofile.cpp mapselect.cpp \
-		   distribution.cpp $(IFLAG)
+		   distribution.cpp measure_radial_clumpiness.cpp $(IFLAG)
 
 clean:
 	rm -f *.o
@@ -48,4 +49,5 @@ clean:
 	rm -f rprofile
 	rm -f rprof_adi
 	rm -f angprofile
+	rm -f measure_radial_clumpiness
 	rm -f bulkvelprof
