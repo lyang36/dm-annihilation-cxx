@@ -21,6 +21,10 @@
 // rotation matrix
 uniform mat3 rotmatrix;
 
+// physics factor
+// used to select different physics scheme
+//uniform int physfac;
+
 // the observer position
 uniform vec3 opos;
 
@@ -227,7 +231,8 @@ void main(){
         }
         
         // calculate the flux, encoded by parameter.g*parameter.r
-        float flux = parameter.r;// / (4.0 * PI * distance * distance);
+        // flux could be calculated by different physics
+        float flux = parameter.r;
         
         // the output parameters of a point sprite
         float xc, yc, r, newsize;
