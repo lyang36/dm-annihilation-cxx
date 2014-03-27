@@ -17,13 +17,13 @@ void fluxShader::loadUniform(){
     //printf("gloc, %d\n", geofacloc);
     
     physfacLoc = glGetUniformLocationARB(shader->progmObj,"physfac");
-    //printf("gloc, %d\n", geofacloc);
+    //printf("physfacLoc, %d\n", physfacLoc);
     
     scaleFacLoc = glGetUniformLocationARB(shader->progmObj,"scaleFac");
-    //printf("gloc, %d\n", geofacloc);
+    //printf("scaleFacLoc, %d\n", scaleFacLoc);
     
     isUseMaskLoc = glGetUniformLocationARB(shader->progmObj,"isUseMask");
-    //printf("gloc, %d\n", geofacloc);
+    //printf("isUseMaskLoc, %d\n", isUseMaskLoc);
 
     
 }
@@ -83,7 +83,7 @@ void fluxShader::setopos3fv(float * ya){
 
 
 void fluxShader::setPhysicsFac(int physfac){
-    glUniform1fARB(physfacLoc, physfac);
+    glUniform1iARB(physfacLoc, physfac);
 }
 
 // wether use mask? 0 no, 1 yes
