@@ -200,14 +200,24 @@ void main(){
     vec4 newpos;
     
     if(isUseMask == 1){
-        
         //discard this particle
         if(gl_Vertex.w < 0.5){
             gl_PointSize = 1.0;  //point size
             newpos = vec4(0.0, 0.0, 0.0, 1.0);
             gl_FrontColor = vec4(0, 0, 0, 0);
+            
+            gl_Position = gl_ModelViewProjectionMatrix * newpos;
+            
+            
+            gl_TexCoord[0] = gl_MultiTexCoord0;
+            
+            return;
         }
-    }else{
+        
+
+    }
+    
+    {
     
         
         // the position vector of the target particle in the frame of the observer
