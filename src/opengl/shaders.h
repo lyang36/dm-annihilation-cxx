@@ -65,6 +65,35 @@ public:
     void setgeofac3f(float x, float y, float z);
     void setgeofac3fv(float * geo);
     
+    
+    // parameter: mass, density, veldisp, hsmooth
+    // physics factor
+    // used to select different physics scheme
+    // physfac = 0: use normal method, flux = parameter.r;
+    // physfac = 1: annihilation,
+    //        flux = parameter.r * parameter.g / pow(distance, 2);
+    // physfac = 2: annihilation 1/v correction
+    //        flux = parameter.r * parameter.g / parameter.b / pow(distance, 2);
+    // physfac = 3: annihilation 1/v^2 correction
+    //        flux = parameter.r * parameter.g / pow(parameter.b, 2)
+    //            / pow(distance, 2);
+    // physfac = 4: annihilation v^2 correction
+    //        flux = parameter.r * parameter.g * pow(parameter.b, 2)
+    //            / pow(distance, 2);
+    // physfac = 5: decay
+    //        flux = parameter.r / pow(distance, 2);
+    void setPhysicsFac(int physfac);
+    
+    // wether use mask? 0 no, 1 yes
+    // if yes, use position.w as mask
+    // if w > 0.5, the point keep
+    // if w < 0.5, the point dispose
+    void setUseMask(int isUseMask);
+    
+    // set a scale factor appling to flux
+    void setScaleFac(float scaleFac);
+    
+    
     void setrotmatrix(Parameters &pars, bool updown);
     
     void setIsUseRotm(bool isrotm){
@@ -79,6 +108,9 @@ private:
     GLint rotmloc;
     GLint oposloc;
     GLint geofacloc;
+    GLint physfacLoc;
+    GLint scaleFacLoc;
+    GLint isUseMaskLoc;
     
     //setup rotation matrix, 9 variables
     //updown: true/up; false/down

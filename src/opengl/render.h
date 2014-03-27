@@ -25,13 +25,14 @@ public:
     //DataReader * reader;
     //Parameter * params;
     
-    render(Parameters &par, int imsize, int pointSize = 256, int nside = 512);
+    // physfac, scalefac, usemask: please read the shader
+    render(Parameters &par, int imsize, int pointSize = 256, int nside = 512,
+           int physFac = 0, int isUseMask = 0, float scalefac =  1.0);
     ~render();
     
     double * getHealPixMap();
     float * getUpSphere();
     float * getLowerSphere();
-    
 
     
     void rend(RenderParticle * fluxdata, int numParts);

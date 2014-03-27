@@ -91,7 +91,8 @@ void render::openGLInit(){
     
 }
 
-render::render(Parameters &par, int imsize, int pointSize, int nside){
+render::render(Parameters &par, int imsize, int pointSize, int nside,
+               int physFac, int isUseMask, float scalefac){
     par_ = & par;
     
     windowSize = imsize;
@@ -127,6 +128,11 @@ render::render(Parameters &par, int imsize, int pointSize, int nside){
         //now use the rotatation matrix
         fshaderL->setopos(*par_);
         fshaderL->setrotmatrix(*par_, false);
+        
+        fshaderL->setPhysicsFac(physFac);
+        fshaderL->setUseMask(isUseMask);
+        fshaderL->setScaleFac(scalefac);
+        
         fshaderL->end();
         
         //begin shader
@@ -137,8 +143,13 @@ render::render(Parameters &par, int imsize, int pointSize, int nside){
         fshaderU->setgeofac3f(orthsize, windowSize, pointSize);
         
         //now use the rotatation matrix
-        fshaderL->setopos(*par_);
-        fshaderL->setrotmatrix(*par_, true);
+        fshaderU->setopos(*par_);
+        fshaderU->setrotmatrix(*par_, true);
+        
+        fshaderU->setPhysicsFac(physFac);
+        fshaderU->setUseMask(isUseMask);
+        fshaderU->setScaleFac(scalefac);
+        
         fshaderU->end();
     }
     

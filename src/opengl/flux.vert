@@ -196,6 +196,9 @@ void geoTrans(in float cosphi, in float sinphi,
 
 void main(){
     
+    // the new position to be calculated
+    vec4 newpos;
+    
     if(isUseMask == 1){
         
         //discard this particle
@@ -203,180 +206,176 @@ void main(){
             gl_PointSize = 1.0;  //point size
             newpos = vec4(0.0, 0.0, 0.0, 1.0);
             gl_FrontColor = vec4(0, 0, 0, 0);
-            return;
         }
-    }
-    
-    
-    // the new position to be calculated
-    vec4 newpos;
-   
-    // the position vector of the target particle in the frame of the observer
-    // input x, y z of the particle
-    // transform it to the stereoprojection plane
-    vec3 pvec = vec3(gl_Vertex.x, gl_Vertex.y, gl_Vertex.z) - opos;
-
-    
-    // the parameters of a partilce is stored in its color
-    // mass, density and hsmooth
-    vec4 parameter = vec4(gl_Color);
-    
-    // anular radias of a particle
-    float dtheta;
-    
-    // calculated point size of the final object
-    float dsize;
- 
-    // the distance from the observer to the particle
-    float distance = length(pvec);
-    
-    // parameter.a is hsmooth, so this is the half angular size
-    // used in the gaussian parameters
-    dtheta = parameter.a / distance;    //2.186
-    float angdsize = 2.0 * dtheta;
-    
-    // rotation and normalize the position vector
-    vec3 npvec = normalize(rotmatrix * pvec);
-    
-    // caltucle the angle of the observed particle
-    float costheta = clamp(npvec.z, -1.0, 1.0);//dot(npvec, nzaxis);
-    
-    // costheta -3.0 / 5.0;
-    // now caluce theta from costheta
-    float theta = acos(costheta);      //0.955
-    
-    
-    // restrict the point is inside the circle
-    if((theta > (PI / 2.0 - 0.1) || (theta + angdsize) > (PI / 2.0 - 0.1))
-       && (angdsize < PI / 2.0+0.2))
-    {   // if the particle is in the lower sphere, do the following
-        // also ignore those particles that are too large
-        
-        // calculate sintheta
-        float sintheta = sin(theta);
-        
-        float sinphi;
-        float cosphi;
-        
-        
-        if(sintheta < 1.0e-8 ){
-            sinphi = 0.0;
-            cosphi = 1.0;
-        }else{
-            sinphi = npvec.y/sintheta;//newpvec.y / sintheta;
-            cosphi = npvec.x/sintheta;//newpvec.x / sintheta;
-        }
-        
-        // calculate the flux, encoded by parameter.g*parameter.r
-        // flux could be calculated by different physics
-        float flux;
-        
-        /*********************Gammay ray physics********************/
-        if(physfac == 0){//: use normal method,
-            flux = parameter.r;
-        }else if( physfac == 1){//: annihilation,
-            flux = parameter.r * parameter.g / (4.0 * PI * distance * distance);
-        }else if( physfac == 2){
-        // physfac = 2: annihilation 1/v correction
-            float v;    // in km/s
-            if(parameter.b < 1.0){
-                v = 1.0;
-            }else{
-                v = parameter.b;
-            }
-            flux = parameter.r * parameter.g / v
-                    / (4.0 * PI * distance * distance);
-        }else if( physfac == 3){
-        // physfac = 3: annihilation 1/v^2 correction
-        //        flux = parameter.r * parameter.g / pow(parameter.b, 2)
-            float v;    // in km/s
-            if(parameter.b < 5.0){
-                v = 5.0;
-            }else{
-                v = parameter.b;
-            }
-            flux = parameter.r * parameter.g / v / v
-            / (4.0 * PI * distance * distance);
-        }else if( physfac == 4){
-            // physfac = 4: annihilation v^2 correction
-            //        flux = parameter.r * parameter.g / pow(parameter.b, 2)
-            float v;    // in km/s
-            v = parameter.b;
-            flux = parameter.r * parameter.g * v * v
-                / (4.0 * PI * distance * distance);
-        }else if( physfac == 5){
-            // physfac = 5: decay
-            flux = parameter.r / (4.0 * PI * distance * distance);
-        }
-        
-        flux *= scaleFac;
-        
-        // the output parameters of a point sprite
-        float xc, yc, r, newsize;
-        
-        geoTrans(cosphi, sinphi, theta,
-                 angdsize, xc, yc, r, newsize);
-
-        // calculate the actuall point position on the screen
-        newpos = vec4(xc * geofac.x * (ViewSize / geofac.y),
-                      yc * geofac.x * (ViewSize / geofac.y),
-                      0.0, 1.0);
-        
-        // if the point size is less than 1, asign it to be 1
-        if(newsize < 1.0){
-            newsize = 1.0;
-        }
-        
-        // output the pointsize to the fragment shader
-        gl_PointSize = newsize;  //point size
-    
-
-
-        // particle must be written before fhe nomal fac
-        // particle = vec4(dsize, npvec.x, npvec.y, npvec.z);
-        particle = vec4(newsize, npvec.x, npvec.y, npvec.z);
-        
-        // the normalization of the particle
-        float normfac;
-        
-        // the angularsize^2
-        float d2 = dtheta * dtheta;
-        
-        // calculate normfac
-        {
-            //if(usenormmap == 0 && newsize != 1.0){
-            if(newsize != 1.0){
-#ifndef USE_ANALYTICAL_NORM
-                //use actual norm
-                float normf = calc_norm(vec2(xc, yc), newsize, dtheta);
-#else
-                //use analytical norm
-                float normf = calc_norm_approx(dtheta);
-#endif
-                
-                if(normf == 0.0){
-                    normf = 1.0;
-                }
-                normfac = 1.0 / normf;
-            }else{
-                normfac = 1.0;
-            }
-        }
-        
-        //Must add another vector (xc, yc)
-        //flux = 1.0;
-        
-        // the color is used to transfor the value of the center and norm
-        gl_FrontColor = vec4(xc, yc, flux * normfac , dtheta);
-
     }else{
-        // if the particles are in the upper sphere, remove this particle
-        
-        gl_PointSize = 1.0;  //point size
-        newpos = vec4(0.0, 0.0, 0.0, 1.0);
-        gl_FrontColor = vec4(0, 0, 0, 0);
-    }
     
+        
+        // the position vector of the target particle in the frame of the observer
+        // input x, y z of the particle
+        // transform it to the stereoprojection plane
+        vec3 pvec = vec3(gl_Vertex.x, gl_Vertex.y, gl_Vertex.z) - opos;
+        
+        
+        // the parameters of a partilce is stored in its color
+        // mass, density and hsmooth
+        vec4 parameter = vec4(gl_Color);
+        
+        // anular radias of a particle
+        float dtheta;
+        
+        // calculated point size of the final object
+        float dsize;
+        
+        // the distance from the observer to the particle
+        float distance = length(pvec);
+        
+        // parameter.a is hsmooth, so this is the half angular size
+        // used in the gaussian parameters
+        dtheta = parameter.a / distance;    //2.186
+        float angdsize = 2.0 * dtheta;
+        
+        // rotation and normalize the position vector
+        vec3 npvec = normalize(rotmatrix * pvec);
+        
+        // caltucle the angle of the observed particle
+        float costheta = clamp(npvec.z, -1.0, 1.0);//dot(npvec, nzaxis);
+        
+        // costheta -3.0 / 5.0;
+        // now caluce theta from costheta
+        float theta = acos(costheta);      //0.955
+        
+        
+        // restrict the point is inside the circle
+        if((theta > (PI / 2.0 - 0.1) || (theta + angdsize) > (PI / 2.0 - 0.1))
+           && (angdsize < PI / 2.0+0.2))
+        {   // if the particle is in the lower sphere, do the following
+            // also ignore those particles that are too large
+            
+            // calculate sintheta
+            float sintheta = sin(theta);
+            
+            float sinphi;
+            float cosphi;
+            
+            
+            if(sintheta < 1.0e-8 ){
+                sinphi = 0.0;
+                cosphi = 1.0;
+            }else{
+                sinphi = npvec.y/sintheta;//newpvec.y / sintheta;
+                cosphi = npvec.x/sintheta;//newpvec.x / sintheta;
+            }
+            
+            // calculate the flux, encoded by parameter.g*parameter.r
+            // flux could be calculated by different physics
+            float flux;
+            
+            /*********************Gammay ray physics********************/
+            if(physfac == 0){//: use normal method,
+                flux = parameter.r;
+            }else if( physfac == 1){//: annihilation,
+                flux = parameter.r * parameter.g / (4.0 * PI * distance * distance);
+            }else if( physfac == 2){
+                // physfac = 2: annihilation 1/v correction
+                float v;    // in km/s
+                if(parameter.b < 1.0){
+                    v = 1.0;
+                }else{
+                    v = parameter.b;
+                }
+                flux = parameter.r * parameter.g / v
+                / (4.0 * PI * distance * distance);
+            }else if( physfac == 3){
+                // physfac = 3: annihilation 1/v^2 correction
+                //        flux = parameter.r * parameter.g / pow(parameter.b, 2)
+                float v;    // in km/s
+                if(parameter.b < 5.0){
+                    v = 5.0;
+                }else{
+                    v = parameter.b;
+                }
+                flux = parameter.r * parameter.g / v / v
+                / (4.0 * PI * distance * distance);
+            }else if( physfac == 4){
+                // physfac = 4: annihilation v^2 correction
+                //        flux = parameter.r * parameter.g / pow(parameter.b, 2)
+                float v;    // in km/s
+                v = parameter.b;
+                flux = parameter.r * parameter.g * v * v
+                / (4.0 * PI * distance * distance);
+            }else if( physfac == 5){
+                // physfac = 5: decay
+                flux = parameter.r / (4.0 * PI * distance * distance);
+            }
+            
+            flux *= scaleFac;
+            
+            // the output parameters of a point sprite
+            float xc, yc, r, newsize;
+            
+            geoTrans(cosphi, sinphi, theta,
+                     angdsize, xc, yc, r, newsize);
+            
+            // calculate the actuall point position on the screen
+            newpos = vec4(xc * geofac.x * (ViewSize / geofac.y),
+                          yc * geofac.x * (ViewSize / geofac.y),
+                          0.0, 1.0);
+            
+            // if the point size is less than 1, asign it to be 1
+            if(newsize < 1.0){
+                newsize = 1.0;
+            }
+            
+            // output the pointsize to the fragment shader
+            gl_PointSize = newsize;  //point size
+            
+            
+            
+            // particle must be written before fhe nomal fac
+            // particle = vec4(dsize, npvec.x, npvec.y, npvec.z);
+            particle = vec4(newsize, npvec.x, npvec.y, npvec.z);
+            
+            // the normalization of the particle
+            float normfac;
+            
+            // the angularsize^2
+            float d2 = dtheta * dtheta;
+            
+            // calculate normfac
+            {
+                //if(usenormmap == 0 && newsize != 1.0){
+                if(newsize != 1.0){
+#ifndef USE_ANALYTICAL_NORM
+                    //use actual norm
+                    float normf = calc_norm(vec2(xc, yc), newsize, dtheta);
+#else
+                    //use analytical norm
+                    float normf = calc_norm_approx(dtheta);
+#endif
+                    
+                    if(normf == 0.0){
+                        normf = 1.0;
+                    }
+                    normfac = 1.0 / normf;
+                }else{
+                    normfac = 1.0;
+                }
+            }
+            
+            //Must add another vector (xc, yc)
+            //flux = 1.0;
+            
+            // the color is used to transfor the value of the center and norm
+            gl_FrontColor = vec4(xc, yc, flux * normfac , dtheta);
+            
+        }else{
+            // if the particles are in the upper sphere, remove this particle
+            
+            gl_PointSize = 1.0;  //point size
+            newpos = vec4(0.0, 0.0, 0.0, 1.0);
+            gl_FrontColor = vec4(0, 0, 0, 0);
+        }
+    }
     // calculate the final position of the particle on the screen
     gl_Position = gl_ModelViewProjectionMatrix * newpos;
     
