@@ -21,9 +21,34 @@
 // rotation matrix
 uniform mat3 rotmatrix;
 
+// parameter: mass, density, veldisp, hsmooth
 // physics factor
 // used to select different physics scheme
-//uniform int physfac;
+// physfac = 0: use normal method, flux = parameter.r;
+// physfac = 1: annihilation,
+//        flux = parameter.r * parameter.g / pow(distance, 2);
+// physfac = 2: annihilation 1/v correction
+//        flux = parameter.r * parameter.g / parameter.b / pow(distance, 2);
+// physfac = 3: annihilation 1/v^2 correction
+//        flux = parameter.r * parameter.g / pow(parameter.b, 2)
+//            / pow(distance, 2);
+// physfac = 4: annihilation v^2 correction
+//        flux = parameter.r * parameter.g * pow(parameter.b, 2)
+//            / pow(distance, 2);
+// physfac = 5: decay
+//        flux = parameter.r / pow(distance, 2);
+uniform int physfac;
+
+// wether use mask? 0 no, 1 yes
+// if yes, use position.w as mask
+// if w > 0.5, the point keep
+// if w < 0.5, the point dispose
+uniform int isUseMask;
+
+
+// a scaleFactor apply to the flux;
+uniform float scaleFac;
+
 
 // the observer position
 uniform vec3 opos;
@@ -171,6 +196,18 @@ void geoTrans(in float cosphi, in float sinphi,
 
 void main(){
     
+    if(isUseMask == 1){
+        
+        //discard this particle
+        if(gl_Vertex.w < 0.5){
+            gl_PointSize = 1.0;  //point size
+            newpos = vec4(0.0, 0.0, 0.0, 1.0);
+            gl_FrontColor = vec4(0, 0, 0, 0);
+            return;
+        }
+    }
+    
+    
     // the new position to be calculated
     vec4 newpos;
    
@@ -193,9 +230,9 @@ void main(){
     // the distance from the observer to the particle
     float distance = length(pvec);
     
-    // parameter.b is hsmooth, so this is the half angular size
+    // parameter.a is hsmooth, so this is the half angular size
     // used in the gaussian parameters
-    dtheta = parameter.b / distance;    //2.186
+    dtheta = parameter.a / distance;    //2.186
     float angdsize = 2.0 * dtheta;
     
     // rotation and normalize the position vector
@@ -232,7 +269,47 @@ void main(){
         
         // calculate the flux, encoded by parameter.g*parameter.r
         // flux could be calculated by different physics
-        float flux = parameter.r;
+        float flux;
+        
+        /*********************Gammay ray physics********************/
+        if(physfac == 0){//: use normal method,
+            flux = parameter.r;
+        }else if( physfac == 1){//: annihilation,
+            flux = parameter.r * parameter.g / (4.0 * PI * distance * distance);
+        }else if( physfac == 2){
+        // physfac = 2: annihilation 1/v correction
+            float v;    // in km/s
+            if(parameter.b < 1.0){
+                v = 1.0;
+            }else{
+                v = parameter.b;
+            }
+            flux = parameter.r * parameter.g / v
+                    / (4.0 * PI * distance * distance);
+        }else if( physfac == 3){
+        // physfac = 3: annihilation 1/v^2 correction
+        //        flux = parameter.r * parameter.g / pow(parameter.b, 2)
+            float v;    // in km/s
+            if(parameter.b < 5.0){
+                v = 5.0;
+            }else{
+                v = parameter.b;
+            }
+            flux = parameter.r * parameter.g / v / v
+            / (4.0 * PI * distance * distance);
+        }else if( physfac == 4){
+            // physfac = 4: annihilation v^2 correction
+            //        flux = parameter.r * parameter.g / pow(parameter.b, 2)
+            float v;    // in km/s
+            v = parameter.b;
+            flux = parameter.r * parameter.g * v * v
+                / (4.0 * PI * distance * distance);
+        }else if( physfac == 5){
+            // physfac = 5: decay
+            flux = parameter.r / (4.0 * PI * distance * distance);
+        }
+        
+        flux *= scaleFac;
         
         // the output parameters of a point sprite
         float xc, yc, r, newsize;
