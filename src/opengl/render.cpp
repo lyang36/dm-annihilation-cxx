@@ -226,8 +226,8 @@ void render::drawFlux(RenderParticle * fluxdata, int numParts){
     GLfloat * vetexarray = (GLfloat *) fluxdata;
     glEnableClientState (GL_VERTEX_ARRAY);
     glEnableClientState (GL_COLOR_ARRAY);
-    glColorPointer (3, GL_FLOAT, 6*sizeof(GLfloat), &(vetexarray[3]));
-    glVertexPointer (3, GL_FLOAT, 6*sizeof(GLfloat), &(vetexarray[0]));
+    glColorPointer (4, GL_FLOAT, 8*sizeof(GLfloat), &(vetexarray[4]));
+    glVertexPointer (4, GL_FLOAT, 8*sizeof(GLfloat), &(vetexarray[0]));
     
     // lower sphere
     fbufferL->bindBuf();

@@ -14,7 +14,7 @@
 #if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>
 #endif
-#include "../types.h"
+//#include "../types.h"
 #include "shaderManager.h"
 #include "../parameters.h"
 
@@ -57,13 +57,13 @@ public:
     static const string FRAGMENT_SHADER_SRC;
     
     //set opos
-    void setopos3f(REAL x, REAL y, REAL z);
-    void setopos3fv(REAL * opos);
+    void setopos3f(float x, float y, float z);
+    void setopos3fv(float * opos);
     void setopos(Parameters &pars);
     
     //set geometric factor
-    void setgeofac3f(REAL x, REAL y, REAL z);
-    void setgeofac3fv(REAL * geo);
+    void setgeofac3f(float x, float y, float z);
+    void setgeofac3fv(float * geo);
     
     void setrotmatrix(Parameters &pars, bool updown);
     
@@ -86,9 +86,9 @@ private:
     
     void loadUniform();
 
-    REAL * opos;
+    float * opos;
 
-    REAL rotmatrix[9];
+    float rotmatrix[9];
     
     //set whether use the rotation matrix
     bool isRotm;

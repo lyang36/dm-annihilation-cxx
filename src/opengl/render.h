@@ -6,11 +6,14 @@
 
 //the class for rendering a particle
 struct RenderParticle{
-    float x, y, z;
+    // w is used for other flags
+    // e.g. the flag for subhalo/halo
+    float x, y, z, w;
     
-    //final flux is calculated  as fluxfac1 * fluxfac2 / 4*pi*r^2
+    //final flux is calculated  as fluxfac1 * fluxfac2 * fluxfac3/ 4*pi*r^2
     float fluxfac1;
     float fluxfac2;
+    float fluxfac3;
     
      //smooth radius
     float hsmooth;
@@ -57,7 +60,7 @@ private:
 
     unsigned int windowSize;      //2^m
     unsigned int pointSize;
-    REAL orthsize;                //orthogonal view port size
+    float orthsize;                //orthogonal view port size
     
     void init();
     void drawFlux(RenderParticle * fluxdata, int numParts);
@@ -67,7 +70,7 @@ private:
     
     void openGLInit();
     
-    REAL * fluxmapL, *fluxmapU;   //L and U map
+    float * fluxmapL, *fluxmapU;   //L and U map
     double * healpixmap_;
     
     void readFluxMap();           //read map from the GPU
