@@ -283,8 +283,12 @@ void Parameters::initialize(){
     memParts = 10000000;
     testNum = -1;
     isNative = true;
-    baseDir = " ";
-    baseName = " ";
+    //baseDir = " ";
+    //baseName = " ";
+    partFile = "";
+    densFile = "";
+    hsmFile = "";
+    dspFile = "";
     nativeDatafile = " ";
     outputFileName = " ";
     isMask = false;
@@ -409,13 +413,25 @@ Parameters::Parameters(string ifname){
                 testNum = atoi(val);
 			}else if (temp == "datafile"){
                 nativeDatafile = (val);
-			}else if (temp == "basename"){
-                baseName = val;
-                isNative = false;
-            }else if (temp == "basedir"){
-                baseDir = val;
-                isNative = false;
-            }else if (temp == "outputmap"){
+            }
+            
+            else if (temp == "partfile"){
+                partFile = val; isNative = false;
+            }else if (temp == "densfile"){
+                densFile = val; isNative = false;
+            }else if (temp == "hsmfile"){
+                hsmFile = val; isNative = false;
+            }else if (temp == "vdspfile"){
+                dspFile = val; isNative = false;
+            }
+
+            //}else if (temp == "basename"){
+            //    baseName = val;
+            //    isNative = false;
+            //}else if (temp == "basedir"){
+            //    baseDir = val;
+            //    isNative = false;
+            else if (temp == "outputmap"){
                 outputFileName = val;
             }else if (temp == "mem_buffer"){
                 memParts = atoi(val);
@@ -558,8 +574,12 @@ void print_out_master( Parameters * master){
     if(master->isNative)
         cout << "Data File (Native): " << master->nativeDatafile << endl;
     else{
-        cout << "Data File Base Dir (XDR): " << master->baseDir << endl;
-        cout << "Data File Base Name (XDR): " << master->baseName << endl;
+        //cout << "Data File Base Dir (XDR): " << master->baseDir << endl;
+        //cout << "Data File Base Name (XDR): " << master->baseName << endl;
+        cout << "Data File (XDR): " << master->partFile << endl;
+        cout << "Density File (Smooth): " << master->densFile << endl;
+        cout << "Hsmooth File (Smooth): " << master->hsmFile << endl;
+        cout << "Velocity Disp File (Smooth) " << master->dspFile << endl;
     }
     if(master->isMask){
         cout << "MaskFile: " << master->maskFileName << endl;

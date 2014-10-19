@@ -29,7 +29,35 @@ DataReader::DataReader(string path, bool isMask, string maskfile){
     
 }
 
+
+DataReader::DataReader(
+        string partfile,
+        string densfile, 
+        string hsmoothfile,
+        string sigmafile,
+        bool isMask, string maskfile, bool isSingleFile){
+        
+    memBuffer_ = 10000000;
+    memCursor_ = 0;
+    readCursor_ = 0;
+    partNumbers_ = 0;
+    memParts_ = 0;
+    testnum_ = -1;
+    buffer_ = NULL;
+
+    isNative_ = false;
+    isMask_ = isMask;
+    isSingleFile_ = isSingleFile;
+    mask_file_name = maskfile;
+
+    particle_file_name = partfile; 
+    density_file_name = densfile; 
+    hsmooth_file_name = hsmoothfile;
+    sigmav_file_name = sigmafile; 
+}
+
 //read XDR data
+//Obsolate
 DataReader::DataReader(string basedir, string basename, bool isMask, string maskfile, bool isSingleFile){
     basedir_ = basedir;
     basename_ = basename;
@@ -91,33 +119,50 @@ bool DataReader::open(){
         xdrstdio_create(&xdrs_,fp_, XDR_DECODE);
         //read header
         int status = xdr_header(&xdrs_, &tips_);
+        numGasPart_ = tips_.nsph;
+        numStarPart_ = tips_.nstar;
         partNumbers_ = tips_.ndark;
-        
-        cerr << "Particles: " << partNumbers_ << endl;
+       
+        cerr << "Time: " << tips_.time << endl;
+        cerr << "# of bodies: " << tips_.nbodies << endl;
+        cerr << "# of gas part: " << numGasPart_ << endl;
+        cerr << "# of star part: " << numStarPart_ << endl;
+        cerr << "# of DM part: " << partNumbers_ << endl;
         
         int np;
         if(!isSingleFile_){
             densStream_.open( density_file_name.c_str(), ios::in | ios::binary);
             densStream_.read( reinterpret_cast<char*>( &np ), sizeof np );
-            if(np != partNumbers_){
+            
+            
+            if(np != tips_.nbodies){
                 fprintf(stderr,"Particle numbers in density not match.\n");
                 exit(1);
+            }
+            if(numGasPart_ != 0){
+                densStream_.seekg(numGasPart_ * sizeof(float), ios_base::cur);
             }
             
             //open hsmooth file
             hsmoothStream_.open( hsmooth_file_name.c_str(), ios::in | ios::binary);
             hsmoothStream_.read( reinterpret_cast<char*>( &np ), sizeof np );
-            if(np != partNumbers_){
+            if(np != tips_.nbodies){
                 fprintf(stderr,"Particle numbers in hsmooth not match.\n");
                 exit(1);
             }
+            if(numGasPart_ != 0){ 
+                hsmoothStream_.seekg(numGasPart_ * sizeof(float), ios_base::cur);
+            }   
             
             sigmavStream_.open( sigmav_file_name.c_str(), ios::in | ios::binary);
             sigmavStream_.read( reinterpret_cast<char*>( &np ), sizeof np);
-            if(np != partNumbers_){
+            if(np != tips_.nbodies){
                 fprintf(stderr,"Particle numbers in sigmav not match.\n");
                 exit(1);
             }
+            if(numGasPart_ != 0){            
+                sigmavStream_.seekg(numGasPart_ * sizeof(float), ios_base::cur);
+            }  
             
         }
     }

@@ -26,7 +26,9 @@ public:
     void printParameters();
     
     //for filename
-    string baseDir, baseName;
+    //string baseDir, baseName;
+    //the four inputs to the data
+    string partFile, densFile, hsmFile, dspFile;
     string nativeDatafile;
     string maskFileName;
     
