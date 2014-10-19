@@ -12,7 +12,7 @@ using namespace std;
 
 int main(int argn, char ** argv){
     if(argn != 4){
-        printf("Usage: showdark file startind endind\n");
+        printf("Usage: showdark file startind endind (input is a tipsyfile)\n");
         exit(1);
     }
     
