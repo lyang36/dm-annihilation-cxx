@@ -1,3 +1,11 @@
+***
+This tool produce GammaRay maps for annihilation and decay of dark matters.
+The input could be a tipsy file or nativefile.
+The inputs includes the the particle possitions, particle density, particle hsmooth, and particle velocity dispersions. These quantities are calculated by "smooth" code.
+
+To convert the tipsyfile to native file, use the tool in dataconverter.
+
+
 *_cuda_* are only for CUDA
 
 3 method for producing the all-skymap.
