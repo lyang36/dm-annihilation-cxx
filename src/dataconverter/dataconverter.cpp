@@ -9,19 +9,27 @@
 
 int main(int argc, const char **argv){
     int m=1;
-    string basedir = "/home/lyang/files/r200";
-    string basename =  "vl2b.00400.r200";
+    //string basedir = "/home/lyang/files/r200";
+    //string basename =  "vl2b.00400.r200";
+    string partfile = "";
+    string densfile = "";
+    string hsmfile = "";
+    string dspfile = "";
     string output = "data.bin";
     while (m<argc)
     {
         string arg = argv[m];
-        if (arg == "-base") { basedir = argv[m+1]; m++;}
-        else if (arg == "-bname") { basename = argv[m+1]; m++;}
+        if (arg == "-partfile") {partfile = argv[m+1]; m++;}
+        else if (arg == "-densfile") {densfile = argv[m+1]; m++;}
+        else if (arg == "-hsmfile") {hsmfile = argv[m+1]; m++;}
+        else if (arg == "-dspfile") {dspfile = argv[m+1]; m++;}
         else if (arg == "-output") {output = argv[m+1]; m++; }
         else {
             cout << "Usage:" << endl;
-            cout << "-base name: setup basedir of the data. Default: /home/lyang/files/r200" << endl;
-            cout << "-bname name: setup basename of the data. Default: vl2b.00400.r200" << endl;
+            cout << "-partfile: XDR datafile" << endl;
+            cout << "-densfile: density file, output by smooth" << endl;
+            cout << "-hsmfile: hsmooth radius file, output by smooth" << endl;
+            cout << "-dspfile: velocity disp file, output by smooth" << endl;
             cout << "-output name: setup output file. Default: data.bin" << endl;
             cout << "-help: watching help" << endl;
             exit(0);
@@ -29,7 +37,7 @@ int main(int argc, const char **argv){
         m ++;
     }
     
-    DataReader reader(basedir, basename);
+    DataReader reader(partfile, densfile, hsmfile, dspfile);
     reader.open();
     
     cout << "writing data to files ... " << endl;
