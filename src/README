@@ -5,6 +5,10 @@ The inputs includes the the particle possitions, particle density, particle hsmo
 
 To convert the tipsyfile to native file, use the tool in dataconverter.
 
+Note:
+    This tool only deal with dark matter particle, even in the simulation has baryonic particle, it only use dark matter particle to calculate the annihilation/decay rate.
+
+
 
 *_cuda_* are only for CUDA
 
