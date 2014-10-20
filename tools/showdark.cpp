@@ -37,9 +37,17 @@ int main(int argn, char ** argv){
     printf("Number of DM particles = %d\n",header.ndark);
     
     fp = fopen(partfile.c_str(),"r");
+    
+    
     xdrstdio_create(&xdr,fp,XDR_DECODE);
     int status = xdr_header(&xdr,&header);
     
+    if(header.nsph != 0){
+        fseek(fp, sizeof(double) + 6*sizeof(float) 
+                + header.nsph * 12 * sizeof(float),
+                0);
+    }
+
     for(int i=0; (i<header.ndark) && (i < endind); i++) {
         status = xdr_dark(&xdr,&dp);
         
