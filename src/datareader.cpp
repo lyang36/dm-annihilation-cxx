@@ -129,6 +129,12 @@ bool DataReader::open(){
         cerr << "# of star part: " << numStarPart_ << endl;
         cerr << "# of DM part: " << partNumbers_ << endl;
         
+        if(numGasPart_ != 0){
+            fseek(fp_, sizeof(double) + 6*sizeof(float) 
+                + tips_.nsph * 12 * sizeof(float),
+                0);  
+        }
+
         int np;
         if(!isSingleFile_){
             densStream_.open( density_file_name.c_str(), ios::in | ios::binary);
