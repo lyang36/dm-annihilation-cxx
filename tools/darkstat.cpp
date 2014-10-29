@@ -98,9 +98,9 @@ int main(int argn, char ** argv){
         addParticle(dp.mass);
     }
     
-    printf("# of masses: %d", num_of_mass_types);
+    printf("# of masses: %d\n", num_of_mass_types);
     for(int i = 0; i < num_of_mass_types; i++){
-        printf("Mass_%d = %10.10e, #parts = %d\n", masses[i], num_of_particles[i]);
+        printf("Mass_%d = %10.10e, #parts = %d\n", i, masses[i], num_of_particles[i]);
     }
     printf("\n");
     
