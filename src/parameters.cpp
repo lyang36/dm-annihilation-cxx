@@ -280,7 +280,7 @@ void Parameters::setupRotation(){
     
     /*********IN ORIGINAL CODE, THIS WAS KEEP**********/
     //if (gamma_t > PI/4.0)
-	
+    
     
     
     gamma_t *= -1.0;
