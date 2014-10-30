@@ -233,4 +233,5 @@ clean:
 		annmap_ogl_core_nosom  annmap_ogl_pwave  annmap_ogl_somv2\
 		decaymap_ogl_nocorr
 	@cd dataconverter; make clean
+	@cd opengl; make clean
 	@cd test; make clean
