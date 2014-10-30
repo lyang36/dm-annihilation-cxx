@@ -151,6 +151,17 @@ void Parameters::setupOthers(){
     dm.M_in_cgs = dm.M_in_GeV * 1e9 * units.eV_in_cgs / pow(natconst.c_in_cgs, 2);
 }
 
+
+/********************************************************
+ * This function set up the rotation matrix by specify a 
+ * align vector. Firstly, the observer's position has been
+ * choosen as the origin point. After that, rotate the 
+ * displacement vector of the center of the halo the the 
+ * original point to the -x direction, around the axis 
+ * r \x e1 by 90 degree. 
+ * After the r has been rotated,
+ *
+ ********************************************************/
 void Parameters::setupRotation(){
     //rotate the against an axis by 90 degree so that the original -z direction will be in +x direction
     //after that, apply a align vector, rotate against the x-direction
