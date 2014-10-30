@@ -1,3 +1,15 @@
+/*************************************************8
+ * Read the tipsy data or native data
+ *
+ * Author: Lin Yang
+ *
+ * Date: Feb. 2014
+ *
+ * ***********************************************/
+
+
+
+
 #include <fstream>
 #include <iostream>
 #include <string>
