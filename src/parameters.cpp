@@ -158,13 +158,14 @@ void Parameters::setupOthers(){
  * choosen as the origin point. After that, rotate the 
  * displacement vector of the center of the halo the the 
  * original point to the -x direction, around the axis 
- * r \x e1 by 90 degree. 
- * After the r has been rotated,
+ * r \x e1 by some angle. This angle could be calculated
+ * by the dot product. 
+ * After the r has been rotated, rotate around the x-dire-
+ * tion to align the major axis of the halo to align 
+ * horizontally.
  *
  ********************************************************/
 void Parameters::setupRotation(){
-    //rotate the against an axis by 90 degree so that the original -z direction will be in +x direction
-    //after that, apply a align vector, rotate against the x-direction
     
     double otheta = params.otheta;
   	double ophi = params.ophi;
@@ -195,7 +196,8 @@ void Parameters::setupRotation(){
     double c = - sin(otheta) * cos(ophi);
   	double t = 1.0 - c;
     
-    //double s = ey \dot r;
+    // double s = rr;
+    // cos(angle) = r.dot(ex) = c
     // ey = ez \x ex = [ 0, sin(theta) * sin(phi), cos(theta)]
     double s = rr;
     
@@ -274,8 +276,14 @@ void Parameters::setupRotation(){
   	//double gamma_t = fabs(atan(ztmp / ytmp));
     double gamma_t = fabs(atan2(ztmp, ytmp));
     
-  	if (gamma_t > PI/4.0)
-		gamma_t *= -1.0;
+  	
+    
+    /*********IN ORIGINAL CODE, THIS WAS KEEP**********/
+    //if (gamma_t > PI/4.0)
+	
+    
+    
+    gamma_t *= -1.0;
 	//cout << "GAMMA = " << gamma_t <<endl;
     
   	double rotmatrix2[][3] = { 1.0, 0.0, 0.0,
