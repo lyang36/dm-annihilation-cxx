@@ -1,3 +1,14 @@
+/****************************************************************
+ * Setup the parameters of the units, the information of the halo,
+ * the setup of the map, and the rotation matrix.
+ *
+ * Author: Lin F. Yang
+ * Date: Feb. 2014
+ *
+ * **************************************************************/
+
+
+
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -141,8 +152,8 @@ void Parameters::setupOthers(){
 }
 
 void Parameters::setupRotation(){
-    //rotate the along an axis by 90 degree so that the original -z direction will be in +x direction
-    //after that, apply a align vector, rotate alone the x-direction
+    //rotate the against an axis by 90 degree so that the original -z direction will be in +x direction
+    //after that, apply a align vector, rotate against the x-direction
     
     double otheta = params.otheta;
   	double ophi = params.ophi;
