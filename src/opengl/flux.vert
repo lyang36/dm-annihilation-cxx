@@ -15,6 +15,7 @@
 // the margin to handle the boundary problem
 #define CANVASMARGIN 0.0
 
+#define MAX_NORM 1.0e15
 //#define USE_ANALYTICAL_NORM
 
 /******************************Parameters*************************************/
@@ -87,7 +88,7 @@ float profile(in vec3 r1, in float dtheta){
     
     // use tayler seriers to calculate the angle^2
     // acos may too much error
-    float t2 = 2.0 * ( 1.0 - costheta) + 1.0/3.0*(costheta - 1.0)*(costheta - 1.0) - 4.0/45.0 * (costheta - 1.0) *(costheta - 1.0)*(costheta - 1.0);
+    float t2 = 2.0 * ( 1.0 - costheta) + 1.0/3.0 * (costheta - 1.0) * (costheta - 1.0) - 4.0 / 45.0 * (costheta - 1.0) * (costheta - 1.0) * (costheta - 1.0);
     
     // alternative method
     //float t2 = acos(costheta);
@@ -99,13 +100,18 @@ float profile(in vec3 r1, in float dtheta){
     //if(d2 > 1.0){
     //    return 0.0;
     //}
-    return exp(- 1.5 * d2);
+    float f = exp(- 1.5 * d2);
+    if((f <= 1.0)){
+    }else{
+        f = 0.0;
+    }
+    return f;
 }
 
 // reverse stereoprojection, given a point on the tangential plane, output the point on the sphere
 vec3 prev(in vec2 xy){
     float r2 = xy.x*xy.x + xy.y*xy.y;
-    return vec3(2.0 * xy.x/(1.0 + r2), 2.0 * xy.y/(1.0 + r2), (r2 - 1.0)/(r2 + 1.0));
+    return vec3(2.0 * xy.x / (1.0 + r2), 2.0 * xy.y / (1.0 + r2), (r2 - 1.0) / (r2 + 1.0));
 }
 
 
@@ -275,10 +281,13 @@ void main(){
             float flux;
             
             /*********************Gammay ray physics********************/
+            // NOTE: distance factor has been already taken care of in the
+            // c code
             if(physfac == 0){//: use normal method,
                 flux = parameter.r;
             }else if( physfac == 1){//: annihilation,
-                flux = parameter.r * parameter.g / (4.0 * PI * distance * distance);
+                flux = parameter.r * parameter.g;
+                // / (4.0 * PI * distance * distance);
             }else if( physfac == 2){
                 // physfac = 2: annihilation 1/v correction
                 float v;    // in km/s
@@ -287,8 +296,8 @@ void main(){
                 }else{
                     v = parameter.b;
                 }
-                flux = parameter.r * parameter.g / v
-                / (4.0 * PI * distance * distance);
+                flux = parameter.r * parameter.g / v;
+                /// (4.0 * PI * distance * distance);
             }else if( physfac == 3){
                 // physfac = 3: annihilation 1/v^2 correction
                 //        flux = parameter.r * parameter.g / pow(parameter.b, 2)
@@ -298,18 +307,18 @@ void main(){
                 }else{
                     v = parameter.b;
                 }
-                flux = parameter.r * parameter.g / v / v
-                / (4.0 * PI * distance * distance);
+                flux = parameter.r * parameter.g / v / v;
+                /// (4.0 * PI * distance * distance);
             }else if( physfac == 4){
                 // physfac = 4: annihilation v^2 correction
                 //        flux = parameter.r * parameter.g / pow(parameter.b, 2)
                 float v;    // in km/s
                 v = parameter.b;
-                flux = parameter.r * parameter.g * v * v
-                / (4.0 * PI * distance * distance);
+                flux = parameter.r * parameter.g * v * v;
+                /// (4.0 * PI * distance * distance);
             }else if( physfac == 5){
                 // physfac = 5: decay
-                flux = parameter.r / (4.0 * PI * distance * distance);
+                flux = parameter.r;// / (4.0 * PI * distance * distance);
             }
             
             flux *= scaleFac;
@@ -361,13 +370,21 @@ void main(){
                         normf = 1.0;
                     }
                     normfac = 1.0 / normf;
+
+
                 }else{
                     normfac = 1.0;
+                }
+
+                if((normfac < MAX_NORM) && (normfac >= 0.0)){
+                }else{
+                    normfac = 0.0;
                 }
             }
             
             //Must add another vector (xc, yc)
-            //flux = 1.0;
+            //flux = 0.0;
+            //normfac = 1.0;
             
             // the color is used to transfor the value of the center and norm
             gl_FrontColor = vec4(xc, yc, flux * normfac , dtheta);

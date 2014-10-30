@@ -3,6 +3,7 @@
 #include <rpc/types.h>
 #include <rpc/xdr.h>
 #include <cmath>
+#include <cfloat>
 
 //fits and HEALPIX
 #include <healpix_base.h>
@@ -49,7 +50,7 @@ void MapGenerator::start(){
     
 
     //remove low resolution particles
-    float hires_particle_mass = 1.0e9f;
+    float hires_particle_mass = FLT_MAX;
     for(int i = 0; i < 10; i ++){
         if(par_->params.particle_masses[i] > 0 &&
            par_->params.particle_masses[i] < hires_particle_mass){
@@ -96,6 +97,7 @@ void MapGenerator::start(){
 			fluxes = getflux(par_, current_part, distances);
             
             //test
+            //fluxes = 0.0;
             //fluxes /= (distances * distances * 4.0 * PI);
             //printf("%e\n", fluxes);
             

@@ -9,8 +9,13 @@
 // the margin to handle the boundary problem
 #define CANVASMARGIN 0.0
 
-//Constants
+// Constants
 #define PI 3.1415926535897932
+
+// overflow constant
+#define MAXFLUX 1.0e37
+
+
 
 /******************************Parameters*************************************/
 // orthsize, windowsize, pointsize
@@ -24,6 +29,9 @@ uniform sampler2D normmap;
 
 // The particle parameter passing from flux.vert
 // vec4(newsize, npvec.x, npvec.y, npvec.z);
+
+
+
 varying vec4 particle;
 
 float ViewSize = geofac.y - CANVASMARGIN * 2.0;
@@ -56,7 +64,12 @@ float profile(in vec3 r1, in float dtheta){
     //if(d2 > 1.0){
     //    return 0.0;
     //}
-    return exp(- 1.5 * d2);
+    float f = exp(- 1.5 * d2);
+    if((f <= 1.0)){
+    }else{
+        f = 0.0;
+    }
+    return f;
 }
 
 // reverse stereoprojection, given a point on the tangential plane, output the point on the sphere
@@ -71,12 +84,14 @@ float profPRJ(in vec3 r1, in float dtheta){
     //test
     //return 1.0;
     
+
     return (1.0 - r1.z) * (1.0 - r1.z) * profile(r1, dtheta);
 }
 
 
 
 void main(){
+
     
     // the new size of the pointsprite
     float newsize = particle.r;
@@ -93,6 +108,12 @@ void main(){
     // flux fac is the normalization calculated in vert
     float fluxfac = gl_Color.b;
     
+    if(fluxfac < MAXFLUX  && (fluxfac >= 0.0)){
+
+    }else{
+        fluxfac = 0.0;
+    }
+
     // rasterizing the point sprite
 	if(newsize > 1.0){
 		if(fluxfac > 0.0){
@@ -133,6 +154,11 @@ void main(){
             // use the actual norm
 			flux = fluxfac  * profPRJ(prev(xyr), dtheta);
             
+            if(flux < 4.0 * fluxfac){
+
+            }else{
+                discard;
+            }
             //profile(prev(xyr), dtheta) * 4.0/(1.0+pr2)/(1.0+pr2);
             
             //use analytical norm
@@ -146,6 +172,7 @@ void main(){
 			discard;
 		}
 	}else{
+
 		gl_FragColor = vec4(fluxfac, 0, 0, 1.0);
 	}
 }

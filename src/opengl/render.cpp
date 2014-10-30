@@ -278,12 +278,11 @@ void render::readFluxMap(){
 
     /********DEBUG***********/
     /*for(int i = 0; i < WSIZE * WSIZE; i++){
-        if(isnan(fluxmapL[i]) || isnan(fluxmapU[i]) ||
-                fluxmapL[i] > 1000000.0 ||fluxmapU[i] > 1000000.0){
+        if(isnan(fluxmapL[i]) || isnan(fluxmapU[i])){
             printf("%d %d %f %e %e\n", 
                     i % WSIZE, 
                     (i / WSIZE) % WSIZE, 
-                    sqrt(pow(i % WSIZE - WSIZE/2, 2) + pow(i / WSIZE % WSIZE - WSIZE/2, 2))
+                    sqrt(pow(i % WSIZE - WSIZE / 2.0, 2) + pow((i / WSIZE) % WSIZE - WSIZE / 2.0, 2)),
                     fluxmapL[i], fluxmapU[i]);
         }
     }*/
@@ -312,7 +311,7 @@ double render::_getPixel(double x, double y, bool isUp){
     //if(isnan(flux)){
     //    printf("%d %f %f %f\n", ind, x, y, sqrt(x*x + y*y));
     //}
-    if(isnan(flux)){
+    if(isnan(flux) || isinf(flux)){
         flux = 0.0;
     }
 
