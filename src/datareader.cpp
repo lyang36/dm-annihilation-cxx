@@ -131,6 +131,11 @@ bool DataReader::open(){
         xdrstdio_create(&xdrs_,fp_, XDR_DECODE);
         //read header
         int status = xdr_header(&xdrs_, &tips_);
+        if(status != 1) {
+            fprintf(stderr,"Problem reading tipsy header.\n");
+            exit(1);
+        }
+
         numGasPart_ = tips_.nsph;
         numStarPart_ = tips_.nstar;
         partNumbers_ = tips_.ndark;
@@ -189,7 +194,7 @@ bool DataReader::open(){
         int np;
         maskStream_.open( mask_file_name.c_str(), ios::in | ios::binary);
         maskStream_.read( reinterpret_cast<char*>( &np ), sizeof np );
-        if(np != partNumbers_){
+        if(np != (int) partNumbers_){
             fprintf(stderr,"Particle numbers in mask file not match.\n");
             exit(1);
         }
@@ -237,7 +242,7 @@ void DataReader::loadBuffer(){
         float hsmooth = 0;
         float sigmav = 0;
         int status;
-        for(i = 0; i < (memParts_); i++){
+        for(i = 0; i < ((int) memParts_); i++){
             status = xdr_dark(&xdrs_, &(dp));
             if (status != 1) {
                 fprintf(stderr,"Error reading dark particle from input file.\n");
@@ -258,7 +263,7 @@ void DataReader::loadBuffer(){
     if(isMask_){
         char * mask = new char[memParts_];
         maskStream_.read(mask, sizeof(char) * memParts_);
-        for(int i = 0; i < memParts_; i++){
+        for(int i = 0; i < (int)memParts_; i++){
             if(mask[i] == 0){
                 buffer_[i].dens = -1;
             }

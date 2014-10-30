@@ -1,5 +1,5 @@
 
-CC=g++
+CC=g++ -O3 -Wall 
 #must setup these 2 lib to compile
 #FITSIOLIB=/Users/lyang/Tools/cfitsio
 #HEALPIXHOME=/Users/lyang/Tools/Healpix_3.00

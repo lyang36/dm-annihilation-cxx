@@ -29,8 +29,8 @@ OGLIFLAG=-I /usr/include/GL/ -I./ -I../ -I$(HEALPIXSRC) -I$(FITSIOLIB)
 
 NVCCARGS=-arch=sm_20
 
-C=gcc
-CC=g++
+C=gcc -O3 -Wall
+CC=g++ -O3 -Wall
 OBJS=main.o datareader.o tipsy_io.o parameters.o mapgenerator.o\
 	 genmap.o anglefuncs.o datatypes.o
 
@@ -164,7 +164,7 @@ cuda-decay-render:
 
 ogl-comp:
 	@cd opengl; make
-	g++ -c genmap_ogl.cpp $(IFLAG) $(OGLIFLAG)
+	$(CC) -c genmap_ogl.cpp $(IFLAG) $(OGLIFLAG)
 
 ogl-render: ogl-ann-nosom ogl-ann-adi ogl-ann-core-nosom ogl-ann-somv ogl-ann-somv2\
 	ogl-ann-pwave ogl-decay

@@ -43,7 +43,6 @@ void MapGenerator::start(){
     int Np = reader_->getPartNum();
     
     int rec = Np / 50;
-    int ll = 0;
     cout << "Creating map!!!" << endl;
 	cout << "---10---20---30---40---50---60---70---80---90--100%\n";
     

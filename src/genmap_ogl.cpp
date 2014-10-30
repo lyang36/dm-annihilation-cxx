@@ -23,10 +23,10 @@
 void MapGenerator::start(){
     MAPTYPE distances;
     MAPTYPE fluxes;
-    MAPTYPE angular_radius;
-    MAPTYPE costheta;
-	MAPTYPE theta;
-	MAPTYPE phi;
+    //MAPTYPE angular_radius;
+    //MAPTYPE costheta;
+	//MAPTYPE theta;
+	//MAPTYPE phi;
     RenderParticle * renderParts = NULL;
     
     //MAPTYPE unit_factor = pow(pow((par_ -> natconst.c_in_cgs), 2) /
@@ -35,8 +35,8 @@ void MapGenerator::start(){
     
 	int Nside = par_->map.Nside;
 	int Npix = par_->map.Npix;
-    MAPTYPE dOmega = par_->map.dOmega;
-    MAPTYPE theta0 = acos( 1.0 - dOmega/(2.0*3.141592) );
+    //MAPTYPE dOmega = par_->map.dOmega;
+    //MAPTYPE theta0 = acos( 1.0 - dOmega/(2.0*3.141592) );
     map_ = new double[Npix];
 
     Healpix_Base base(Nside, RING, SET_NSIDE);
@@ -44,7 +44,7 @@ void MapGenerator::start(){
     int Np = reader_->getPartNum();
     
     int rec = Np / 50;
-    int ll = 0;
+    //int ll = 0;
 
     
 
@@ -108,9 +108,14 @@ void MapGenerator::start(){
             renderParts[i].fluxfac1 = fluxes;
             renderParts[i].fluxfac2 = 1.0;
             renderParts[i].hsmooth = current_part.hsmooth;
-			
+
+            /*************DEBUG********************/
+		    if(isnan(fluxes)){
+                printf("%d\n", i);
+            }
+
+
 		}
-        //printf("ok\n");
         oglRender.rend(renderParts, reader_->getMemparts());
 		reader_->loadBuffer();
     }

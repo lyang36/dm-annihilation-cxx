@@ -269,12 +269,24 @@ void render::readFluxMap(){
 
 
     fbufferL -> bindTex();
-    glGetTexImage(GL_TEXTURE_2D,0,GL_RED,GL_FLOAT,fluxmapL);
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, fluxmapL);
     fbufferL->unbindTex();
     
     fbufferU -> bindTex();
-    glGetTexImage(GL_TEXTURE_2D,0,GL_RED,GL_FLOAT,fluxmapU);
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, fluxmapU);
     fbufferU->unbindTex();
+
+    /********DEBUG***********/
+    /*for(int i = 0; i < WSIZE * WSIZE; i++){
+        if(isnan(fluxmapL[i]) || isnan(fluxmapU[i]) ||
+                fluxmapL[i] > 1000000.0 ||fluxmapU[i] > 1000000.0){
+            printf("%d %d %f %e %e\n", 
+                    i % WSIZE, 
+                    (i / WSIZE) % WSIZE, 
+                    sqrt(pow(i % WSIZE - WSIZE/2, 2) + pow(i / WSIZE % WSIZE - WSIZE/2, 2))
+                    fluxmapL[i], fluxmapU[i]);
+        }
+    }*/
 }
 
 void render::rend(RenderParticle * fluxdata, int numParts){
@@ -288,12 +300,23 @@ double render::_getPixel(double x, double y, bool isUp){
     isUp = _getTexCoord(x, y, d, isUp);
     int ind = (int)floor((WSIZE / 2 - y - 1) * WSIZE + x + WSIZE / 2);
     
+    double flux;
     if(isUp){
-        return fluxmapU[ind];
+        flux = fluxmapU[ind];
     }
     else{
-        return fluxmapL[ind];
+        flux = fluxmapL[ind];
     }
+
+    /*****DEBUG**********/
+    //if(isnan(flux)){
+    //    printf("%d %f %f %f\n", ind, x, y, sqrt(x*x + y*y));
+    //}
+    if(isnan(flux)){
+        flux = 0.0;
+    }
+
+    return flux;
 }
 
 
@@ -358,6 +381,12 @@ double render::_getpixflux(double x, double y, double z){
     double fr1 = (x2 - xc) / (x2 - x1) * f11 + (xc - x1) / (x2 - x1) * f21;
     double fr2 = (x2 - xc) / (x2 - x1) * f12 + (xc - x1) / (x2 - x1) * f22;
     flux = (y2 - yc) / (y2 - y1) * fr1 + (yc - y1) / (y2 - y1) * fr2;
+    
+    /******DEBUG**********/
+    //if(isnan(flux))
+    //    printf("%e %e %e %e %e\n", flux, f11, f12, f21, f22);
+
+
     return flux;
 }
 
@@ -369,9 +398,9 @@ void render::convertToHealpixMap(){
     int npix = nside * nside * 12;
     healmap = healpixmap_;
     
-    double _rffmin = 1.0e36;
-    double _rffmax = 0.0;
-    double total_f = 0.0;
+    //double _rffmin = 1.0e36;
+    //double _rffmax = 0.0;
+    //double total_f = 0.0;
     
     Healpix_Base base(nside, RING, SET_NSIDE);
 
@@ -389,7 +418,11 @@ void render::convertToHealpixMap(){
         }
         double pr = sqrt(1 - this_vec.z * this_vec.z)/(1-this_vec.z);
         healmap[i] = flux / (4.0 / (1 + pr*pr)/(1 + pr*pr))
-            * WSIZE * WSIZE / 4.0 *  par_->map.dOmega;;
+            * WSIZE * WSIZE / 4.0 *  par_->map.dOmega;
+
+        /***DEBUG****/
+        //if(isnan(healmap[i]))
+        //    printf("%e %e\n", healmap[i], flux);
         
     }
 }

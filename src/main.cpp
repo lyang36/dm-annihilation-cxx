@@ -66,7 +66,8 @@ int main(int argc, const char **argv){
     printf("Finished....\nMap saved as fits file in %s.\n", par.outputFileName.c_str());
    
     string command = "map2tga " + par.outputFileName + " " + par.outputFileName + ".tga -log -bar -lon 180";
-    system(command.c_str());
+    if(0 == system(command.c_str()))
+        //Do nothing;
 
     delete reader;
 }

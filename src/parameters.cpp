@@ -286,9 +286,9 @@ void Parameters::setupRotation(){
     gamma_t *= -1.0;
 	//cout << "GAMMA = " << gamma_t <<endl;
     
-  	double rotmatrix2[][3] = { 1.0, 0.0, 0.0,
-        0.0, cos(gamma_t), sin(gamma_t),
-        0.0, -sin(gamma_t), cos(gamma_t)};
+  	double rotmatrix2[3][3] = { {1.0, 0.0, 0.0},
+        {0.0, cos(gamma_t), sin(gamma_t)},
+        {0.0, -sin(gamma_t), cos(gamma_t)}};
     
     /*double rotmatrix2[][3] = { 1.0, 0.0, 0.0,
         0.0, 1, 0,
