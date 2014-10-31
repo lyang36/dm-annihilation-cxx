@@ -164,6 +164,7 @@ void MapGenerator::start(){
     for(int i = 0; i < Npix; i++){
         totalC += map_[i];
         
+        // make the final units to be GeV^2/cm^6/sr
         map_[i] /= par_->map.dOmega;
     }
     

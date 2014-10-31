@@ -100,7 +100,7 @@ private:
     unsigned int numGasPart_; //number of Gas particle
     unsigned int numStarPart_;//number of star particle
     unsigned int readCursor_; //the read Cursor of the file
-    bool isopen_d;  //is open?
+    //bool isopen_d;  //is open?
     unsigned int memBuffer_;  //how many particles should be load in the buffer
     //default 10^6
     
