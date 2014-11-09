@@ -144,7 +144,10 @@ int main(int argc, const char **argv){
     DataReader &reader = *preader;
     reader.open();
 
-    static HaloCore halocore;
+    HaloCore * phalocore;
+    if(isCore){
+        phalocore = new HaloCore();
+    }
 
     double minsigmaav = 1.0e99;
     double maxsigmaav = 0.0;
@@ -171,7 +174,7 @@ int main(int argc, const char **argv){
                 double corr = 1.0;
                 // Correlation
                 if(isCore){
-                    corr = halocore.getCorrection(part.posx, part.posy, part.posz);
+                    corr = phalocore->getCorrection(part.posx, part.posy, part.posz);
                 }
                 int ind = r / dr;
                 databins[ind] += part.mass / (4 * PI / 3
@@ -189,6 +192,7 @@ int main(int argc, const char **argv){
     fprintf(stderr, "Sigma V range: [%f %e], total mass: %10e\n", minsigmaav, maxsigmaav, totalmass);
     
     reader.close();
+    delete phalocore;
     
     for(int i = 0; i < numbins; i++){
         if(countbins[i] != 0){

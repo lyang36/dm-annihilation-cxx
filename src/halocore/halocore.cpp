@@ -10,9 +10,10 @@ using namespace std;
 #define RADIUS_RATIO (4.0 / 402.0)
 #define SAT_RADIUS (1.0 / 40000.0 / RADIUS_RATIO)
 
-static const string halo_core_file_name_ = "./halocore/VL2_Halos.data";
+//static const string halo_core_file_name_ = "./halocore/VL2_Halos.data";
 
-HaloCore::HaloCore(){
+HaloCore::HaloCore(string halo_core_file_name_){
+    //halo_core_file_name_ = "./halocore/VL2_Halos.data";
     int number_of_lines = 0;
     std::string line;
     std::ifstream counterfile(halo_core_file_name_.c_str());

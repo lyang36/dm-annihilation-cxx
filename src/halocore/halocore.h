@@ -14,10 +14,11 @@ public:
 
 class HaloCore{
 public:
-    HaloCore(); //initialize
+    HaloCore(std::string halofile = "./halocore/VL2_Halos.data");
     ~HaloCore();
     MAPTYPE getCorrection(float x, float y, float z);
 private:
+    std::string halo_core_file_name_;
     std::string haloDataFiles_; 
     MAPTYPE coreFunc(float x, float y, float z, 
                     float hxc, float hyc, float hzc, float radius);
