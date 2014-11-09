@@ -192,7 +192,9 @@ int main(int argc, const char **argv){
     fprintf(stderr, "Sigma V range: [%f %e], total mass: %10e\n", minsigmaav, maxsigmaav, totalmass);
     
     reader.close();
-    delete phalocore;
+    if(isCore){
+        delete phalocore;
+    }
     
     for(int i = 0; i < numbins; i++){
         if(countbins[i] != 0){
