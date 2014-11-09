@@ -1,3 +1,14 @@
+/***********************************************
+ * Measure the radial profile of the simulation
+ * from a center, using shell bins
+ * Outputs are in code units.
+ *
+ * Author: Lin Yang
+ * Date: Feb/2014
+ * ********************************************/
+
+
+
 //fits and HEALPIX
 //measure the density field using shell method 
 
@@ -28,8 +39,8 @@ void printUsage(const char * s){
            "-b <baseName> for tipsyfile only\n"
            "-f <fitsfilename>\n"
            "-n <num of bins>\n"
-           "-r <radius>\n"
-           "-c <x>, <y>, <z>\n"
+           "-r <radius (code units)>\n"
+           "-c <x>, <y>, <z> (code units)\n"
            "-m <maskfile>\n"
            "-core\n", s);
 }
@@ -114,8 +125,8 @@ int main(int argc, const char **argv){
     
     fprintf(stderr, "Filename: %s\n", filename.c_str());
     fprintf(stderr, "Bins: %d\n", numbins);
-    fprintf(stderr, "Radius: %f (kpc/h)\n", radius);
-    fprintf(stderr, "x y z: %f %f %f (40 Mpc/h)\n", x, y, z);
+    fprintf(stderr, "Radius: %f (code units)\n", radius);
+    fprintf(stderr, "x y z: %f %f %f (code units)\n", x, y, z);
     if(isMask){
         fprintf(stderr, "Mask: %s\n", maskfile.c_str());
     }
@@ -155,17 +166,13 @@ int main(int argc, const char **argv){
             double r = sqrt((part.posx - x) *(part.posx - x) +
                             (part.posy - y) *(part.posy - y) +
                             (part.posz - z) *(part.posz - z));
-            r *= (40000.0);
+            //r *= (40000.0);
             if((r < radius)){// && (part.dens > 0)){
-                //if(r < radius * 18.0 / 400.0)
-                    //printf("%f %f %f %f %f %f\n", r, radius, radius * 18.0 / 400.0, part.posx, part.posy, part.posz);
                 double corr = 1.0;
+                // Correlation
                 if(isCore){
                     corr = halocore.getCorrection(part.posx, part.posy, part.posz);
                 }
-                //if(corr != 1.0){
-                //    printf("%f\n", corr);
-                //}
                 int ind = r / dr;
                 databins[ind] += part.mass / (4 * PI / 3
                                               * (pow((ind+1.0) * dr, 3) - pow((ind) * dr, 3)));//part.dens * corr;
