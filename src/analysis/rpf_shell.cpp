@@ -2,6 +2,12 @@
  * Measure the radial profile of the simulation
  * from a center, using shell bins
  * Outputs are in code units.
+ * 
+ * Three colume are output: 
+ *  [rbin], [density], [mean radius]
+ *
+ *  the mean radius is the mean of radius of all
+ *  particles in the bin
  *
  * Author: Lin Yang
  * Date: Feb/2014
@@ -42,17 +48,25 @@ void printUsage(const char * s){
            "-r <radius (code units)>\n"
            "-c <x>, <y>, <z> (code units)\n"
            "-m <maskfile>\n"
-           "-core\n", s);
+           "-core\n" 
+           "-log <rmin> (using log bins)\n", s);
 }
 
 
 int main(int argc, const char **argv){
     int numbins = 100;
+    
     double radius;
+    double rmin = 0.0;
+    double logbase = 10.0;    /*for log bins, r = rmin * b^n */
+
     double theta, phi;
+
     double * databins;
     //double * angbins;
     double * countbins;
+    double * mean_radius;
+    
     double dr, x, y, z;
     string baseName = "";
     string filename = "";
@@ -60,6 +74,7 @@ int main(int argc, const char **argv){
     bool isMask = false;
     bool isCore = false;
     bool isTipsy = false;
+    bool isLog = false;
     
     int m=1;
     //printf("ok!\n");
@@ -101,7 +116,18 @@ int main(int argc, const char **argv){
             m+=1;
         }else if (arg == "-core") {
             isCore = true;
-        }else{
+        }else if (arg == "-log"){
+            isLog = true;
+            ss << argv[m+1];
+            ss >> rmin;
+
+            if(rmin <= 0.0){
+                printf("Mininum radius must be positive!\n");
+                exit(1);
+            }
+            m ++;
+        }
+        else{
             printUsage(argv[0]);
             exit(1);
         }
@@ -117,7 +143,13 @@ int main(int argc, const char **argv){
     
     databins = new double[numbins];
     countbins = new double[numbins];
+    mean_radius = new double[numbins];
     
+    
+    if(isLog){
+        logbase = pow((radius / rmin), 1.0 / numbins);
+    }
+
     for(int i = 0; i < numbins; i++){
         databins[i] = 0;
         countbins[i] = 0;
@@ -127,6 +159,10 @@ int main(int argc, const char **argv){
     fprintf(stderr, "Bins: %d\n", numbins);
     fprintf(stderr, "Radius: %f (code units)\n", radius);
     fprintf(stderr, "x y z: %f %f %f (code units)\n", x, y, z);
+    if(isLog){
+        fprintf(stderr, "LogBase: %f\n", logbase);
+        fprintf(stderr, "Rmin: %f\n", rmin);
+    }
     if(isMask){
         fprintf(stderr, "Mask: %s\n", maskfile.c_str());
     }
@@ -176,9 +212,42 @@ int main(int argc, const char **argv){
                 if(isCore){
                     corr = phalocore->getCorrection(part.posx, part.posy, part.posz);
                 }
-                int ind = r / dr;
+                int ind = 0;
+                if(! isLog){
+                    ind = r / dr;
+                }else{
+                    if(r == 0.0){
+                        ind = 0;
+                    }else{
+                        ind = (int) (log(r / rmin) / log(logbase));
+                    }
+                }
+                if(ind < 0){
+                    ind = 0;
+                }
+                if(r >= numbins){
+                    r = numbins - 1;
+                }
+
+                double r0;
+                double r1;
+
+                if(isLog){
+                    if(ind == 0){
+                        r0 = 0.0;
+                    }else{
+                        r0 = pow(logbase, ind - 1) * rmin;
+                    }
+
+                    r1 = pow(logbase, ind) * rmin;
+                }else{
+                    r0 = ind * dr;
+                    r1 = r0 + dr;
+                }
+
+                mean_radius[ind] += r;
                 databins[ind] += part.mass / (4 * PI / 3
-                                              * (pow((ind+1.0) * dr, 3) - pow((ind) * dr, 3)));//part.dens * corr;
+                                              * (pow(r1, 3) - pow(r0, 3)));//part.dens * corr;
                 countbins[ind] ++;
                 totalmass += part.mass * corr;
             }
@@ -197,13 +266,32 @@ int main(int argc, const char **argv){
     }
     
     for(int i = 0; i < numbins; i++){
+        double ri = 0.0;
+        if(isLog){
+            ri = pow(logbase, i) * rmin;
+        }else{
+            ri = i * dr; 
+        } 
+
+
         if(countbins[i] != 0){
-            //databins[i] /= countbins[i];
+            mean_radius[i] /= ((double) countbins[i]);
         }else{
             databins[i] = 0.0;
+
+            /*the center of the bin*/
+            double r0 = 0;
+            if(i > 0){
+                if(isLog){
+                    r0 = pow(logbase, i - 1.0) * rmin;
+                }else{
+                    r0 = (i - 1.0) * dr;
+                }
+            }
+            mean_radius[i] = (r0 + ri) / 2.0;
         }
-        
-        printf("%f %e\n", i * dr, databins[i]);
+       
+        printf("%1.20lf %1.20le %1.20le\n", ri, databins[i], mean_radius[i]);
     }
     
     delete[] databins;
