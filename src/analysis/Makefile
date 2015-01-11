@@ -33,14 +33,17 @@ all: comp
 	$(CC) -o sampleparts sampleparts.o ../datareader.o ../tipsy_io.o ../halocore.o ${LFLAGS}
 	$(CC) -o distribution distribution.o ../datareader.o ../tipsy_io.o ../halocore.o ${LFLAGS}
 	$(CC) -o measure_radial_clumpiness measure_radial_clumpiness.o ../datareader.o ../tipsy_io.o ../halocore.o ${LFLAGS}
+	$(CC) -o shell_clumpiness_distribution shell_clumpiness_distribution.o ../datareader.o ../tipsy_io.o ../halocore.o  ${LFLAGS}
+
 
 comp:
 	$(CC) -c rpf_shell_adi.cpp bulkvelprof.cpp rpf_shell.cpp angprofile.cpp\
 		   sampleparts.cpp rprof_adi.cpp radialprofile.cpp mapselect.cpp \
-		   distribution.cpp measure_radial_clumpiness.cpp $(IFLAG)
+		   distribution.cpp measure_radial_clumpiness.cpp shell_clumpiness_distribution.cpp $(IFLAG)
 
 clean:
 	rm -f *.o
+	rm -f shell_clumpiness_distribution
 	rm -f sampleparts
 	rm -f rpf_shell_adi
 	rm -f rpf_shell

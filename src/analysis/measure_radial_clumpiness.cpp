@@ -1,5 +1,7 @@
 // measure the clumpniness in a shell
-// get the result of <rho^2>/<rho>^2 of each shell
+// get the result of int <rho^2> int <rho>^2 of each shell
+// int <rho^2>  \approx rho m
+// int <rho> \approx mass
 
 #include <sstream>
 #include <string>
@@ -72,8 +74,8 @@ int main(int argc, const char **argv){
             r *= simsize;
             int inds = floor(r / dr);
             if((inds < numbins) && (part.dens > 0)){
-                rhobins[inds] += part.dens;
-                rhosqbins[inds] += part.dens * part.dens;
+                rhobins[inds] += part.mass;//part.dens;
+                rhosqbins[inds] += part.dens * part.mass;// * part.dens;
                 countbins[inds] ++;
             }
             cts ++;
