@@ -1,3 +1,8 @@
+Note:
+    VL2 has different formats in tipsy files.
+    use tostd to conver to standard version.
+
+
 Tools:
     1. angprofile.cpp > angprofile
         	measure the angular density of HEALPix Map fits file

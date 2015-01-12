@@ -47,7 +47,9 @@ vector<int> loadSelectedHaloIds(string fn);
 int main(int argc, const char **argv){
    string datafilename = 
        "/grouphome/gwln2/data2/dss001/vialactea/snapshots/vl2b.00400";
+       //"/grouphome/gwln2/data2/dss001/vialactea/r200/vl2b.00400.r200";
    string halocatalog = 
+       //"/grouphome/gwln2/data2/dss001/vialactea/r200/vl2b.00400.r200";
        "/grouphome/gwln2/home/lyang/data/VL2Halos/vl_400_rhovesc.z0.000.AHF_particles";
    string haloselected = 
        "/home/lyang/iPythonNoteBooks/darkmatter_clumpiness/subhalos_6_10.txt";
@@ -91,6 +93,8 @@ int main(int argc, const char **argv){
            vely = haloParts[i][j].vel[1];
            velz = haloParts[i][j].vel[2];
 
+           printf("%f %f %f\n", velx, vely, velz);
+
            double velsq = velx * velx + vely * vely + velz * velz;
            
            average_velmag[i] += sqrt(velsq);
@@ -110,6 +114,7 @@ int main(int argc, const char **argv){
    if(oputfile.good()){
        oputfile << "#num of halos\n"; 
        oputfile << "#ID <vx> <vy> <vz> <vx^2> <vy^2> <vz^2> <v> <v^2>\n";
+       oputfile << haloPartIds.size() << endl;
        for(unsigned int i = 0; i < haloPartIds.size(); i++){
             oputfile << average_velx[i] << " ";
             oputfile << average_vely[i] << " ";
@@ -221,8 +226,21 @@ vector<vector<Pdm> > loadHaloParticles(vector<set<int> > haloPartIds, string fn)
     printf("Number of DM particles = %d\n",header.ndark);
 
     fp = fopen(fn.c_str(),"r");
+    
+    if( NULL == fp ){
+        fprintf(stderr, "DATAFILE ERROR!\n");
+        exit(1);
+    }  
+
     xdrstdio_create(&xdr,fp,XDR_DECODE);
     int status = xdr_header(&xdr,&header);
+    
+    if(header.nsph != 0){ 
+        fseek(fp, sizeof(double) + 6*sizeof(float) 
+                + header.nsph * 12 * sizeof(float),
+                0); 
+    }
+
     for(int i=0; i<header.ndark; i++) {
         if (status != 1) {
             fprintf(stderr,"Error reading dark particle from input file.\n");
@@ -230,10 +248,12 @@ vector<vector<Pdm> > loadHaloParticles(vector<set<int> > haloPartIds, string fn)
 
         }
         status = xdr_dark(&xdr,&dp);
+
         if(i % 10000 == 0){
             printf("\r %2.2f%%", 100.0 * (double)(i) / (double)(header.ndark));
             cout.flush();
         }
+
         if(totalSet.end() != totalSet.find(i)){
             //insert into the list
             for(unsigned int j = 0; j < haloPartIds.size(); j++){
@@ -242,6 +262,10 @@ vector<vector<Pdm> > loadHaloParticles(vector<set<int> > haloPartIds, string fn)
                 }
             }
         }
+        
+        printf("%f %f %f\n", dp.vel[0], dp.vel[1], dp.vel[2]);
+        //DEBUG TEST
+        if(i > 10000) break;
     }
     printf("\n"); 
     fclose(fp);
