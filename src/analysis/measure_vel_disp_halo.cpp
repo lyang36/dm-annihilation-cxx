@@ -46,7 +46,8 @@ vector<int> loadSelectedHaloIds(string fn);
 
 int main(int argc, const char **argv){
    string datafilename = 
-       "/grouphome/gwln2/data2/dss001/vialactea/snapshots/vl2b.00400";
+       "/grouphome/gwln2/scratch/gwln2/lyang/data/vl2b.00400.std";
+       //"/grouphome/gwln2/data2/dss001/vialactea/snapshots/vl2b.00400";
        //"/grouphome/gwln2/data2/dss001/vialactea/r200/vl2b.00400.r200";
    string halocatalog = 
        //"/grouphome/gwln2/data2/dss001/vialactea/r200/vl2b.00400.r200";
@@ -92,8 +93,9 @@ int main(int argc, const char **argv){
            velx = haloParts[i][j].vel[0];
            vely = haloParts[i][j].vel[1];
            velz = haloParts[i][j].vel[2];
-
-           printf("%f %f %f\n", velx, vely, velz);
+            
+           //TEST
+           //printf("%f %f %f\n", velx, vely, velz);
 
            double velsq = velx * velx + vely * vely + velz * velz;
            
@@ -263,9 +265,9 @@ vector<vector<Pdm> > loadHaloParticles(vector<set<int> > haloPartIds, string fn)
             }
         }
         
-        printf("%f %f %f\n", dp.vel[0], dp.vel[1], dp.vel[2]);
+        //printf("%f %f %f\n", dp.vel[0], dp.vel[1], dp.vel[2]);
         //DEBUG TEST
-        if(i > 10000) break;
+        //if(i > 10000) break;
     }
     printf("\n"); 
     fclose(fp);
